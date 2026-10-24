@@ -1,0 +1,2 @@
+import {defineConfig} from '@playwright/test';
+export default defineConfig({testDir:'tests/e2e',fullyParallel:false,workers:1,timeout:60000,reporter:'list',use:{baseURL:'http://127.0.0.1:4317',channel:process.env.CI?undefined:'chrome',headless:true,acceptDownloads:false,trace:'off',video:'off',screenshot:'off'},webServer:{command:'npm run dev',url:'http://127.0.0.1:4317/health',reuseExistingServer:true,env:{NODE_ENV:'production'},timeout:30000}});

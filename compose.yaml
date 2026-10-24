@@ -1,0 +1,47 @@
+name: araread
+services:
+  db:
+    image: postgres:17.11
+    ports: ["127.0.0.1:56432:5432"]
+    environment:
+      POSTGRES_DB: araread
+      POSTGRES_PASSWORD: araread-local-admin-only
+    volumes:
+      - araread_pg:/var/lib/postgresql/data
+      - ./scripts/local-bootstrap.sql:/docker-entrypoint-initdb.d/001-local.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d araread"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  auth:
+    image: supabase/gotrue:v2.197.0
+    depends_on:
+      db: {condition: service_healthy}
+    ports: ["127.0.0.1:4318:9999"]
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: 9999
+      API_EXTERNAL_URL: http://127.0.0.1:4317/auth/v1
+      GOTRUE_SITE_URL: http://127.0.0.1:4317
+      GOTRUE_URI_ALLOW_LIST: http://127.0.0.1:4317/**
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:araread-local-auth-only@db:5432/araread
+      GOTRUE_DB_NAMESPACE: auth
+      GOTRUE_JWT_SECRET: araread-local-test-signing-secret-at-least-32-chars
+      GOTRUE_JWT_KEYS: ${LOCAL_JWT_KEYS:?Execute npm run local:setup primeiro}
+      GOTRUE_JWT_ISSUER: http://127.0.0.1:4317/auth/v1
+      GOTRUE_JWT_AUD: authenticated
+      GOTRUE_JWT_EXP: 3600
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_JWT_ADMIN_ROLES: service_role
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: true
+      GOTRUE_MAILER_AUTOCONFIRM: true
+      GOTRUE_DISABLE_SIGNUP: false
+      GOTRUE_OAUTH_SERVER_ENABLED: true
+      GOTRUE_OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: true
+      GOTRUE_OAUTH_SERVER_AUTHORIZATION_PATH: /consent
+      GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_ENABLED: true
+      GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_URI: pg-functions://postgres/araread_private/token_hook
+volumes:
+  araread_pg:

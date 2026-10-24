@@ -1,0 +1,29 @@
+name: verificação local
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24.14.0
+          cache: npm
+      - run: npm ci
+      - run: npm run check && npm run docs:check && npm run build
+      - run: npm run local:setup
+      - run: docker compose up -d --wait
+      - run: npm run db:migrate && npm run local:accounts
+      - run: npx playwright install --with-deps chromium
+      - name: servidor e testes reais
+        run: |
+          NODE_ENV=production npm run dev > /tmp/araread-server.log 2>&1 &
+          for attempt in $(seq 1 30); do curl --fail --silent http://127.0.0.1:4317/health && break; sleep 1; done
+          npm test
+          npm run test:e2e
+      - run: npm audit --audit-level=moderate
+      - if: always()
+        run: docker compose down
