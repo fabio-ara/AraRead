@@ -12,6 +12,14 @@ No cliente compatível, cadastre a URL MCP com OAuth, confira a conta no consent
 
 No hospedado, o desafio `WWW-Authenticate` aponta para os metadados em `/functions/v1/araread/.well-known/oauth-protected-resource/mcp`. O emissor é o Auth real do projeto exclusivo. Localmente existem `/.well-known/oauth-protected-resource` e `/.well-known/oauth-authorization-server/auth/v1`. Emissor, audiência, hook e endpoint precisam concordar; um 401 isolado não prova a cadeia.
 
+## Telas preparadas no Chrome dedicado
+
+O formulário observado fica em ChatGPT → Plugins → Adicionar → Adicionar servidor MCP personalizado. Nome `AraRead`, URL acima e autenticação `OAuth` já estão preenchidos. O ChatGPT descobriu sozinho registro dinâmico, emissor, recurso e endpoints; não é necessário preencher configurações avançadas manualmente.
+
+Antes de conectar, conclua a entrada privada da interface com a conta ChatGPT proprietária e o convite da biblioteca com o e-mail escolhido. Defina pessoalmente sua senha de leitor; essa identidade é distinta da conta do painel Supabase. Na caixa MCP, leia o aviso e marque “Entendo e quero continuar” somente se desejar conceder essa confiança; então “Criar como plugin” inicia o fluxo. Entre na biblioteca se solicitado, confira a conta/destino e decida o consentimento “Autorizar acesso”. O agente deixou esses atos pessoais pendentes conforme o §2 do mandato, sem compartilhar nem solicitar senha ou link no chat.
+
+Depois do consentimento, execute a jornada abaixo. O formulário preparado e a descoberta correta não equivalem a uma instalação ou homologação concluída nesse cliente.
+
 ## Primeiro uso e teste verificável
 
 Peça ao assistente:

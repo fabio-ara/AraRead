@@ -60,5 +60,16 @@
   "limits": [
     "Offline/SW comprovado localmente, não na QA hospedada com credencial de serviço",
     "Avaliação editorial sintética por IA; nenhuma revisão humana ou eficácia demonstrada"
-  ]
+  ],
+  "ci": {
+    "commit": "af9ffd107b288f06ea458a03b85122f60203a09e",
+    "url": "https://github.com/fabio-ara/AraRead/actions/runs/40064353878",
+    "status": "success",
+    "core_tests": 32,
+    "browser_journeys": 4,
+    "types": true,
+    "build": true,
+    "documentation": true,
+    "audit_known_vulnerabilities": 0
+  }
 }
