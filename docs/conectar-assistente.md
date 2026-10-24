@@ -2,7 +2,7 @@
 
 O assistente precisa receber a orientação e usar o MCP para que as explicações sobrevivam à conversa. Um arquivo local no repositório não é carregado automaticamente pelo ChatGPT. A instalação expõe a orientação por três caminhos: instruções do servidor, ferramenta `assistant_guidance` e recurso `araread://assistant/guidance`; o prompt `retomar-leitura` também inclui o texto versionado.
 
-**Estado:** OAuth/PKCE, descoberta, 16 ferramentas, leitura/escrita, retomada em nova sessão, revogação e reconexão passaram com o SDK oficial também no HTTPS hospedado. Essa prova é de um cliente compatível, fora do servidor; não é homologação no ChatGPT. A [interface privada](https://araread-biblioteca.stonyrain65.chatgpt.site) e o [endpoint MCP](https://ltzoontstgpbegtakrgk.supabase.co/functions/v1/araread/mcp) já foram publicados. O endpoint exige OAuth; não cole chave administrativa no cliente.
+**Estado em 24/10/2026:** conexão pessoal e jornada de leitura/escrita/retomada aprovadas no ChatGPT, com conferência na [interface privada](https://araread-biblioteca.stonyrain65.chatgpt.site). O ChatGPT carregou orientação 1.0.0 e recuperou os registros em nova conversa; veja a [evidência](evidencias/chatgpt-2026-10-24.json). Separadamente, o SDK oficial comprovou OAuth/PKCE, 16 ferramentas, revogação e reconexão no HTTPS hospedado. O [endpoint MCP](https://ltzoontstgpbegtakrgk.supabase.co/functions/v1/araread/mcp) exige OAuth; não cole chave administrativa no cliente.
 
 ## Preparar uma conexão hospedada
 
@@ -12,13 +12,13 @@ No cliente compatível, cadastre a URL MCP com OAuth, confira a conta no consent
 
 No hospedado, o desafio `WWW-Authenticate` aponta para os metadados em `/functions/v1/araread/.well-known/oauth-protected-resource/mcp`. O emissor é o Auth real do projeto exclusivo. Localmente existem `/.well-known/oauth-protected-resource` e `/.well-known/oauth-authorization-server/auth/v1`. Emissor, audiência, hook e endpoint precisam concordar; um 401 isolado não prova a cadeia.
 
-## Telas preparadas no Chrome dedicado
+## Conectar no ChatGPT
 
-O formulário observado fica em ChatGPT → Plugins → Adicionar → Adicionar servidor MCP personalizado. Nome `AraRead`, URL acima e autenticação `OAuth` já estão preenchidos. O ChatGPT descobriu sozinho registro dinâmico, emissor, recurso e endpoints; não é necessário preencher configurações avançadas manualmente.
+O formulário observado fica em ChatGPT → Plugins → Adicionar → Adicionar servidor MCP personalizado. Use nome `AraRead`, URL acima e autenticação `OAuth`. O ChatGPT descobriu sozinho registro dinâmico, emissor, recurso e endpoints; não foi necessário preencher configurações avançadas manualmente. Nesta instalação o plugin pessoal já está criado e conectado; abra-o e use “Testar no chat”, ou selecione `@AraRead` em uma conversa nova.
 
-Antes de conectar, conclua a entrada privada da interface com a conta ChatGPT proprietária e o convite da biblioteca com o e-mail escolhido. Defina pessoalmente sua senha de leitor; essa identidade é distinta da conta do painel Supabase. Na caixa MCP, leia o aviso e marque “Entendo e quero continuar” somente se desejar conceder essa confiança; então “Criar como plugin” inicia o fluxo. Entre na biblioteca se solicitado, confira a conta/destino e decida o consentimento “Autorizar acesso”. O agente deixou esses atos pessoais pendentes conforme o §2 do mandato, sem compartilhar nem solicitar senha ou link no chat.
+Antes de conectar uma instalação nova, conclua a entrada privada da interface com a conta ChatGPT proprietária e o convite da biblioteca com o e-mail escolhido. Defina pessoalmente sua senha de leitor; essa identidade é distinta da conta do painel Supabase. Na caixa MCP, leia o aviso e marque “Entendo e quero continuar” somente se desejar conceder essa confiança; então “Criar como plugin” inicia o fluxo. Entre na biblioteca se solicitado, confira a conta/destino e decida o consentimento “Autorizar acesso”. O titular concluiu esses atos nesta instalação, conforme o §2 do mandato, sem compartilhar senha ou link com o agente.
 
-Depois do consentimento, execute a jornada abaixo. O formulário preparado e a descoberta correta não equivalem a uma instalação ou homologação concluída nesse cliente.
+Depois do consentimento, execute a jornada abaixo. Na jornada observada, a página do plugin mostrava versão 1.0.0; a aplicação/servidor continuou em 0.1.0. Essas versões são distintas da orientação 1.0.0.
 
 ## Primeiro uso e teste verificável
 
@@ -34,9 +34,9 @@ Para homologar uma instância no cliente real, execute com material sintético:
 4. Confira a mesma explicação na interface web autenticada.
 5. Confirme uma continuidade explícita e encerre a conversa.
 6. Em nova conversa/sessão, carregue a orientação e confirme idioma, retomada, notas e mediação anteriores.
-7. Revogue o acesso pelo provedor, verifique recusa e refaça a autorização legitimamente.
+7. Confira a evidência de revogação pelo provedor, recusa imediata e nova autorização. Nesta instalação esse teste passou com o SDK oficial e identidade sintética; a concessão pessoal do ChatGPT foi preservada. Se precisar testar a revogação também nesse cliente, a nova autorização exigirá outro consentimento pessoal.
 
-Registre cliente/versão, data, URL de destino sem segredos, resultado de cada passo e limites. Não armazene tokens ou biblioteca pessoal em evidências. Não marque o nível externo como aprovado antes dessa jornada.
+Registre cliente/versão, data, URL de destino sem segredos, resultado de cada passo e limites. Não armazene tokens ou biblioteca pessoal em evidências. Os passos 1–6 foram observados no ChatGPT e o passo 7, separadamente, no SDK oficial com o mesmo provedor hospedado. A [imagem do leitor](assets/chatgpt-reader-confirmed.png) mostra a explicação e as notas efetivamente gravadas pelo ChatGPT.
 
 ## Recuperação e confirmação
 

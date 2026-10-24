@@ -91,7 +91,27 @@ A prova UI é opcional dentro do gate MCP: recebe `ARAREAD_SITE_SERVICE_ACCESS` 
 
 O teste UI hospedado bloqueia service workers, porque a credencial de serviço não cria uma sessão de visitante Sites. Portanto, ele não comprova cache offline hospedado. A jornada local com quatro testes E2E cobre o service worker, rede lenta, rascunhos e troca de identidade. Todos os gates remotos removem suas identidades sintéticas; o MCP também remove o cliente OAuth criado por ele.
 
-O [relatório consolidado sem credenciais](evidencias/2026-10-24.json) preserva datas e resultados desses gates no repositório. O formulário real do ChatGPT descobriu automaticamente emissor, endpoints OAuth, DCR e recurso do AraRead. A caixa pessoal de confiança permaneceu desmarcada. Ainda faltam o consentimento do titular e a jornada de ferramentas nesse cliente; descoberta de metadados não comprova leitura/escrita no ChatGPT. O nível externo acima é o cliente oficial compatível, em processo separado do servidor.
+O [relatório consolidado sem credenciais](evidencias/2026-10-24.json) preserva datas e resultados desses gates no repositório. A prova abaixo acrescenta o ChatGPT real, após os atos pessoais do titular, e não substitui nem reclassifica as provas do SDK.
+
+## Homologação no ChatGPT e leitor pessoal
+
+Em 24/10/2026, o titular concluiu senha da biblioteca, confiança no plugin pessoal e consentimento OAuth. O cliente foi o ChatGPT web no Chrome dedicado, plugin pessoal AraRead cuja página mostrava versão 1.0.0; aplicação 0.1.0 e orientação 1.0.0. Foram usadas duas conversas e somente a obra sintética `Homologação AraRead ChatGPT c229730b`, com três parágrafos de 180, 181 e 103 pontos de código. O [relatório específico](evidencias/chatgpt-2026-10-24.json) registra referências e resultados, sem identidade da conta, tokens ou biblioteca pessoal.
+
+| Verificação | Evidência observada |
+|---|---|
+| Orientação e contexto | ChatGPT recebeu `assistant_guidance` 1.0.0 e `account_context`; buscou a fixture e importou três blocos estruturados na ordem fornecida |
+| Mediação e conversa salva | Reescrita pt-BR com proveniência ChatGPT/`ai_unreviewed`, uma pergunta de origem `user`, resposta `assistant` com `reply_to` correto e termo “hipótese” |
+| Escrita sem avanço | Cinco recibos confirmados; revisão 4, retomada e posição aberta no Parágrafo 1 `[0,180)`, cobertura vazia, sem marca de compreensão |
+| Interface independente | Leitor autenticado mostrou original, mesma reescrita, pergunta/resposta e termo no glossário; [captura nativa inspecionada](assets/chatgpt-reader-confirmed.png) |
+| Continuidade explícita | Um `continue` confirmado por recibo mudou revisão 4→5; cobertura somente do Parágrafo 1 e retomada/aberto no Parágrafo 2 `[0,181)`, sem mediação inventada na segunda porção |
+| Nova conversa | Nova busca pelo título encontrou a leitura; orientação, contexto, índice e históricos recuperaram original atual, idioma pt-BR, mediação anterior, notas e termo; releitura final manteve revisão 5 e as mesmas posições |
+| Conferência após reconectar | Interface online retomou no Parágrafo 2, informou ausência real de mediação e manteve o rascunho sem enviá-lo |
+
+A revisão editorial da reescrita sintética preservou hipótese provisória, condição de explicitação e distinção entre possibilidade e certeza, com definições no próprio parágrafo. Isso não é revisão humana nem prova geral de fidelidade ou aprendizagem. Uma busca inicial do ChatGPT retornou erro sem diagnóstico preservado; a repetição com paginação padrão funcionou. Não há evidência suficiente para atribuir uma causa. As operações posteriores e a busca na nova conversa passaram.
+
+Na sessão pessoal do Site, o navegador confirmou service worker ativo/controlando a página. O bloqueio de requisições pelo DevTools, viewport 390×844 e recarga recuperaram shell, biblioteca, porção anterior, reescrita e notas em cache. Um rascunho digitado sobreviveu à recarga e nova abertura da leitura, sem ser salvo no servidor; a largura do documento permaneceu 390 px. A captura nativa foi inspecionada. O instrumento manteve `navigator.onLine=true`, logo esse ensaio não prova os estados desativados dos botões; o gate E2E local cobre o modo offline completo. O rascunho foi limpo e rede/viewport restaurados. Revogação e reconexão continuam comprovadas pelo SDK no provedor real, sem revogar a concessão pessoal recém-autorizada do ChatGPT.
+
+Ao final, o ChatGPT conferiu o título e `work_id` reais, excluiu somente a fixture com `work_delete`, recuperou o recibo confirmado e obteve busca vazia pelo título. A interface online confirmou biblioteca vazia. A cópia privada local do ensaio foi removida pelo controle da própria aplicação, preservando identidade e conexão pessoal. Não foram excluídas outras obras ou contas.
 
 ## Avaliação editorial
 
@@ -110,6 +130,6 @@ As reescritas curtas cobrem as proposições fornecidas, mantêm sua sequência 
 
 ## Três níveis e CI
 
-Local usa aplicação completa, banco/Auth reais e cliente SDK. Hospedado exige identidade/destino exclusivo, migrations/configuração, interface, gateway e OAuth/duas contas no destino. Cliente externo real exige leitura/escrita e retomada no ChatGPT ou cliente autorizado, com conferência na interface. Os três níveis têm evidência no [STATUS](../STATUS.md); a homologação específica no ChatGPT continua pendente, sem substituí-la por descoberta de metadados, `/health`, 401 ou token administrativo.
+Local usa aplicação completa, banco/Auth reais e cliente SDK. Hospedado exige identidade/destino exclusivo, migrations/configuração, interface, gateway e OAuth/duas contas no destino. Cliente externo real exige leitura/escrita e retomada no ChatGPT ou cliente autorizado, com conferência na interface. Os três níveis passaram, incluindo a jornada específica no ChatGPT descrita acima. Descoberta de metadados, `/health`, 401 e token administrativo não foram usados como substitutos dessa jornada.
 
 A [CI](../.github/workflows/ci.yml) fixa Ubuntu 24.04, configura Node, instalação pelo lockfile, tipos/docs/build, Compose real, identidades, testes e Chromium, sem segredos pessoais. O runner é fixado porque Playwright 1.56.1 não suporta Ubuntu 26.04, atualmente selecionado por `ubuntu-latest`. O comando opcional de rede pública não roda na CI. Não faça upload de `.local`, traces, tokens ou backups como artifacts. O estado da execução remota, quando disponível, deve ser registrado separadamente da evidência local.

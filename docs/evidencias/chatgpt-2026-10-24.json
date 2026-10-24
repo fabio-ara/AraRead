@@ -1,0 +1,109 @@
+{
+  "date": "2026-10-24",
+  "timezone": "America/Sao_Paulo",
+  "client": "ChatGPT web no Chrome dedicado, plugin pessoal AraRead",
+  "plugin_page_version": "1.0.0",
+  "application_version": "0.1.0",
+  "guidance_version": "1.0.0",
+  "application_commit": "af9ffd107b288f06ea458a03b85122f60203a09e",
+  "frontend": "https://araread-biblioteca.stonyrain65.chatgpt.site",
+  "mcp": "https://ltzoontstgpbegtakrgk.supabase.co/functions/v1/araread/mcp",
+  "personal_identity_completed_by_user": true,
+  "personal_oauth_consent_completed_by_user": true,
+  "conversations": 2,
+  "fixture": {
+    "title": "Homologação AraRead ChatGPT c229730b",
+    "reading_id": "10661dcc-5610-4e7c-8167-815568e474e9",
+    "work_id": "6fa3fe05-cb47-4a52-97e5-e0cdf9655fad",
+    "source_id": "272b4904-4df4-4ac2-ad77-57b67094f2cf",
+    "original_language": "pt-BR",
+    "partial": true,
+    "import_format": "structured",
+    "paragraph_codepoints": [180, 181, 103],
+    "scope": "Somente texto sintético composto para esta homologação; sem obras pessoais"
+  },
+  "passed": [
+    "assistant_guidance 1.0.0 e account_context recebidos pelo ChatGPT",
+    "busca e importação de três parágrafos sintéticos na ordem fornecida",
+    "reescrita pt-BR salva e relida com proveniência ChatGPT/ai_unreviewed",
+    "pergunta de teste user e resposta assistant vinculada por reply_to",
+    "termo hipótese salvo e conferido no glossário da interface",
+    "cinco recibos confirmados: revisão 4, primeira porção, cobertura vazia",
+    "interface autenticada confirmou original, reescrita, pergunta, resposta e glossário",
+    "continuidade explícita única confirmada: revisão 5, cobertura da primeira porção, retomada na segunda",
+    "nova conversa buscou a leitura e recuperou do servidor idioma, retomada, índice, mediação anterior, notas e termo",
+    "releitura final da nova conversa manteve revisão 5 sem regenerar, escrever ou avançar",
+    "interface após reconectar retomou na segunda porção, sem simular mediação ausente",
+    "work_delete da fixture com título exato, recibo confirmed e busca posterior vazia"
+  ],
+  "before_continue": {
+    "revision": 4,
+    "opened_and_resume": {"paragraph": 1, "range": [0, 180]},
+    "coverage": [],
+    "understanding_inferred": false
+  },
+  "after_continue_and_new_conversation": {
+    "revision": 5,
+    "opened_and_resume": {"paragraph": 2, "range": [0, 181]},
+    "coverage": [{"paragraph": 1, "range": [0, 180]}],
+    "effective_language": "pt-BR",
+    "current_mediation": null,
+    "history": {"mediations": 1, "notes": 2, "terms": 1},
+    "understanding_inferred": false
+  },
+  "receipts": {
+    "import": "d28bd63e-6d9b-4aa9-bc0d-8d3fd3c477ff",
+    "mediation": "fc9d5484-d035-4ffc-8778-9d68102c5df1",
+    "question": "0cbf7cc4-16ff-46bd-bb23-f045590c662f",
+    "answer": "1a84d786-4b84-4ace-a1ec-d2040932fa9a",
+    "term": "b4b5438c-83ed-45b5-a426-fc8c542f480c",
+    "continue": "9a2c6f82-07e1-4b9b-bb53-8f6e135f7e13",
+    "delete": "ef6f31ce-acbd-4b26-ba1d-e71c94d8381a"
+  },
+  "question_answer": {
+    "question_id": "3e55feb1-c970-44d7-986e-03bd39dad020",
+    "answer_id": "39e242d0-9bf1-4319-a9d1-e5a07d9098dd",
+    "reply_to_matches": true,
+    "origin": ["user", "assistant"]
+  },
+  "native_reader_capture": {
+    "path": "docs/assets/chatgpt-reader-confirmed.png",
+    "bytes": 176249,
+    "sha256": "177731610efae47d4f426ccf599712e43e39148eb43229fef39354faf76c7d66",
+    "visually_inspected": true,
+    "transfer": "Bytes PNG retornados nativamente pelo Chrome DevTools; gravação direta fora da UI"
+  },
+  "hosted_cache_probe": {
+    "personal_site_session": true,
+    "service_worker_controlled": true,
+    "request_network_emulation": "Offline",
+    "viewport": [390, 844],
+    "document_width": 390,
+    "reload_shell_library_portion_and_mediation": true,
+    "draft_survived_reload_and_reopening": true,
+    "draft_sent_to_server": false,
+    "native_capture_sha256": "3145b50c636bab8a313546a54809a2d570666a7b94e90fe287829be03bb6819e",
+    "native_capture_visually_inspected": true,
+    "navigator_online_during_emulation": true,
+    "disabled_offline_controls_proven_by_this_probe": false,
+    "network_and_viewport_restored": true,
+    "limit": "O instrumento bloqueou requisições, mas manteve navigator.onLine=true; o modo offline completo e seus controles são cobertos pelo E2E local"
+  },
+  "cleanup": {
+    "synthetic_work_deleted": true,
+    "delete_receipt_confirmed": true,
+    "post_delete_exact_title_search_total": 0,
+    "independent_online_ui_empty_library": true,
+    "local_test_copy_cleared_through_ui": true,
+    "personal_identity_preserved": true,
+    "personal_oauth_grant_preserved": true
+  },
+  "observed_issue": "Uma busca inicial retornou erro sem diagnóstico preservado no cliente; repetição com paginação padrão funcionou. Buscas posteriores passaram. Causa não determinada.",
+  "limits": [
+    "Revogação/reconexão comprovadas separadamente pelo SDK oficial com identidade sintética no mesmo provedor real; a concessão pessoal do ChatGPT não foi revogada",
+    "A importação ChatGPT usou blocos estruturados; a prova de bytes originais/hash é dos gates HTTP/SDK anteriores",
+    "Avaliação editorial sintética por IA, sem revisão humana, eficácia pedagógica ou garantia para qualquer modelo/cliente",
+    "Sem publicação no diretório público de plugins e sem alteração de AraLearn/AraHub"
+  ],
+  "required_human_actions_remaining": []
+}

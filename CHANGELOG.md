@@ -15,4 +15,12 @@
 - Adaptador HTTP Web com a mesma autorização/domínio do Node; TLS para IP público fixado, PDF.js empacotado em 3 MB e CA PostgreSQL verificada.
 - OAuth/PKCE, cliente externo oficial, interface hospedada desktop/celular e restauração de 17 MB comprovados no destino real.
 - Recuperação/definição de senha testada com GoTrue real; quatro jornadas E2E locais.
-- Documentação dos perfis de memória, implantação reproduzível e distinção entre cliente compatível aprovado e consentimento/homologação do ChatGPT pendentes. Veja [STATUS](STATUS.md).
+- Documentação dos perfis de memória e implantação reproduzível. Veja [STATUS](STATUS.md).
+
+## Homologação no ChatGPT — 24/10/2026
+
+- Titular concluiu senha da biblioteca, confiança no plugin pessoal e consentimento OAuth.
+- ChatGPT carregou a orientação 1.0.0, importou fonte sintética, salvou reescrita, pergunta/resposta e glossário, conferiu recibos e avançou somente após pedido explícito.
+- Nova conversa recuperou revisão, idioma, retomada e registros anteriores sem regeneração ou escrita; interface autenticada confirmou os dados.
+- Leitor hospedado recarregou shell, porção e rascunho sob bloqueio de rede. Limites da emulação estão na [matriz de testes](docs/testes.md).
+- Fixture removida com recibo e confirmação independente na biblioteca; conexão pessoal preservada.

@@ -54,11 +54,15 @@
   },
   "chatgpt": {
     "metadata_discovery": "observed",
-    "personal_trust_consent": "pending",
-    "tools_journey": "not_validated"
+    "personal_trust_consent": "completed_by_user",
+    "personal_oauth_consent": "completed_by_user",
+    "tools_journey": "passed",
+    "conversations": 2,
+    "evidence": "chatgpt-2026-10-24.json",
+    "synthetic_work_deleted": true
   },
   "limits": [
-    "Offline/SW comprovado localmente, não na QA hospedada com credencial de serviço",
+    "Offline/SW completo comprovado localmente; no Site pessoal, shell/porção/rascunho recarregados sob bloqueio de rede, sem alteração do indicador navigator.onLine",
     "Avaliação editorial sintética por IA; nenhuma revisão humana ou eficácia demonstrada"
   ],
   "ci": {
@@ -71,5 +75,13 @@
     "build": true,
     "documentation": true,
     "audit_known_vulnerabilities": 0
+  },
+  "hosted_personal_cache": {
+    "service_worker_controlled": true,
+    "reload_under_request_blocking": true,
+    "draft_preserved": true,
+    "viewport_width": 390,
+    "navigator_online_override": false,
+    "limit": "DevTools bloqueou requisições mas manteve navigator.onLine=true; controles offline completos comprovados no E2E local"
   }
 }
