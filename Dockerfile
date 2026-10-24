@@ -5,6 +5,7 @@ RUN npm ci
 COPY index.html vite.config.ts tsconfig.json ./
 COPY src ./src
 COPY public ./public
+COPY LICENSE THIRD_PARTY_NOTICES.md THIRD_PARTY_LICENSES.txt ./
 RUN npm run build
 
 FROM node:24.14.0-bookworm-slim
