@@ -6,7 +6,7 @@ Registro consolidado da evolução 0.2.0. As provas históricas 0.1.0 permanecem
 |---|---|
 | Frontend TypeScript sem framework visual | Biblioteca/leitor/configurações cabem em DOM simples; reaproveita contratos sem acrescentar infraestrutura curricular |
 | Um domínio, adaptadores Node e Web padrão | Node reproduz o ambiente local; Edge serve a instalação hospedada. Ambos chamam o mesmo serviço, autorização e persistência |
-| PostgreSQL/Auth Supabase; originais em `bytea` | Importação, referência e original entram no mesmo commit; suficiente para arquivos de 8 MiB e biblioteca pessoal; consome a cota de banco, sem depender de bucket público |
+| PostgreSQL/Auth Supabase; cânone textual e bytes opcionais | Texto, estrutura, hashes e referências entram no mesmo commit. Bytes antigos permanecem; fontes novas guardam binário quando necessário ou solicitado. Economia física precisa de benchmark com TOAST/índices |
 | Supabase Edge e interface estática pública no GitHub Pages | A incompatibilidade de `https.request.lookup` foi resolvida com Undici 7.30.1 e socket TLS para IP já validado, sem segunda resolução. O PDF foi reduzido de um pacote de 33 MB recusado para os módulos necessários; o pacote final de 3 MB passou no Edge real. Render foi retirado conforme a escolha do titular |
 | Perfil de memória para Edge | Conta com 16 MiB de conteúdo e restauração HTTP de 32 MiB, mantendo original de até 8 MiB. Backup v2 real de 17.086.190 bytes foi restaurado, com IDs novos e hashes iguais. Node local mantém 80/128 MiB |
 | Pooler transacional no Edge | A repetição do gate atingiu `EMAXCONNSESSION`: instâncias efêmeras ocuparam as 15 conexões do modo de sessão. Porta 6543, pool de uma conexão e descarte ocioso em 1 s evitam prender uma sessão PostgreSQL por instância. Identidade/RLS continuam locais à transação, sem prepared statements nomeados |
@@ -56,3 +56,13 @@ Consultas adicionais em 24/10/2026: [limites Edge](https://supabase.com/docs/gui
 A configuração final de conexões segue [conexão PostgreSQL para funções](https://supabase.com/docs/guides/database/connecting-to-postgres): pooler transacional, pool de uma conexão, ausência de prepared statements nomeados e contexto local à transação. A investigação de `EMAXCONNSESSION` consultou os [logs por SQL](https://supabase.com/docs/guides/observability/advanced-log-filtering), somente no projeto exclusivo e em janela delimitada, sem registrar tokens ou corpos de requisição.
 
 Consultas primárias da evolução: [GitHub Pages por workflow](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages), [MCP Apps](https://apps.extensions.modelcontextprotocol.io/api/documents/Overview.html), [Supabase OAuth Server](https://supabase.com/docs/guides/auth/oauth-server/getting-started) e [armazenamento TOAST](https://www.postgresql.org/docs/current/storage-toast.html). A interface estática não hospeda um backend. Compressão e contexto limitado economizam recursos; não tornam o Free adequado a um número ilimitado de usuários/obras.
+
+## Decisões da leitura 0.3
+
+- Extração em módulos HTML/PDF/qualidade/OCR, compartilhados por Node e Edge. O adaptador aberto de OCR fica fora do Edge por custo de recursos; não há serviço pago ou chave de modelo.
+- Separar `reading_context` de `reading_display` evita painel prematuro. A UI só apresenta três representações; o chat conserva o controle do estudo. Preparação persistida e comparação editorial precedem a apresentação.
+- Perfis reutilizáveis são dados privados versionados, distintos de perspectivas presas a uma leitura. Pacotes opt-in não criam descoberta pública nem certificação de autoria.
+- Preferências de sessão usam o ID real de Auth e não entram no backup. Exclusão, desativação e padrão têm efeitos distintos; valores sensíveis exigem pedido explícito.
+- Mapa organizacional não reescreve títulos nem ordem do autor. Continuar fora da retomada conserva o percurso principal e só cobre o intervalo realmente confirmado.
+
+Veja [Leitura 0.3](leitura-0.3.md), [testes](testes.md) e [STATUS](../STATUS.md) para evidência e limitações, sem extrapolar provas anteriores.

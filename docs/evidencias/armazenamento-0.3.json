@@ -1,0 +1,215 @@
+{
+  "date": "2026-10-24T18:13:46.430Z",
+  "revision": "6f0fcd5e7cbb84fde072ade451c0835916b90532",
+  "working_tree_dirty": true,
+  "node": "v24.14.0",
+  "documents": 16,
+  "paragraphs_per_document": 160,
+  "policies": {
+    "raw_retained": {
+      "input_bytes": 874150,
+      "logical": {
+        "text_bytes": 619030,
+        "raw_bytes": 874150,
+        "variant_bytes": 23488,
+        "compressed_raw_column_bytes": 188684,
+        "source_metadata_json_bytes": 18384,
+        "element_metadata_json_bytes": 586464,
+        "context_json_bytes": 16926
+      },
+      "physical": {
+        "works": {
+          "heap": 8192,
+          "table_with_toast": 16384,
+          "indexes": 49152,
+          "total": 65536,
+          "toast_and_auxiliary": 8192
+        },
+        "sources": {
+          "heap": 16384,
+          "table_with_toast": 278528,
+          "indexes": 114688,
+          "total": 393216,
+          "toast_and_auxiliary": 262144
+        },
+        "elements": {
+          "heap": 958464,
+          "table_with_toast": 991232,
+          "indexes": 598016,
+          "total": 1589248,
+          "toast_and_auxiliary": 32768
+        },
+        "readings": {
+          "heap": 8192,
+          "table_with_toast": 16384,
+          "indexes": 81920,
+          "total": 98304,
+          "toast_and_auxiliary": 8192
+        },
+        "reading_segments": {
+          "heap": 8192,
+          "table_with_toast": 8192,
+          "indexes": 65536,
+          "total": 73728,
+          "toast_and_auxiliary": 0
+        },
+        "mediations": {
+          "heap": 65536,
+          "table_with_toast": 98304,
+          "indexes": 65536,
+          "total": 163840,
+          "toast_and_auxiliary": 32768
+        },
+        "contexts": {
+          "heap": 16384,
+          "table_with_toast": 49152,
+          "indexes": 65536,
+          "total": 114688,
+          "toast_and_auxiliary": 32768
+        },
+        "receipts": {
+          "heap": 49152,
+          "table_with_toast": 147456,
+          "indexes": 32768,
+          "total": 180224,
+          "toast_and_auxiliary": 98304
+        }
+      },
+      "total_physical_bytes": 2678784,
+      "original_compression": "l",
+      "timings": {
+        "import": {
+          "total_ms": 1540.35,
+          "median_ms": 85.14,
+          "p95_ms": 226.26
+        },
+        "query": {
+          "total_ms": 1615.02,
+          "median_ms": 97.21,
+          "p95_ms": 132.17
+        },
+        "two_variants": {
+          "total_ms": 4017.18,
+          "median_ms": 257.6,
+          "p95_ms": 288.3
+        },
+        "backup_ms": 3337.85
+      },
+      "backup_sample_bytes": 2582621,
+      "backup_account_transfer_bytes": 31413331,
+      "backup_pages": 97
+    },
+    "text_first": {
+      "input_bytes": 874150,
+      "logical": {
+        "text_bytes": 619030,
+        "raw_bytes": 0,
+        "variant_bytes": 23488,
+        "compressed_raw_column_bytes": 0,
+        "source_metadata_json_bytes": 18342,
+        "element_metadata_json_bytes": 586464,
+        "context_json_bytes": 16925
+      },
+      "physical": {
+        "works": {
+          "heap": 8192,
+          "table_with_toast": 16384,
+          "indexes": 49152,
+          "total": 65536,
+          "toast_and_auxiliary": 8192
+        },
+        "sources": {
+          "heap": 16384,
+          "table_with_toast": 49152,
+          "indexes": 114688,
+          "total": 163840,
+          "toast_and_auxiliary": 32768
+        },
+        "elements": {
+          "heap": 958464,
+          "table_with_toast": 991232,
+          "indexes": 606208,
+          "total": 1597440,
+          "toast_and_auxiliary": 32768
+        },
+        "readings": {
+          "heap": 8192,
+          "table_with_toast": 16384,
+          "indexes": 81920,
+          "total": 98304,
+          "toast_and_auxiliary": 8192
+        },
+        "reading_segments": {
+          "heap": 8192,
+          "table_with_toast": 8192,
+          "indexes": 65536,
+          "total": 73728,
+          "toast_and_auxiliary": 0
+        },
+        "mediations": {
+          "heap": 65536,
+          "table_with_toast": 98304,
+          "indexes": 65536,
+          "total": 163840,
+          "toast_and_auxiliary": 32768
+        },
+        "contexts": {
+          "heap": 16384,
+          "table_with_toast": 49152,
+          "indexes": 65536,
+          "total": 114688,
+          "toast_and_auxiliary": 32768
+        },
+        "receipts": {
+          "heap": 49152,
+          "table_with_toast": 147456,
+          "indexes": 32768,
+          "total": 180224,
+          "toast_and_auxiliary": 98304
+        }
+      },
+      "total_physical_bytes": 2457600,
+      "original_compression": "l",
+      "timings": {
+        "import": {
+          "total_ms": 1435.35,
+          "median_ms": 88.39,
+          "p95_ms": 164.58
+        },
+        "query": {
+          "total_ms": 1746.76,
+          "median_ms": 106.38,
+          "p95_ms": 155.73
+        },
+        "two_variants": {
+          "total_ms": 4555.88,
+          "median_ms": 281.6,
+          "p95_ms": 444.66
+        },
+        "backup_ms": 3457.84
+      },
+      "backup_sample_bytes": 1386369,
+      "backup_account_transfer_bytes": 30294995,
+      "backup_pages": 99
+    }
+  },
+  "limits": [
+    "Corpus HTML sintético determinístico: prosa repetitiva, valores únicos, navegação e marcação. Não representa todo PDF ou biblioteca.",
+    "Operações passam pelo domínio real com Auth e papel authenticated. Tabelas TEMP copiam schema, compressão e índices reais, incluindo TOAST; sem dados de outras contas.",
+    "Tamanhos físicos são alocações de tabelas novas, sem WAL, backups do provedor, bloat preexistente ou concorrência. Não são previsão do limite Free.",
+    "Tempos são uma execução local aquecida, sem teste de carga nem garantia de latência hospedada. Exportação pagina a conta sintética; bytes reportados separam a amostra.",
+    "pg_column_size mede conteúdo após compressão quando aplicável, não substitui pg_table_size/pg_indexes_size. Pequenos ganhos podem ser absorvidos por blocos de alocação."
+  ],
+  "postgres": {
+    "version": "17.11 (Debian 17.11-1.pgdg13+2)",
+    "default_compression": "pglz",
+    "role": "authenticated"
+  },
+  "comparison": {
+    "physical_saved_bytes": 221184,
+    "physical_saved_percent": 8.26,
+    "backup_saved_bytes": 1196252,
+    "backup_saved_percent": 46.32
+  },
+  "working_tree_scope": "Somente documentação pendente durante a medição; código/scripts testados no commit informado."
+}

@@ -1,5 +1,7 @@
 # Documentação por objetivo
 
+A experiência corrente está descrita em [Leitura 0.3](leitura-0.3.md): chat conduz o estudo, painel tem três abas e fontes passam por pré-verificação. As provas de versões anteriores abaixo são históricas; o [STATUS](../STATUS.md) identifica a revisão efetivamente verificada.
+
 O AraRead conserva uma biblioteca e o percurso de leitura para que uma interrupção não obrigue a reconstruir a conversa anterior. A fonte determina a ordem; o assistente acrescenta uma mediação identificada.
 
 | Objetivo | Percurso |

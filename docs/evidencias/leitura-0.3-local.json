@@ -1,0 +1,70 @@
+{
+  "version": "0.3.0",
+  "code_revision": "6f0fcd5e7cbb84fde072ade451c0835916b90532",
+  "base_revision": "bf9cf1abe1198924aca9b97ae03405de354f6876",
+  "date": "2026-10-24",
+  "environment": {
+    "node": "24.14.0",
+    "postgres": "17.11",
+    "auth": "GoTrue local real",
+    "identities": 2,
+    "role": "authenticated"
+  },
+  "local": {
+    "core_tests": {
+      "passed": 70,
+      "failed": 0,
+      "log_sha256": "ba218a962f84d994fefb5306481777f56a769f7138c769ed5e9cffc7d20b9e96"
+    },
+    "last_ingestion_warning_change": {
+      "targeted_passed": 6
+    },
+    "browser_tests": {
+      "passed": 7,
+      "failed": 0,
+      "log_sha256": "4482da8754e933ba5435065d4c71f00490fdcfd8feaf1889f74bf24e1c4b8fe4"
+    },
+    "types": true,
+    "build": true,
+    "docker_build": true,
+    "edge_package": true,
+    "docs_links": true,
+    "public_audit": {
+      "commits": 8,
+      "blobs": 222,
+      "artifact_files": 69,
+      "alerts": 0
+    },
+    "npm_audit_vulnerabilities": 0,
+    "visual": {
+      "widths": [
+        320,
+        480,
+        1440
+      ],
+      "css_zoom": 2,
+      "dark": true,
+      "keyboard": true,
+      "mcp_bridge": "local harness; no study writes"
+    }
+  },
+  "migrations": [
+    "20261024171342_editorial_ingestion_v3.sql",
+    "20261024172646_preferences_profiles_v3.sql",
+    "20261024180204_preference_reference_ownership_v3.sql"
+  ],
+  "rls_tables": 19,
+  "pending": [
+    "Independent review: subagent attempts failed with capacity 429; local CLI fallback in progress",
+    "Exact-branch CI",
+    "Hosted deployment and 0.3 gates",
+    "Real ChatGPT 0.3 acceptance"
+  ],
+  "limits": [
+    "No human specialist editorial review or pedagogical efficacy study",
+    "Local harness is not ChatGPT verification",
+    "OCR remains unreviewed and original retained",
+    "Synthetic benchmark is not a Supabase Free capacity forecast",
+    "0.2 hosted/client evidence is historical; no remote changes in this checkpoint"
+  ]
+}

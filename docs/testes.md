@@ -1,12 +1,29 @@
 # Testes e evidências
 
+## Validação 0.3 em andamento
+
+Em 24/10/2026, o núcleo atual passou em 70/70 testes com PostgreSQL/Auth reais e duas identidades. A suíte inclui instalação vazia, evolução de dados, RLS direto, recibos, concorrência, OAuth/PKCE e SDK MCP oficial preparando e apresentando as três representações, restauração acima de 16 MiB e 10 mil elementos. Os 13 testes de ingestão cobrem HTML contaminado, preâmbulo/bibliografia, prosa, colunas, notas, tabelas, fórmulas, lacunas e OCR não revisado. Casos editoriais sintéticos incluem filosofia, ciência, matemática, poesia, distinção marxiano/marxista e problema ontológico; não são citações autênticas.
+
+Sete jornadas Playwright passaram: autenticação/recuperação real, recibo após resposta perdida, recuperação de fila anterior com conflito, três abas, teclado, responsividade, privacidade offline e ponte MCP Apps de apresentação sem escrita. Capturas nativas de 320/480/1440 px, tema escuro e CSS zoom 200% foram inspecionadas. O zoom de 200% também foi exercitado sobre viewport de 320 px, com abas empilhadas. Isso não constitui certificação WCAG nem prova no host ChatGPT.
+
+O adaptador real Poppler/Tesseract 5.3.0 processou `synthetic-scanned.pdf` sem rede, com memória limitada; a ingestão preservou as negações e reteve o PDF. O caso HTTPS pontual `https://plato.stanford.edu/entries/plato/` passou com 140 elementos úteis (17 títulos, 43 parágrafos, 80 itens), autoria, preâmbulo e bibliografia, sem menus iniciais. A página não foi versionada; regressões usam fixtures próprias.
+
+Tipos, build, links documentais, auditoria de histórico/árvore e npm audit passaram no checkpoint. O código está no commit `6f0fcd5`; [evidência local](evidencias/leitura-0.3-local.json), [ingestão real](evidencias/ingestao-0.3.json) e benchmark vinculam escopo/limites. Revisão independente, CI exata e gates hospedados/ChatGPT devem ser conferidos em [STATUS](../STATUS.md). Nenhuma prova 0.2 abaixo se aplica automaticamente à 0.3.
+
+### Benchmark de armazenamento 0.3
+
+O script [benchmark-storage-v3.ts](../scripts/benchmark-storage-v3.ts) importa dezesseis HTMLs sintéticos por política, cada um com 160 parágrafos, e cria duas variantes por leitura. Opera sob Auth real e papel `authenticated`. Compara retenção bruta explícita e texto canônico, copia a amostra para tabelas TEMP com o schema/compressão/índices reais e mede heap, TOAST/auxiliares e índices por relação. A exportação passa por todas as dezoito seções da API.
+
+A medição local do commit `6f0fcd5` registrou 8,26% de economia física (221.184 bytes) e 46,32% no backup da amostra (1.196.252 bytes). A compressão LZ4 do bruto reduz a diferença de disco. Tabelas novas não representam bloat, WAL, backups do provedor ou concorrência; latências locais aquecidas e corpus sintético não estimam capacidade de muitos usuários no plano Free. O [relatório completo](evidencias/armazenamento-0.3.json) identifica revisão, ambiente, tamanhos por tabela, latências e limites. A execução exploratória anterior mediu 8,56% de ganho físico; variação de um bloco de 8 KiB nos índices mostra o limite da alocação em corpus pequeno.
+
+
 O gate usa material sintético e identidades do Supabase Auth local real, em PostgreSQL isolado. Não exige chave de modelo. O teste de navegador interage com a interface servida e relê dados pela API; o teste MCP usa o cliente oficial e o provedor OAuth real. Simulação complementar de perda da resposta ocorre depois que a requisição real chegou ao servidor, sem substituir a persistência.
 
 A evolução 0.2.0 tem [matriz F01–F10 própria](evolucao.md), incluindo limites das provas editoriais e do painel. Resultados atuais devem ser lidos no [checkpoint](../STATUS.md), sem atribuir as provas históricas à revisão nova.
 
 Gate local 0.2.0: 52 testes do núcleo e oito jornadas web aprovados, tipos/build, links documentais e auditoria de dependências sem vulnerabilidades conhecidas. A prova de 10 mil elementos distingue tamanho lógico, compressão e tamanho físico das relações, sem prometer escala ilimitada. O [relatório sanitizado](evidencias/evolucao-2026-10-24.json) registra números e limites. Capturas nativas da [coluna no desktop](assets/evolution-phone-desktop.png) e das [configurações em 320 px](assets/evolution-settings-320.png) usam somente fixtures sintéticas. O teste também amplia texto a 200%, opera por teclado e confere foco/ausência de overflow; não é certificação assistiva completa.
 
-## Gates atuais 0.2.0 — local, hospedado e ChatGPT
+## Gates 0.2.0 — históricos — local, hospedado e ChatGPT
 
 O código [26687a4](https://github.com/fabio-ara/AraRead/commit/26687a4b89edac80d88af5720c3a57efb15b126c) passou na [CI](https://github.com/fabio-ara/AraRead/actions/runs/40102736244): 52 testes do núcleo, oito jornadas web, Docker, tipos/build/documentação e auditoria sem vulnerabilidades conhecidas. O [Pages aprovado](https://github.com/fabio-ara/AraRead/actions/runs/40103014546) publicou esse código com auditoria de 69 arquivos e licenças no artefato. O workflow exige CI aprovada na revisão exata; resultados posteriores aparecem nos links de workflows do checkpoint.
 
@@ -155,3 +172,7 @@ As reescritas curtas cobrem as proposições fornecidas, mantêm sua sequência 
 Local usa aplicação completa, banco/Auth reais e cliente SDK. Hospedado exige identidade/destino exclusivo, migrations/configuração, interface, gateway e OAuth/duas contas no destino. Cliente externo real exige leitura/escrita e retomada no ChatGPT ou cliente autorizado, com conferência na interface. Os três níveis passaram, incluindo a jornada específica no ChatGPT descrita acima. Descoberta de metadados, `/health`, 401 e token administrativo não foram usados como substitutos dessa jornada.
 
 A [CI](../.github/workflows/ci.yml) fixa Ubuntu 24.04, configura Node, instalação pelo lockfile, tipos/docs/build, Compose real, identidades, testes e Chromium, sem segredos pessoais. O runner é fixado porque Playwright 1.56.1 não suporta Ubuntu 26.04, atualmente selecionado por `ubuntu-latest`. O comando opcional de rede pública não roda na CI. Não faça upload de `.local`, traces, tokens ou backups como artifacts. O estado da execução remota, quando disponível, deve ser registrado separadamente da evidência local.
+
+## Capturas locais 0.3
+
+[320 px](assets/reader-v3-320.png), [desktop com coluna de até 480 px](assets/reader-v3-desktop.png), [zoom de 200% em 320 px](assets/reader-v3-zoom200.png), [tema escuro](assets/reader-v3-dark.png) e [ponte MCP Apps local](assets/mcp-v3-320.png). São material sintético, capturado pelo retorno nativo do Playwright; não homologam o ChatGPT real.

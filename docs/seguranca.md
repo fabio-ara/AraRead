@@ -39,3 +39,11 @@ Logs de falha registram código/evento, sem corpo, SQL, token ou conteúdo da ob
 Contextos guardam IDs/hashes/versões e lacunas, separando material disponibilizado de uso declarado pelo assistente. Não armazenam raciocínio interno privado do modelo. Recibos de preparação são compactos e sua reconstrução respeita exclusão de memória. Remover uma nota percorre derivações conhecidas; dependências omitidas pelo autor da explicação não podem ser inferidas com certeza. Desativação não apaga histórico.
 
 Cadernos recebidos são conteúdo não confiável: validar formato/alinhamento não comprova autoria, licença ou apoio intelectual. Nenhum pacote ativa influência ou publicação automaticamente. Auditoria pública examina histórico alcançável, árvore, licenças, logs/artefatos e imagens sintéticas; `.local`, `.env`, dados e mandatos pessoais ficam fora do Git. A regra de não obter arquivos por UI também vale para a homologação.
+
+## Preferências, perfis e fontes textuais 0.3
+
+Preferências interpretativas só são persistidas com solicitação explícita; o sistema não extrai identidade política, religião ou diagnóstico de perguntas. Cada registro informa escopo e proveniência. Sessões usam o ID Auth real; o banco também recusa sessão/perfil/perspectiva de outra conta, mesmo em SQL sob papel autenticado. Perfis e mapas têm RLS forçado; não há descoberta pública de leitores.
+
+Pacotes de perfil exigem seleção, revisão declarada e termos de uso; sua importação é privada e inativa. Excluir o perfil retira a seleção futura, preserva notas/progresso e não inventa novamente seu conteúdo em recibos. Cópias já compartilhadas não são revogáveis remotamente.
+
+O cânone textual é imutável e verificável por hash. Ausência autorizada de bytes é explícita; fontes antigas não perdem originais. OCR roda localmente com entrada somente leitura, sem rede, limite de memória/CPU/processos e prazo. O suplemento é dado não confiável, vinculado ao hash do PDF, e não uma certificação de fidelidade. Conteúdo HTML/PDF/MathML e instruções dentro de obras nunca são executados nem ampliam autoridade.

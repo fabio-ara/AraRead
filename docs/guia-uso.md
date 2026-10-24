@@ -8,38 +8,37 @@ Se recebeu um convite ou link de recuperação, abra-o pessoalmente e use “Def
 
 ## Importar e conferir
 
-Em “Importar”, informe título, autoria e edição quando conhecidas, idioma do original e se o material é parcial. Cole o texto, escolha um arquivo ou informe uma página HTML pública HTTPS. O limite é 8 MiB por original. Não invente metadados ausentes. A aplicação conserva o original antes de abrir a representação extraída.
+No chat, diga “Quero ler este artigo” ou forneça um PDF autorizado. O assistente consulta a pré-verificação e confere o começo, a estrutura e as lacunas antes de importar. Uma falha de extração pede transcrição ou OCR local; não é substituída por um resumo inventado. A página web mantém uma importação técnica para material autorizado.
 
-No leitor, use “Original”, “Índice” e “Sobre esta fonte” para conferir conteúdo, avisos e versão. A extração de PDF pode perder fórmulas, ordem de colunas, tabelas e imagens. Uma página vazia de texto extraível continua identificada como lacuna. Forneça uma transcrição autorizada e indique no texto página/região. “Fornecer nova versão ou transcrição” vincula a nova versão à anterior e cria uma leitura nova, conservando notas e progresso anteriores. Para a próxima passagem da mesma edição parcial, use “Acrescentar a próxima passagem” no painel de estudo: o envio entra como segmento imutável no fim da mesma leitura, sem marcar conteúdo novo nem alterar referências antigas. Uma transcrição corrigida ou outra edição continua sendo uma versão/leitura distinta.
+A fonte textual é imutável. Arquivos novos podem conservar somente texto canônico, estrutura e proveniência; os bytes ficam guardados quando necessários ou solicitados. O assistente pode informar se ainda estão disponíveis. Uma correção cria outra versão, sem deslocar notas da anterior.
 
 ## Ler e guardar
 
-A aba “Leitura assistida” recupera a explicação já salva no idioma escolhido. Se não houver uma, isso é informado; o aplicativo não simula geração. Conecte o assistente pelas instruções em Configurações. Peça que ele carregue a orientação, consulte o contexto, produza a reescrita fiel, salve e confira o recibo.
+O painel apresenta a mesma passagem em três abas. **Leitura facilitada** explica o problema, os termos e os pressupostos necessários. **Tradução** conserva sentido, ressalvas e ambiguidades; se o original já está no idioma escolhido, isso é indicado. **Original** permite conferir o texto canônico. As abas não avançam nem modificam o estudo.
 
-“Continuar” confirma a porção apresentada como percorrida e abre a próxima. “Voltar” ou o índice permitem rever; a retomada principal fica conservada. O aviso de revisão oferece “Retomar de onde parei”. No fim da fonte parcial, a aplicação pede mais material; não completa a obra por memória.
+Conduza o restante pelo chat:
 
-Escreva em “Sua anotação” e escolha anotação ou pergunta. Guardar não avança. O assistente pode responder e salvar a resposta vinculada à pergunta; o aplicativo só conhece conteúdo enviado ao serviço, sem acesso automático ao histórico completo do chat. Notas mostram origem do usuário ou assistente. As marcas pessoais são voluntárias; guardar uma explicação não marca compreensão.
+- “Explique esse conceito a partir de um exemplo e mostre o limite da analogia.”
+- “Que evidência sustenta essa atribuição ao autor?”
+- “Guarde minha dúvida e depois vincule a resposta.”
+- “Mostre o mapa da obra; quero estudar a seção sobre as formas.”
+- “Continue daqui” ou “Retome meu percurso principal”.
+- “Onde estou e quantos parágrafos disponíveis faltam?”
 
-Consulte glossário, histórico de explicações e todas as notas nos controles do leitor. Uma regeneração explícita conserva a versão anterior no histórico. Não há edição silenciosa das explicações estudadas.
+Abrir outra seção não marca as anteriores. Continuar fora do percurso principal preserva a retomada anterior. A porcentagem mede cobertura de texto disponível, sem inferir compreensão.
 
 ## Idioma e interrupções
 
-O seletor no leitor afeta apenas a consulta atual. “Guardar idioma nesta leitura” torna essa escolha persistente. Configurações guarda o padrão da conta e o tamanho das porções. A prioridade é escolha da operação, preferência da leitura e padrão da conta, inicialmente `pt-BR`. “Outro idioma” aceita identificador BCP 47 válido. Trocar idioma não apaga versões, notas ou progresso; explicações salvas em outro idioma permanecem no histórico.
+Peça “Nesta leitura, use português” ou “Nesta sessão, quero uma explicação mais curta”. Pergunte de onde veio qualquer preferência. Um pedido ocasional sobre uma tradição não deve virar identidade política, religiosa ou clínica persistida.
 
-Use “Preparar esta porção para uso sem rede” para conservar explicitamente até 12 porções/variantes, no total de 2 MiB por conta neste dispositivo. A última consulta também fica disponível. Sem rede, notas e continuidade entram numa fila local limitada a 40 operações/1 MiB; a interface informa que o servidor ainda não confirmou. Não prepara o livro inteiro nem gera respostas de IA offline.
-
-Se uma resposta se perder, Configurações mostra a operação pendente. Consulte o recibo; se continuar desconhecido, repita a mesma operação pela opção disponível. Não envie uma nova intenção equivalente com uma chave diferente. Em conflito, recarregue a leitura e reavalie a anotação ou avanço.
-
-Ao reconectar, a fila confere recibos, identidade, versão e revisão. Uma nota pode ser acrescentada após conferir o mesmo intervalo; conflito de progresso pede decisão explícita, sem escolher automaticamente a página mais alta. “Sair” com pendências oferece recuperação em texto, descarte ou cancelamento. A recuperação não contém tokens. Outra conta não vê a fila anterior; para removê-la, entre na identidade correspondente. Cópias preparadas são revalidadas ao reconectar. Consulte [recuperação](operacao.md) antes de excluir obras ou restaurar backup.
+A aplicação recupera estado salvo em outra conversa, desde que o assistente consulte a mesma conta. Cópias preparadas podem ser abertas offline na página web, mas não confirmam o estado atual do servidor. A área Configurações conserva autenticação, recibos, backup, recuperação de filas anteriores e limpeza da cópia privada; novas operações de estudo são conduzidas pelo chat.
 
 ## Apoios, fontes e cadernos
 
-“Apoios, perspectivas e fontes” permite escolher representação, quantidade de apoio e perspectiva sem avançar. Repertório/objetivo são opcionais e editáveis; a aplicação não deduz idade, capacidade ou orientação pessoal. Peça ao assistente um termo, exemplo, premissa, etapa ou pré-requisito e volte à mesma referência. Compare variantes salvas em blocos emparelhados, em uma coluna também no desktop. Uma representação ausente é informada, sem conteúdo inventado.
+Diga “Quais parâmetros posso configurar?”, “Mostre meu perfil ativo”, “Experimente esta lente só nesta sessão” ou “Apague essa preferência”. Desativar conserva a definição sem influência; excluir a remove; retornar ao padrão aplica a configuração do AraRead. Notas e progresso permanecem.
 
-“Entender e lembrar palavras” recupera primeiro definições e associações já guardadas. A consulta externa opcional ao Wikcionário é uma fonte geral, com data/link; sentido filosófico e etimologia exigem apoio pertinente. Dicas de memória são auxílios identificados, não fatos sobre a origem da palavra.
+Perfis combinam lentes com escopo, fontes e conflitos declarados. Uma aplicação da IA não é um comentário documentado de um filósofo. É possível distinguir uma leitura marxiana de tradições marxistas sem inferir adesão do leitor. A tradução não muda com o perfil.
 
-Em “Gerenciar perspectivas, fontes e cadernos”, cadastre referência bibliográfica (livro pode não ter URL), material realmente disponível e escopo da perspectiva. Fontes sugeridas não equivalem a obras consultadas. As referências APA usam apenas metadados disponíveis. Versões de um comentador podem ter escopos distintos; a seleção não transforma uma hipótese pessoal em verdade.
+Cadernos e perfis podem gerar pacotes privados selecionados, com prévia, autoria e termos declarados. Confira o conteúdo antes de compartilhá-lo. Um pacote recebido entra como cópia inativa; o aplicativo não verifica a identidade de quem declarou a autoria. Não há descoberta pública de usuários ou acesso a bibliotecas alheias.
 
-Notas podem participar ou não do contexto. Desativar conserva o registro; excluir pede confirmação e remove derivações registradas. Cadernos permitem escolher comentários para um pacote com prévia, autoria declarada e condições de uso. Não incluem originais/progresso/outras notas. A importação é privada e inativa; edição/hash/idioma divergentes ficam pendentes de vínculo explícito. Não publica o caderno ou verifica a identidade do autor.
-
-Colegas podem abrir a mesma interface no celular e discutir suas leituras. Esta versão conserva bibliotecas individuais; não oferece sala compartilhada, chat coletivo ou sincronização de progresso entre pessoas.
+Veja [Leitura 0.3](leitura-0.3.md), [fontes e formatos](fontes-formatos.md) e [recuperação](operacao.md).
