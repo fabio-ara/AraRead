@@ -1,0 +1,155 @@
+{
+  "version": "0.3.0",
+  "date": "2026-10-24",
+  "code_revision": "18e9855b2865cf61bd6ccc37f0fb3f6c63b16d40",
+  "edge_revision": "3b3336a773727db8e4cb29127f539cbc78b06e20",
+  "frontend_revision": "237f228f56e2c637863787251051d6eddeb769e1",
+  "deployment": {
+    "runtime": "Supabase Edge, existing exclusive Free project",
+    "version": 7,
+    "status": "ACTIVE",
+    "checked_at": "2026-10-24T18:49:30.150Z",
+    "gateway_jwt_verification": "delegated to the function for asymmetric JWT; unchanged configuration",
+    "identity_checks": [
+      "signature",
+      "issuer",
+      "audience",
+      "active session",
+      "OAuth grant"
+    ]
+  },
+  "schema": {
+    "migrations": [
+      {
+        "name": "20261024021521_araread_core.sql",
+        "sha256": "f8926b06ec6cb834aa0bb82243cf690ea81f4853ccc604401f9514cdcb9fa514"
+      },
+      {
+        "name": "20261024022151_auth_and_integrity.sql",
+        "sha256": "dc3830ae5c7a4e48f02b70dcfc06c0c4b441e45548ebde705beb05510c81bd20"
+      },
+      {
+        "name": "20261024123904_study_evolution.sql",
+        "sha256": "00fda574d2a834bd976bbfda661e2aec99ca6e91536763f75e4aeb7ceafbb5ab"
+      },
+      {
+        "name": "20261024171342_editorial_ingestion_v3.sql",
+        "sha256": "08c27a05788ad9f31a6bf7d1921786e43b81b23fb6bcbd54b4b9a2aeb5b32264"
+      },
+      {
+        "name": "20261024172646_preferences_profiles_v3.sql",
+        "sha256": "462a039f09d6c7bf2046b3d8f0c0af78ec7dbca81ab741035aa9423a8dd74d8e"
+      },
+      {
+        "name": "20261024180204_preference_reference_ownership_v3.sql",
+        "sha256": "b18c5113ad0a1f19651827e7bca1f3aa305030080bafded4b4bf0598f49a95bf"
+      }
+    ],
+    "tables": 19,
+    "forced_rls": true,
+    "application_role_bypasses_rls": false
+  },
+  "data_preservation": {
+    "preupgrade_backup": "Private consistent backup obtained and verified through authenticated reader connector",
+    "postupgrade_comparison": "All preexisting fields of sources, works, elements, readings, notes and terms equal the preupgrade reader backup",
+    "checked_at": "2026-10-24T18:56:59.710Z",
+    "administrative_read": false
+  },
+  "backend": {
+    "level": "Auth/PostgreSQL remotos; dominio Node local",
+    "checked_at": "2026-10-24T18:51:14.372Z",
+    "passed": [
+      "duas identidades sinteticas; assinatura, emissor e audiencia reais",
+      "cadastro publico desativado",
+      "original imutavel, Unicode, porcao e idioma persistidos no banco remoto",
+      "mediacao conferida por segunda leitura e recibo idempotente",
+      "continuidade e revisao conservam cobertura e retomada",
+      "RLS comum bloqueia fonte, busca, recibo, exportacao e referencia cruzada",
+      "revogacao imediata de sessao ainda assinada"
+    ],
+    "synthetic_identities_removed": 2,
+    "does_not_validate": [
+      "gateway HTTP hospedado",
+      "UI hospedada",
+      "ChatGPT"
+    ]
+  },
+  "http": {
+    "level": "HTTP Edge e Auth/PostgreSQL hospedados",
+    "checked_at": "2026-10-24T18:50:21.116Z",
+    "passed": [
+      "saude com banco real; dados sem token recebem 401",
+      "CORS aceita somente a origem da interface",
+      "HTTP preserva bytes e hash; porcao e idioma reais",
+      "escrita, segunda leitura e recibo idempotente pelo gateway",
+      "duas identidades isoladas por RLS atraves do HTTP",
+      "PDF real no Edge, com avisos da extracao parcial",
+      "URL publica funciona no Edge e loopback e recusado",
+      "24 chamadas concorrentes preservam identidades pelo pooler transacional",
+      "sessao revogada perde acesso imediatamente no gateway"
+    ],
+    "synthetic_identities_removed": 2,
+    "does_not_validate": [
+      "interface hospedada",
+      "ChatGPT"
+    ]
+  },
+  "mcp": {
+    "client": "SDK oficial MCP sobre HTTPS hospedado, fora do processo servidor",
+    "checked_at": "2026-10-24T18:59:13.449Z",
+    "passed": [
+      "descoberta, DCR, consentimento sintetico e PKCE reais no provedor",
+      "SDK oficial descobre contratos 0.3 e orientacao atraves do MCP hospedado",
+      "leitura e escrita reais, nova sessao MCP e conferencia independente pela API da interface",
+      "Pages apresenta três abas preparadas pelo MCP, teclado/offline e nenhuma escrita de estudo",
+      "mapa, progresso, navegação fora de sequência, preferências e pacote privado de perfil no MCP hospedado",
+      "perspectiva, livro sem URL, contexto/variante, vocabulário salvo, envio na mesma leitura e recurso MCP Apps no runtime hospedado",
+      "token web nao substitui audiencia e permissao MCP",
+      "revogacao imediata e nova autorizacao real"
+    ],
+    "published_ui": {
+      "published_ui": true,
+      "desktop": true,
+      "mobile": true,
+      "phone_width_everywhere": true,
+      "three_tabs": true,
+      "keyboard": true,
+      "study_buttons": false,
+      "reading_progress_unchanged": true,
+      "logout": true,
+      "service_worker": "shell e porção recuperados após recarga sem rede no Pages real"
+    },
+    "synthetic_identity_removed": true,
+    "synthetic_oauth_client_removed": true,
+    "does_not_validate": [
+      "ChatGPT"
+    ]
+  },
+  "restore": {
+    "checked_at": "2026-10-24T18:52:32.043Z",
+    "bundle_bytes": 17086902,
+    "passed": [
+      "perfil Edge informa cota real de 16 MiB",
+      "backup acima de 16 MiB restaura no gateway de 32 MiB",
+      "recibo confirmado e IDs remapeados",
+      "bytes originais iguais em contas distintas"
+    ],
+    "synthetic_identities_removed": 2
+  },
+  "publication": {
+    "pr": "https://github.com/fabio-ara/AraRead/pull/1",
+    "branch_ci": [
+      "https://github.com/fabio-ara/AraRead/actions/runs/40122242574",
+      "https://github.com/fabio-ara/AraRead/actions/runs/40122245421"
+    ],
+    "main_ci": "https://github.com/fabio-ara/AraRead/actions/runs/40122839598",
+    "pages": "https://github.com/fabio-ara/AraRead/actions/runs/40122990632",
+    "public_signup": false,
+    "new_paid_services": false
+  },
+  "limits": [
+    "The SDK and Playwright gates do not establish ChatGPT acceptance; that has separate evidence",
+    "No human specialist editorial review or pedagogical efficacy study",
+    "Benchmark does not forecast Supabase Free capacity"
+  ]
+}

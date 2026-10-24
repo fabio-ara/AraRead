@@ -1,6 +1,6 @@
 # Testes e evidências
 
-## Validação 0.3 em andamento
+## Validação 0.3 concluída
 
 Em 24/10/2026, o núcleo atual passou em 78/78 testes com PostgreSQL/Auth reais e duas identidades. A suíte inclui instalação vazia, evolução de dados, RLS direto, recibos, concorrência, OAuth/PKCE e SDK MCP oficial preparando e apresentando as três representações, restauração acima de 16 MiB e 10 mil elementos. Os 13 testes de ingestão cobrem HTML contaminado, preâmbulo/bibliografia, prosa, colunas, notas, tabelas, fórmulas, lacunas e OCR não revisado. Casos editoriais sintéticos incluem filosofia, ciência, matemática, poesia, distinção marxiano/marxista e problema ontológico; não são citações autênticas.
 
@@ -8,7 +8,7 @@ Sete jornadas Playwright passaram: autenticação/recuperação real, recibo ap�
 
 O adaptador real Poppler/Tesseract 5.3.0 processou `synthetic-scanned.pdf` sem rede, com memória limitada; a ingestão preservou as negações e reteve o PDF. O caso HTTPS pontual `https://plato.stanford.edu/entries/plato/` passou com 140 elementos úteis (17 títulos, 43 parágrafos, 80 itens), autoria, preâmbulo e bibliografia, sem menus iniciais. A página não foi versionada; regressões usam fixtures próprias.
 
-Tipos, build, links documentais, auditoria de histórico/árvore e npm audit passaram no checkpoint. O código verificado após a revisão está no commit `18e9855`; [evidência local](evidencias/leitura-0.3-local.json), [ingestão real](evidencias/ingestao-0.3.json) e benchmark vinculam escopo/limites. A revisão independente teve oito achados corrigidos e reproduzidos em testes antes/depois ([relatório](evidencias/revisao-0.3.md)). CI exata e gates hospedados/ChatGPT devem ser conferidos em [STATUS](../STATUS.md). Nenhuma prova 0.2 abaixo se aplica automaticamente à 0.3.
+Tipos, build, links documentais, auditoria de histórico/árvore e npm audit passaram no checkpoint. O código verificado após a revisão está no commit `18e9855`; [evidência local](evidencias/leitura-0.3-local.json), [ingestão real](evidencias/ingestao-0.3.json) e benchmark vinculam escopo/limites. A revisão independente teve oito achados corrigidos e reproduzidos em testes antes/depois ([relatório](evidencias/revisao-0.3.md)). CI exata e gates hospedados/ChatGPT passaram, com escopo e limites em [STATUS](../STATUS.md). Nenhuma prova 0.2 abaixo se aplica automaticamente à 0.3.
 
 ### Benchmark de armazenamento 0.3
 
@@ -19,11 +19,17 @@ A medição local do commit `6f0fcd5` registrou 8,26% de economia física (221.1
 
 O gate usa material sintético e identidades do Supabase Auth local real, em PostgreSQL isolado. Não exige chave de modelo. O teste de navegador interage com a interface servida e relê dados pela API; o teste MCP usa o cliente oficial e o provedor OAuth real. Simulação complementar de perda da resposta ocorre depois que a requisição real chegou ao servidor, sem substituir a persistência.
 
+### Instalação e cliente 0.3
+
+A [evidência hospedada](evidencias/hospedado-0.3.json) registra os gates do PostgreSQL/Auth remoto, HTTPS Edge, SDK e Pages, incluindo restauração de 17.086.902 bytes e isolamento. A [evidência ChatGPT](evidencias/chatgpt-0.3.json) registra ferramentas atualizadas, três abas acionadas, navegação, memória, preferências/perfis e recuperação em outra conversa sem escrita. O host mostrava CSP desativada no modo de desenvolvimento preexistente; essa configuração permaneceu intacta.
+
+Capturas nativas inspecionadas: [explicação no ChatGPT](assets/chatgpt-v3-facilitated.png), [tradução](assets/chatgpt-v3-translation.png), [original](assets/chatgpt-v3-original.png), [retomada em outra conversa](assets/chatgpt-v3-resume.png), [Pages móvel](assets/hosted-v3-mobile.png) e [Pages desktop](assets/hosted-v3-desktop.png). Os materiais exibidos são sintéticos e as imagens foram preservadas diretamente dos bytes nativos, sem downloads na interface.
+
+## Gates 0.2.0 — históricos — local, hospedado e ChatGPT
+
 A evolução 0.2.0 tem [matriz F01–F10 própria](evolucao.md), incluindo limites das provas editoriais e do painel. Resultados atuais devem ser lidos no [checkpoint](../STATUS.md), sem atribuir as provas históricas à revisão nova.
 
 Gate local 0.2.0: 52 testes do núcleo e oito jornadas web aprovados, tipos/build, links documentais e auditoria de dependências sem vulnerabilidades conhecidas. A prova de 10 mil elementos distingue tamanho lógico, compressão e tamanho físico das relações, sem prometer escala ilimitada. O [relatório sanitizado](evidencias/evolucao-2026-10-24.json) registra números e limites. Capturas nativas da [coluna no desktop](assets/evolution-phone-desktop.png) e das [configurações em 320 px](assets/evolution-settings-320.png) usam somente fixtures sintéticas. O teste também amplia texto a 200%, opera por teclado e confere foco/ausência de overflow; não é certificação assistiva completa.
-
-## Gates 0.2.0 — históricos — local, hospedado e ChatGPT
 
 O código [26687a4](https://github.com/fabio-ara/AraRead/commit/26687a4b89edac80d88af5720c3a57efb15b126c) passou na [CI](https://github.com/fabio-ara/AraRead/actions/runs/40102736244): 52 testes do núcleo, oito jornadas web, Docker, tipos/build/documentação e auditoria sem vulnerabilidades conhecidas. O [Pages aprovado](https://github.com/fabio-ara/AraRead/actions/runs/40103014546) publicou esse código com auditoria de 69 arquivos e licenças no artefato. O workflow exige CI aprovada na revisão exata; resultados posteriores aparecem nos links de workflows do checkpoint.
 

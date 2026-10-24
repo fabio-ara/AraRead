@@ -1,11 +1,11 @@
 # Alterações
 
-## 0.3.0 — em validação
+## 0.3.0 — 24/10/2026
 
 - Ingestão HTML/PDF com pré-verificação, reconstrução posicional, lacunas explícitas e adaptador OCR local aberto. Armazenamento textual canônico, retenção excepcional e deduplicação privada.
 - Leitor com três abas, preparação sem painel e apresentação final por `reading_display`. Chat controla navegação, memória e preferências.
 - Confronto editorial, mapa/progresso, continuidade fora do percurso principal, catálogo de preferências e perfis versionados com pacotes opt-in.
-- Três migrations novas, 19 tabelas com RLS e backup v3 compatível com v1/v2. Provas e limites em [STATUS](STATUS.md).
+- Três migrations novas, 19 tabelas com RLS e backup v3 compatível com v1/v2. Oito achados de revisão independente corrigidos; 78 testes do núcleo, sete jornadas web e gates hospedados/ChatGPT real aprovados. Provas e limites em [STATUS](STATUS.md).
 
 ## 0.2.0 — 24/10/2026
 

@@ -55,17 +55,13 @@
     "20261024180204_preference_reference_ownership_v3.sql"
   ],
   "rls_tables": 19,
-  "pending": [
-    "Exact-branch CI after review fixes",
-    "Hosted deployment and 0.3 gates",
-    "Real ChatGPT 0.3 acceptance"
-  ],
+  "pending": [],
   "limits": [
     "No human specialist editorial review or pedagogical efficacy study",
     "Local harness is not ChatGPT verification",
     "OCR remains unreviewed and original retained",
     "Synthetic benchmark is not a Supabase Free capacity forecast",
-    "0.2 hosted/client evidence is historical; no remote changes in this checkpoint"
+    "0.2 evidence is historical; 0.3 hosted/client proof is recorded separately"
   ],
   "independent_review": {
     "method": "Independent Codex CLI read-only review; findings reproduced and corrected by implementation agent",
@@ -87,5 +83,9 @@
       "code_revision": "18e9855b2865cf61bd6ccc37f0fb3f6c63b16d40"
     },
     "details": "revisao-0.3.md"
+  },
+  "external_completion": {
+    "hosted": "hospedado-0.3.json",
+    "chatgpt": "chatgpt-0.3.json"
   }
 }
