@@ -51,7 +51,7 @@ await mcp.callTool({name:'reading_context',arguments:{reading_id:source.reading_
 await mcp.callTool({name:'mediation_save',arguments:{
   operation_id:randomUUID(),reading_id:source.reading_id,expected_revision:0,ref,
   rewrite:'O texto apresenta uma possibilidade (algo que pode ocorrer), sem afirmar certeza.',
-  provenance:{agent:'Cliente sintético MCP',guidance_version:'1.0.0'}
+  provenance:{agent:'Cliente sintético MCP',guidance_version:'1.1.0'}
 }});
 ```
 

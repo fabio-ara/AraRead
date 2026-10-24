@@ -1,6 +1,6 @@
 {
   "version": "0.2.0",
-  "checked_at": "2026-10-24T14:23:16.539Z",
+  "checked_at": "2026-10-24T15:09:38.536Z",
   "local": {
     "core": {
       "passed": 52,
@@ -32,20 +32,130 @@
     "editorial": "9 fixtures sintéticas, 3 erros deliberados; sem revisão acadêmica humana ou estudo com participantes"
   },
   "audit": {
-    "commits": 5,
-    "blobs": 133,
-    "bytes": 2276234,
-    "working_files": 119,
+    "commits": 7,
+    "blobs": 209,
+    "bytes": 3110382,
+    "working_files": 121,
+    "tree_checked_at": "2026-10-24T15:16:06.992Z",
+    "code_commit": "26687a4b89edac80d88af5720c3a57efb15b126c",
+    "artifact_files": 69,
     "secret_alerts": 0,
     "forbidden_paths": [],
-    "ci_log_bytes": 119561,
-    "ci_log_sha256": "57e12ed48fb2f900abd9d064519cc1d57e7cb55ea1b121f5b238b9ba8b6da6a1",
-    "binary_review": "5 capturas históricas sintéticas inspecionadas; PDF de fixture sintético; imagens novas de QA sintética",
-    "commit_metadata": "Autoria histórica conferida com e-mail já publicado voluntariamente no perfil GitHub e no repositório público do titular; nenhum histórico reescrito",
-    "rights": "Código próprio MIT; avisos de dependências preservados; tokens Ara adaptados sob MIT"
+    "ci": {
+      "url": "https://github.com/fabio-ara/AraRead/actions/runs/40102736244",
+      "conclusion": "success",
+      "head_sha": "26687a4b89edac80d88af5720c3a57efb15b126c",
+      "log_bytes": 150094,
+      "log_sha256": "6b8d38d2be140226d5e8168465216cc7f81854f68ce27f713082f8252e339a28",
+      "pattern_alerts": 0,
+      "artifacts": 0
+    },
+    "binary_review": "5 capturas históricas sintéticas, PDF de fixture e novas capturas locais/Pages inspecionados; sem dados pessoais",
+    "commit_metadata": "Autoria histórica conferida com atribuição já pública; nenhum histórico reescrito",
+    "rights": "Código e documentação próprios MIT; avisos completos de terceiros distribuídos; tokens Ara adaptados sob MIT",
+    "limitations": "Varredura por padrões não prova ausência de todo segredo. Contagens registram o checkpoint do código; o workflow repete auditoria na revisão documental e no artefato Pages."
   },
   "remote": {
-    "status": "pending",
-    "note": "As provas históricas 0.1.0 não comprovam a evolução; atualizar após gates hospedados e cliente real."
-  }
+    "status": "verified",
+    "frontend": "https://fabio-ara.github.io/AraRead/",
+    "api": "https://ltzoontstgpbegtakrgk.supabase.co/functions/v1/araread",
+    "runtime": "Supabase Edge 0.2.0 no projeto exclusivo Free",
+    "schema": {
+      "checked_at": "2026-10-24T14:32:43.894Z",
+      "migrations": [
+        {
+          "name": "20261024021521_araread_core.sql",
+          "sha256": "f8926b06ec6cb834aa0bb82243cf690ea81f4853ccc604401f9514cdcb9fa514"
+        },
+        {
+          "name": "20261024022151_auth_and_integrity.sql",
+          "sha256": "dc3830ae5c7a4e48f02b70dcfc06c0c4b441e45548ebde705beb05510c81bd20"
+        },
+        {
+          "name": "20261024123904_study_evolution.sql",
+          "sha256": "00fda574d2a834bd976bbfda661e2aec99ca6e91536763f75e4aeb7ceafbb5ab"
+        }
+      ],
+      "tables": 16,
+      "forced_rls": true,
+      "application_bypasses_rls": false
+    },
+    "http": {
+      "level": "HTTP Edge e Auth/PostgreSQL hospedados",
+      "checked_at": "2026-10-24T14:34:35.524Z",
+      "passed": [
+        "saude com banco real; dados sem token recebem 401",
+        "CORS aceita somente a origem da interface",
+        "HTTP preserva bytes e hash; porcao e idioma reais",
+        "escrita, segunda leitura e recibo idempotente pelo gateway",
+        "duas identidades isoladas por RLS atraves do HTTP",
+        "PDF real no Edge, com avisos da extracao parcial",
+        "URL publica funciona no Edge e loopback e recusado",
+        "24 chamadas concorrentes preservam identidades pelo pooler transacional",
+        "sessao revogada perde acesso imediatamente no gateway"
+      ],
+      "synthetic_identities_removed": 2,
+      "does_not_validate": [
+        "interface hospedada",
+        "ChatGPT"
+      ]
+    },
+    "mcp": {
+      "client": "SDK oficial MCP sobre HTTPS hospedado, fora do processo servidor",
+      "checked_at": "2026-10-24T14:36:04.138Z",
+      "passed": [
+        "descoberta, DCR, consentimento sintetico e PKCE reais no provedor",
+        "SDK oficial descobre 27 ferramentas e orientacao atraves do MCP hospedado",
+        "leitura e escrita reais, nova sessao MCP e conferencia independente pela API da interface",
+        "interface publicada confere mediação MCP e grava nota/continuidade relidas por nova sessao MCP",
+        "perspectiva, livro sem URL, contexto/variante, vocabulário salvo, envio na mesma leitura e recurso MCP Apps no runtime hospedado",
+        "token web nao substitui audiencia e permissao MCP",
+        "revogacao imediata e nova autorizacao real"
+      ],
+      "published_ui": {
+        "published_ui": true,
+        "desktop": true,
+        "mobile": true,
+        "phone_width_everywhere": true,
+        "annotations": true,
+        "language_switch": true,
+        "continue": true,
+        "logout": true,
+        "service_worker": "shell e porção recuperados após recarga sem rede no Pages real"
+      },
+      "synthetic_identity_removed": true,
+      "synthetic_oauth_client_removed": true,
+      "does_not_validate": [
+        "ChatGPT"
+      ]
+    },
+    "restore": {
+      "checked_at": "2026-10-24T14:36:51.515Z",
+      "bundle_bytes": 17086190,
+      "passed": [
+        "perfil Edge informa cota real de 16 MiB",
+        "backup acima de 16 MiB restaura no gateway de 32 MiB",
+        "recibo confirmado e IDs remapeados",
+        "bytes originais iguais em contas distintas"
+      ],
+      "synthetic_identities_removed": 2
+    },
+    "publication": {
+      "repository": "https://github.com/fabio-ara/AraRead",
+      "visibility": "public",
+      "own_license": "MIT",
+      "pages_deployment": "https://github.com/fabio-ara/AraRead/actions/runs/40103014546",
+      "code_commit": "26687a4b89edac80d88af5720c3a57efb15b126c",
+      "legacy_entry": "Substituído por redirecionamento ao Pages, preservando audiência privada",
+      "legacy_deployment_status": "succeeded"
+    },
+    "auth": {
+      "site_url": "https://fabio-ara.github.io/AraRead/",
+      "authorization_path": "/",
+      "public_signup": false,
+      "personal_oauth_grant_preserved": true
+    },
+    "client_evidence": "chatgpt-evolucao-2026-10-24.json"
+  },
+  "code_commit": "26687a4b89edac80d88af5720c3a57efb15b126c"
 }

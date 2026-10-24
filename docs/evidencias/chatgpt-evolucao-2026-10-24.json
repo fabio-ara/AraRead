@@ -1,0 +1,108 @@
+{
+  "date": "2026-10-24",
+  "application_version": "0.2.0",
+  "guidance_version": "1.1.0",
+  "code_commit": "26687a4b89edac80d88af5720c3a57efb15b126c",
+  "client": {
+    "name": "ChatGPT web",
+    "browser": "Chrome dedicado",
+    "model": "Não identificado no registro; não inferido pelo agente",
+    "tools_refresh": "Atualizar ferramentas na conexão pessoal existente; 27 ferramentas descobertas pelo SDK, ferramentas novas usadas pelo ChatGPT",
+    "personal_consent": "Existente e preservado; nenhuma senha, código ou token extraído do navegador",
+    "host_csp": "Host exibia CSP desativada na configuração de desenvolvimento preexistente; agente não alterou essa configuração"
+  },
+  "reading_and_panel": {
+    "title": "Homologação AraRead evolução 20261024-b37e",
+    "work_id": "685cbd47-1e1f-404c-9329-03d2319c3bef",
+    "reading_id": "0473ce44-42cb-4030-88aa-a2e32c2b83ff",
+    "original": "Dois parágrafos sintéticos, seguidos de um terceiro envio à mesma leitura; sem atribuição histórica",
+    "saved": [
+      "Referência local com trecho, localizador e consulta declarada em 2026-10-24",
+      "Perspectiva sintética com escopo e contexto preparado",
+      "Mediação pt-BR ai_unreviewed com contexto/proveniência",
+      "Termo hipótese com sentido contextual e auxílio de memória explicitamente não etimológico",
+      "Pergunta de origem user e resposta assistant com reply_to",
+      "Novo segmento imutável na mesma leitura, sem mover os intervalos anteriores"
+    ],
+    "mediation_id": "8ef001c9-5d3d-467b-834b-91134e1d2cab",
+    "initial_writes": {
+      "receipts_confirmed": 9,
+      "revision": 8,
+      "covered": 0,
+      "elements": 3,
+      "segments": 2
+    },
+    "real_mcp_apps_interactions": [
+      "Recurso reading_context renderizado em iframe MCP Apps no ChatGPT",
+      "Original mostrou a passagem exata de 134 pontos de código",
+      "Vocabulário guardado: hipótese recuperada por tools/call sem nova geração, revisão permaneceu 8 e cobertura vazia",
+      "Continuar acionado uma vez: status Porção percorrida, sem inferir compreensão; revisão 9, cobertura só do primeiro elemento",
+      "Consulta independente pelo conector confirmou a retomada no segundo elemento de 97 pontos de código"
+    ],
+    "new_conversation": {
+      "read_only": true,
+      "revision_before_and_after": 9,
+      "recovered": ["retomada", "cobertura", "mediação anterior", "pergunta/resposta", "termo", "referência", "perspectiva", "contexto", "índice com três elementos e dois envios"],
+      "historical_context": "Diferença do contexto atual sinalizada; variante histórica preservada, sem regeneração"
+    },
+    "cleanup": {
+      "operation_id": "204bf6a6-f8ad-42fa-82fd-01fcef2f7a4c",
+      "exact_title_and_id_checked": true,
+      "delete_confirmed": true,
+      "receipt_reread_confirmed": true,
+      "search_results_after": 0
+    }
+  },
+  "variant_comparison_and_correction": {
+    "title": "Homologação AraRead variantes 20261024-c92a",
+    "work_id": "3c9ae760-aa54-4585-8534-7a4b40d51aba",
+    "reading_id": "2d27eb0a-6331-4763-a109-c7a8629991a4",
+    "ref": {"source_id":"9ebf09db-705f-4d39-bf60-63108b50b9da","element_id":"6402dff3-13af-4f8a-8668-b4e71352a4bf","start":0,"end":93},
+    "original": "Se a hipótese se mantiver, a conclusão pode ser considerada; o exemplo, isolado, não a prova.",
+    "variant_ids": ["f323a843-3ede-438f-aa51-b77786102067", "9c9bacce-ba7b-4ca2-93ad-412179cbb050"],
+    "initial": {"perspectives":2,"contexts":2,"variants":2,"confirmed_receipts":7,"revision":6,"covered":0},
+    "comparison": "Duas variantes recuperadas por ID e histórico, sem nova geração para comparar. Segunda variante ampliava indevidamente o original para prova da hipótese ou da conclusão; problema identificado, não aprovado como fiel.",
+    "new_conversation": {
+      "recovered_original_and_both_variants_before_correction": true,
+      "revision_before_correction": 6,
+      "coverage_before_correction": 0
+    },
+    "correction": {
+      "status":"confirmed",
+      "problem":"Ampliação indevida para prova da hipótese ou da conclusão",
+      "correction_note_id":"9d770768-dd98-4511-88f2-e08df49eb863",
+      "updated_context_id":"665e4ea0-3df2-415a-ac47-d467db718aa1",
+      "replacement_id":"f558daf0-a69e-4387-a217-a98a633c7106",
+      "supersedes":"9c9bacce-ba7b-4ca2-93ad-412179cbb050",
+      "rewrite":"Se a hipótese se mantiver, a conclusão poderá ser considerada. O exemplo, por si só, não basta para provar essa conclusão.",
+      "states":{"first":"unreviewed","problematic":"needs_review","replacement":"unreviewed"},
+      "confirmed_receipts":3,
+      "revision_after":9,
+      "covered_after":0,
+      "history_variants":3,
+      "independent_connector_reread":true,
+      "original_unchanged":true,
+      "human_review_inferred":false,
+      "validation_rejection":"Primeira tentativa de mediação com nota crítica sem documentação de suporte recusada; não gravada. Cliente salvou somente a reescrita corrigida. Relato de correção permaneceu separado.",
+      "editorial_limit":"O pronome a foi explicitado pelo cliente como referência à conclusão. Essa interpretação não é certificação acadêmica. A primeira variante também conserva formulação continuar válida que pode ser mais forte que se mantiver."
+    },
+    "cleanup": {
+      "operation_id":"a83c8eb2-8ef0-4066-9c8a-bbd0b4b376f9",
+      "exact_title_and_id_checked":true,
+      "delete_confirmed":true,
+      "receipt_reread_confirmed":true,
+      "search_results_after":0
+    }
+  },
+  "visual_evidence": {
+    "public": ["../assets/pages-reader-desktop.png", "../assets/pages-reader-mobile.png"],
+    "private_native_widget_capture": "Captura nativa parcial do painel inspecionada; instrumentação recortou o viewport e não produziu visão integral. Não publicada nem obtida por download de UI."
+  },
+  "does_not_validate": [
+    "Fidelidade semântica automática ou revisão acadêmica humana",
+    "Eficácia de aprendizagem em participantes",
+    "Aplicação de CSP pelo host ChatGPT nesta configuração",
+    "Compatibilidade de todo provider com MCP Apps; o frontend Pages e o endpoint MCP são independentes do ChatGPT"
+  ],
+  "personal_data_and_grants_preserved": true
+}

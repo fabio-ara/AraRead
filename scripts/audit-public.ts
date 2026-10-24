@@ -2,7 +2,7 @@ import {execFileSync} from 'node:child_process';
 import {readFile,mkdir,writeFile,readdir,realpath} from 'node:fs/promises';
 import {resolve,relative,sep} from 'node:path';
 const git=(...args:string[])=>execFileSync('git',args,{encoding:'utf8',maxBuffer:40*1024*1024,windowsHide:true});
-const rules:[string,RegExp][]=[['secret-key',/\b(?:sb_secret_|sbp_)[A-Za-z0-9_-]{15,}/g],['jwt',/\beyJ[A-Za-z0-9_-]{15,}\.[A-Za-z0-9_-]{15,}\.[A-Za-z0-9_-]{15,}/g],['private-key',/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/g],['database-password',/postgres(?:ql)?:\/\/[^\s"'<>]+:[^\s"'<>]+@[^\s"'<>]+/g],['personal-email',/[A-Za-z0-9._%+-]+@(?:gmail|hotmail|outlook)\.com/g]];
+const rules:[string,RegExp][]=[['secret-key',/\b(?:sb_secret_|sbp_)[A-Za-z0-9_-]{15,}/g],['github-token',/\b(?:gh[pousr]_|github_pat_)[A-Za-z0-9_]{24,}/g],['model-api-key',/\bsk-(?:proj-|svcacct-)?[A-Za-z0-9_-]{24,}/g],['jwt',/\beyJ[A-Za-z0-9_-]{15,}\.[A-Za-z0-9_-]{15,}\.[A-Za-z0-9_-]{15,}/g],['private-key',/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/g],['database-password',/postgres(?:ql)?:\/\/[^\s"'<>]+:[^\s"'<>]+@[^\s"'<>]+/g],['personal-email',/[A-Za-z0-9._%+-]+@(?:gmail|hotmail|outlook)\.com/g]];
 const hits:{path:string,rule:string,revision:string}[]=[],knownFixtures=new Set<string>();let blobs=0,bytes=0;
 function scan(body:Buffer,path:string,revision:string){
  if(body.includes(0)||/\.(png|pdf)$/.test(path))return;const text=body.toString('utf8');

@@ -6,6 +6,24 @@ A evolução 0.2.0 tem [matriz F01–F10 própria](evolucao.md), incluindo limit
 
 Gate local 0.2.0: 52 testes do núcleo e oito jornadas web aprovados, tipos/build, links documentais e auditoria de dependências sem vulnerabilidades conhecidas. A prova de 10 mil elementos distingue tamanho lógico, compressão e tamanho físico das relações, sem prometer escala ilimitada. O [relatório sanitizado](evidencias/evolucao-2026-10-24.json) registra números e limites. Capturas nativas da [coluna no desktop](assets/evolution-phone-desktop.png) e das [configurações em 320 px](assets/evolution-settings-320.png) usam somente fixtures sintéticas. O teste também amplia texto a 200%, opera por teclado e confere foco/ausência de overflow; não é certificação assistiva completa.
 
+## Gates atuais 0.2.0 — local, hospedado e ChatGPT
+
+O código [26687a4](https://github.com/fabio-ara/AraRead/commit/26687a4b89edac80d88af5720c3a57efb15b126c) passou na [CI](https://github.com/fabio-ara/AraRead/actions/runs/40102736244): 52 testes do núcleo, oito jornadas web, Docker, tipos/build/documentação e auditoria sem vulnerabilidades conhecidas. O [Pages aprovado](https://github.com/fabio-ara/AraRead/actions/runs/40103014546) publicou esse código com auditoria de 69 arquivos e licenças no artefato. O workflow exige CI aprovada na revisão exata; resultados posteriores aparecem nos links de workflows do checkpoint.
+
+| Camada | Resultado atual observado | Limite |
+|---|---|---|
+| Banco hospedado | Três migrations, 16 tabelas com RLS forçado e aplicação sem bypass | Projeto exclusivo, sem alteração dos irmãos |
+| HTTP Edge | Nove verificações: 401, CORS, original/hash, recibos, duas contas, PDF, URL/SSRF, 24 chamadas concorrentes e revogação | Material e identidades sintéticos |
+| SDK MCP sobre HTTPS | Sete verificações, 27 ferramentas/orientação 1.1.0, DCR/PKCE, nova sessão, estudo/variantes/contexto/lexicon/source_append e recurso Apps, audiência e revogação/reautorização | Cliente oficial separado do ChatGPT |
+| Pages com login comum | Mediação MCP relida, nota/continuidade salvas e confirmadas em outra sessão MCP; 1440 px com coluna ≤480 e celular 390 px; idioma e logout | Sem credencial de serviço Sites no caminho |
+| Offline Pages | Service worker ativo; contexto sem rede e recarga recuperaram shell, biblioteca e porção preparada | Sem geração offline; limites explícitos de cache |
+| Restauração Edge | Quatro verificações; backup v2 de 17.086.190 bytes, gateway 32 MiB, recibo/IDs novos e originais iguais entre duas contas | Não é restauração administrativa do provedor |
+| ChatGPT real | Orientação atual, bibliografia/perspectiva/contexto, mediação, termo e diálogo, acréscimo na mesma leitura, painel interativo, nova conversa e comparação de duas variantes salvas | Modelo não identificado no registro; sem revisão humana; CSP do host preexistente desativada |
+
+As capturas nativas do [Pages no desktop](assets/pages-reader-desktop.png) e [Pages no celular](assets/pages-reader-mobile.png) foram inspecionadas e contêm apenas material sintético. O [relatório consolidado](evidencias/evolucao-2026-10-24.json) preserva resultados, configuração pública e revisão sem credenciais. A [prova ChatGPT 0.2.0](evidencias/chatgpt-evolucao-2026-10-24.json) registra ações e limpeza exatas; não contém e-mail da conta, tokens, sidebar ou URL de conversa privada. As identidades sintéticas dos gates HTTPS foram removidas; as fixtures da sessão pessoal foram excluídas por título/ID exatos e recibo, preservando conta e concessão.
+
+Para reproduzir a UI hospedada, o runner fornece HOSTED_FRONTEND_ORIGIN (origem CORS) e HOSTED_FRONTEND_URL (URL completa com /AraRead/); a função verifyHostedUi recebe essa URL completa. Não usa ARAREAD_SITE_SERVICE_ACCESS nem bloqueia service workers. Testes históricos abaixo conservam suas condições originais e não descrevem a implementação atual.
+
 ## Reproduzir
 
 Execute a [instalação local](instalacao.md), mantenha o servidor em produção local ativo e rode:
@@ -54,7 +72,7 @@ Ela obtém somente `example.com` e usa o redirecionamento público do httpbin pa
 | 17 | Exportação/restauração/proveniência/IDs → bundle validado e transação | Integração: hashes, relações, cobertura e rollback adulterado; `large-restore.test.ts`: backup >16 MiB e bytes iguais |
 | 18 | Obra extensa/resposta limitada/docs → paginação e verificador de links | `scale.test.ts`: 10 mil elementos; `docs:check`: arquivos e links; métricas sem conteúdo pessoal |
 
-## Evidências observadas
+## Evidências da base 0.1.0 (históricas)
 
 Os resultados finais ficam registrados no [STATUS](../STATUS.md). Durante o desenvolvimento passaram separadamente integração, OAuth/MCP, gêneros, reinício, instalação, restauração grande e jornadas web. O gate consolidado deve ser executado depois da última alteração; não atribua uma passagem anterior a uma revisão posterior sem verificar se ela permanece válida.
 
@@ -68,13 +86,13 @@ Computer Use e Chrome DevTools foram usados na preparação do fluxo oficial de 
 
 A jornada `tests/e2e/account.spec.ts` cria uma identidade sintética, gera um link real de recuperação no GoTrue local, abre a tela de senha, rejeita confirmação divergente, altera a senha e entra novamente. Remove a identidade ao final. A screenshot nativa `.local/evidence/password-setup.png`, sem senha preenchida, foi inspecionada. O teste encontrou o caminho incorreto `/verify`; a configuração local do mailer foi corrigida para `/auth/v1/verify`.
 
-## Gate remoto parcial
+## Gate remoto parcial 0.1.0 (histórico)
 
 `tests/hosted-backend.ts` é separado da suíte local e não roda automaticamente na CI. Execute somente após conferir conta/organização/projeto exclusivos e disponibilizar por variáveis de processo `APP_MODE=production`, `AUTH_URL`, `AUTH_ISSUER`, `AUTH_AUDIENCE=authenticated`, `AUTH_PUBLISHABLE_KEY`, `DATABASE_URL`, `HOSTED_AUTH_ADMIN_KEY` e `CONFIRMED_ARAREAD_PROJECT_REF`. Com esses valores já definidos, use `npx tsx tests/hosted-backend.ts`. Não passe segredos na linha de comando nem crie um arquivo de credenciais rastreado pelo Git.
 
 O gate exige host do Auth igual ao ref confirmado, usuário PostgreSQL `araread_app.<ref>` e TLS `verify-full` com raiz configurada. A chave administrativa cria/remove apenas as duas identidades sintéticas desta execução; as operações do domínio usam identidade comum e RLS. Foram aprovadas sete verificações: identidade/JWKS, cadastro público fechado, fonte/Unicode/idioma, mediação/recibo, continuidade/revisão, isolamento e revogação. Resultado em `.local/evidence/hosted-backend.json`, com as duas identidades removidas. Esse processo de domínio é Node local; as provas seguintes exercitam a aplicação hospedada.
 
-## Aplicação HTTPS e cliente externo
+## Aplicação HTTPS e cliente externo 0.1.0 (histórico)
 
 Os gates voluntários exigem `CONFIRMED_ARAREAD_PROJECT_REF`, `HOSTED_API_BASE`, `HOSTED_FRONTEND_ORIGIN`, `AUTH_PUBLISHABLE_KEY` e `HOSTED_AUTH_ADMIN_KEY` em variáveis do processo. Recusam API cujo host ou caminho não correspondam ao projeto confirmado. A chave administrativa somente provisiona e remove as identidades sintéticas; a jornada usa login comum, OAuth e RLS. Confira conta/organização/projeto antes de fornecer essas variáveis.
 
@@ -97,7 +115,7 @@ O teste UI hospedado bloqueia service workers, porque a credencial de serviço n
 
 O [relatório consolidado sem credenciais](evidencias/2026-10-24.json) preserva datas e resultados desses gates no repositório. A prova abaixo acrescenta o ChatGPT real, após os atos pessoais do titular, e não substitui nem reclassifica as provas do SDK.
 
-## Homologação no ChatGPT e leitor pessoal
+## Homologação 0.1.0 no ChatGPT e leitor pessoal (histórica)
 
 Em 24/10/2026, o titular concluiu senha da biblioteca, confiança no plugin pessoal e consentimento OAuth. O cliente foi o ChatGPT web no Chrome dedicado, plugin pessoal AraRead cuja página mostrava versão 1.0.0; aplicação 0.1.0 e orientação 1.0.0. Foram usadas duas conversas e somente a obra sintética `Homologação AraRead ChatGPT c229730b`, com três parágrafos de 180, 181 e 103 pontos de código. O [relatório específico](evidencias/chatgpt-2026-10-24.json) registra referências e resultados, sem identidade da conta, tokens ou biblioteca pessoal.
 

@@ -1,13 +1,13 @@
 # Alterações
 
-## 0.2.0 — evolução em homologação, 24/10/2026
+## 0.2.0 — 24/10/2026
 
 - Interface GitHub Pages independente do ChatGPT; identidade visual Ara e coluna de celular de até 480 px em todas as telas.
 - Original, tradução e reescrita distintos; perspectivas versionadas, variantes históricas, contexto limitado e bibliografia/consulta rastreáveis.
 - Vocabulário contextual e consulta pública opcional; notas selecionáveis, exclusão de derivações, relações entre obras e cadernos seletivos privados.
 - Envios parciais na mesma leitura; preparo offline limitado e fila com recibos, conflitos e recuperação antes de sair.
 - Backup v2 consistente de quinze seções, restauração v1 e migration de dados antigos. Painel opcional MCP Apps e 27 ferramentas no mesmo domínio.
-- Auditoria pública de histórico/artefatos e matriz F01–F10 em [evolução](docs/evolucao.md). O [checkpoint](STATUS.md) distingue código pronto e gates hospedados.
+- Auditoria pública de histórico/artefatos e matriz F01–F10 em [evolução](docs/evolucao.md). Código MIT público, Pages e runtime 0.2.0 publicados; gates locais, hospedados e ChatGPT real concluídos no [checkpoint](STATUS.md).
 
 ## 0.1.0 — 23/10/2026
 
@@ -18,7 +18,7 @@
 - Exportação/restauração com mapa de IDs, cache privado da última leitura e rascunhos offline.
 - Suítes reais, fixtures editoriais sintéticas, imagem Docker, CI e documentação de implantação e limites.
 
-## Implantação — 24/10/2026
+## Implantação 0.1.0 (histórica) — 24/10/2026
 
 - API e MCP publicados no Supabase Edge do projeto exclusivo; frontend estático privado no Sites, sem Render.
 - Adaptador HTTP Web com a mesma autorização/domínio do Node; TLS para IP público fixado, PDF.js empacotado em 3 MB e CA PostgreSQL verificada.
@@ -26,7 +26,7 @@
 - Recuperação/definição de senha testada com GoTrue real; quatro jornadas E2E locais.
 - Documentação dos perfis de memória e implantação reproduzível. Veja [STATUS](STATUS.md).
 
-## Homologação no ChatGPT — 24/10/2026
+## Homologação 0.1.0 no ChatGPT (histórica) — 24/10/2026
 
 - Titular concluiu senha da biblioteca, confiança no plugin pessoal e consentimento OAuth.
 - ChatGPT carregou a orientação 1.0.0, importou fonte sintética, salvou reescrita, pergunta/resposta e glossário, conferiu recibos e avançou somente após pedido explícito.
