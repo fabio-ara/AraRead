@@ -1,0 +1,61 @@
+{
+  "date": "2026-10-24T18:00:11.711Z",
+  "environment": "PostgreSQL/Auth locais reais; material sintético; sem serviço pago",
+  "ocr": {
+    "engine": "tesseract",
+    "version": "tesseract 5.3.0",
+    "pages": 1,
+    "confidence": [
+      95.82199654545455
+    ],
+    "quality": {
+      "version": 1,
+      "status": "partial",
+      "useful_characters": 138,
+      "textual_elements": 4,
+      "structure": {
+        "paragraph": 4
+      },
+      "gaps": [],
+      "warnings": [
+        "PDF: reconstrução posicional heurística; fórmulas, colunas e notas exigem conferência editorial.",
+        "1 página(s) sem camada textual. OCR não executado no servidor; preparação local disponível.",
+        "OCR preparado localmente com Tesseract; proveniência declarada, sem certificação humana. Confira negações, fórmulas, tabelas e ordem no original."
+      ],
+      "original_required": true,
+      "method": "pdfjs-positional-v1",
+      "removed_elements": 0
+    },
+    "negations_preserved": true,
+    "original_retained": true
+  },
+  "sep": {
+    "url": "https://plato.stanford.edu/entries/plato/",
+    "title": "Plato",
+    "first_kind": "paragraph",
+    "first_excerpt": "Plato (429?–347 B.C.E.) is, by any reckoning, one of the most dazzling writers in the",
+    "elements": 140,
+    "quality": {
+      "version": 1,
+      "status": "ready",
+      "useful_characters": 72883,
+      "textual_elements": 140,
+      "structure": {
+        "heading": 17,
+        "paragraph": 43,
+        "list": 80
+      },
+      "gaps": [],
+      "warnings": [
+        "HTML: scripts e controles não foram executados; imagens não foram interpretadas."
+      ],
+      "original_required": false,
+      "method": "semantic-html-v1",
+      "removed_elements": 31
+    },
+    "bytes": 95660,
+    "canonical_sha256": "c3c36f850cfdb74762909591a266957e5095836e647d0970db4cd7a95b519ff7",
+    "persisted": false
+  },
+  "code_revision": "6f0fcd5e7cbb84fde072ade451c0835916b90532"
+}

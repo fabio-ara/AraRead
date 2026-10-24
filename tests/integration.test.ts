@@ -48,7 +48,7 @@ test('percurso durável e isolamento com PostgreSQL e duas identidades reais',as
   const first=context.ref;await call('reading_move',mutation({action:'continue',ref:first}));await refresh();const principal=context.reading.resume;
   assert.equal(context.reading.covered[0].end,first.end);assert.ok(context.reading.covered[0].end<Array.from(long).length);
   await call('reading_move',mutation({action:'open',ref:first}));await refresh('opened');assert.deepEqual(context.reading.resume,principal);assert.deepEqual(context.ref,first);
-  await assert.rejects(()=>call('reading_move',mutation({action:'continue',ref:first})),{code:'NOT_AT_RESUME'});
+  await call('reading_move',mutation({action:'continue',ref:first}));await refresh('opened');assert.deepEqual(context.reading.resume,principal);
   const index=await call('source_elements',{reading_id:created.reading_id});const later=index.items.at(-1).ref;await call('reading_move',mutation({action:'open',ref:later}));await refresh('opened');assert.deepEqual(context.reading.resume,principal);assert.equal(context.reading.covered.length,1);
   await call('reading_move',mutation({action:'resume'}));await refresh();assert.deepEqual(context.ref,principal);
  });
@@ -92,7 +92,7 @@ test('percurso durável e isolamento com PostgreSQL e duas identidades reais',as
   let snapshot:string|undefined;const sections:Record<string,any[]>={};for(const section of backupSections){
    let offset:number|null=0;sections[section]=[];while(offset!==null){const page=await call('data_export',{section,offset,limit:50,include_original:true,snapshot});snapshot=page.snapshot;sections[section].push(...page.items);offset=page.pagination.next_offset;}
   }
-  const bundle={format:'araread/2',snapshot,sections};const restored=await call('data_restore',{operation_id:op(),bundle},bob);assert.ok(restored.id_map[created.reading_id]);
+  const bundle={format:'araread/3',snapshot,sections};const restored=await call('data_restore',{operation_id:op(),bundle},bob);assert.ok(restored.id_map[created.reading_id]);
   const restoredContext=await call('reading_context',{reading_id:restored.id_map[created.reading_id]},bob);assert.equal(restoredContext.original,context.original);assert.equal(restoredContext.mediation.rewrite,context.mediation.rewrite);assert.equal(restoredContext.reading.covered.length,context.reading.covered.length);assert.notEqual(restoredContext.source.id,context.source.id);
   const tampered=structuredClone(bundle);tampered.sections.readings[0].resume.end=999999;await assert.rejects(()=>call('data_restore',{operation_id:op(),bundle:tampered},bob),{code:'INVALID_REF'});
   for(const work of sections.works)await call('work_delete',{operation_id:op(),work_id:restored.id_map[work.id],confirm_title:work.title},bob);

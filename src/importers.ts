@@ -1,12 +1,15 @@
 import { lookup } from 'node:dns/promises';
 import { connect } from 'node:tls';
 import { Client } from 'undici';
-import { parseHTML } from 'linkedom';
+import {extractHtml,prose} from './ingestion/html.ts';
+import {extractPdf} from './ingestion/pdf.ts';
+import {assessExtraction,canonicalHash} from './ingestion/quality.ts';
+import {applyOcr,ocrSchema,type OcrPreparation} from './ingestion/ocr.ts';
 import ipaddr from 'ipaddr.js';
 import { blockSchema,type Block,type Extraction } from './contracts.ts';
 import { AppError,ensure } from './errors.ts';
 const MAX=8*1024*1024;
-export interface ImportInput {format:string;text?:string;file_base64?:string;filename?:string;url?:string;blocks?:Block[]}
+export interface ImportInput {format:string;text?:string;file_base64?:string;filename?:string;url?:string;blocks?:Block[];ocr?:OcrPreparation}
 export function publicAddress(address:string){try{const ip=ipaddr.process(address);return ip.range()==='unicast';}catch{return false;}}
 export async function validatePublicUrl(value:string){
  const u=new URL(value);ensure(u.protocol==='https:'&&!u.username&&!u.password&&(!u.port||u.port==='443'),'UNSAFE_URL','Importação de página exige HTTPS público, sem credenciais e na porta padrão.');
@@ -24,7 +27,7 @@ async function getPublic(value:string,maxBytes:number,signal:AbortSignal):Promis
   socket.once('secureConnect',()=>{socket.removeListener('error',failed);callback(null,socket);});
  }});
  try{
-  const response=await client.request({method:'GET',path:url.pathname+url.search,signal,headers:{'User-Agent':'AraRead/0.1 (single-page user-directed importer)','Accept':'text/html, text/plain;q=0.8','Accept-Encoding':'identity'}});
+  const response=await client.request({method:'GET',path:url.pathname+url.search,signal,headers:{'User-Agent':'AraRead/0.3 (single-page user-directed importer)','Accept':'text/html, text/plain;q=0.8','Accept-Encoding':'identity'}});
   const status=response.statusCode,mime=String(response.headers['content-type']||'').split(';')[0].toLowerCase();
   if(status>=300&&status<400)return {body:Buffer.alloc(0),mime,status,location:typeof response.headers.location==='string'?response.headers.location:undefined};
   ensure(Number(response.headers['content-length']||0)<=maxBytes,'TOO_LARGE','Página excede o limite de bytes.',413);
@@ -49,9 +52,9 @@ export async function fetchPublicHtml(value:string){
 }
 function utf8(bytes:Buffer){try{return new TextDecoder('utf-8',{fatal:true}).decode(bytes);}catch{throw new AppError('ENCODING','Forneça texto UTF-8 válido.');}}
 function textBlocks(text:string,markdown=false):Block[]{
- if(!markdown)return text.split(/\r?\n\s*\r?\n/).filter(x=>x.trim()).map(text=>({kind:'paragraph',text,meta:{}}));
+ if(!markdown)return text.split(/\r?\n\s*\r?\n/).filter(x=>x.trim()).map(text=>({kind:'paragraph',text:prose(text),meta:{}}));
  const lines=text.split(/\r?\n/),blocks:Block[]=[];let pending:string[]=[];
- const flush=()=>{if(pending.length){blocks.push({kind:'paragraph',text:pending.join('\n'),meta:{}});pending=[];}};
+ const flush=()=>{if(pending.length){blocks.push({kind:'paragraph',text:prose(pending.join(' ')),meta:{}});pending=[];}};
  for(let i=0;i<lines.length;i++){
   const line=lines[i];if(!line.trim()){flush();continue;}
   const fence=line.match(/^\s*(```+|~~~+)(.*)$/);if(fence){flush();const body=[];while(++i<lines.length&&!lines[i].trim().startsWith(fence[1]))body.push(lines[i]);blocks.push({kind:'code',text:body.join('\n')||' ',meta:{language:fence[2].trim()}});continue;}
@@ -66,44 +69,6 @@ function textBlocks(text:string,markdown=false):Block[]{
  }
  flush();return blocks;
 }
-function htmlBlocks(text:string):Block[]{
- const {document}=parseHTML(text),blocks:Block[]=[];
- document.querySelectorAll('script,style,noscript,template,iframe,object,embed').forEach(x=>x.remove());
- const root=document.querySelector('main,article')||document.body||document.documentElement;
- const walk=(node:any)=>{
-  if(node.nodeType===3){if(node.textContent.trim())blocks.push({kind:'paragraph',text:node.textContent,meta:{}});return;}
-  if(node.nodeType!==1)return;
-  const tag=node.tagName.toLowerCase(),text=(node.textContent||'').trim();
-  if(tag==='figure'||tag==='img'){const img=tag==='img'?node:node.querySelector('img'),caption=node.querySelector?.('figcaption')?.textContent||'',alt=img?.getAttribute('alt')||'';blocks.push({kind:'figure',text:[alt,caption].filter(Boolean).join('\n')||'Figura sem descrição. Imagem não interpretada.',meta:{alt,caption,observed:false}});return;}
-  if(tag==='table'){const rows=Array.from(node.querySelectorAll('tr')).map((r:any)=>Array.from(r.querySelectorAll('th,td')).map((c:any)=>c.textContent.trim()));blocks.push({kind:'table',text:rows.map((r:any)=>r.join(' | ')).join('\n')||text||'Tabela sem texto extraível.',meta:{rows}});return;}
-  if(['math','svg'].includes(tag)){blocks.push({kind:tag==='math'?'equation':'unknown',text:node.outerHTML,meta:{representation:'original_markup_as_text',interpretation:'not_verified'}});return;}
-  const kind=/^h[1-6]$/.test(tag)?'heading':({p:'paragraph',pre:'code',blockquote:'quote',li:'list',aside:'note'} as Record<string,string>)[tag];
-  if(kind&&text){blocks.push({kind,text,meta:kind==='heading'?{level:Number(tag[1])}:{}});return;}
-  for(const child of node.childNodes)walk(child);
- };
- if(root)walk(root);return blocks;
-}
-async function pdfBlocks(bytes:Buffer){
- ensure(bytes.subarray(0,5).toString()==='%PDF-','INVALID_PDF','Arquivo sem cabeçalho PDF.');
- const {getDocument}=await import('pdfjs-dist/legacy/build/pdf.mjs');
- const task=getDocument({data:new Uint8Array(bytes),useSystemFonts:true,stopAtErrors:true,disableFontFace:true});
- let timeout:ReturnType<typeof setTimeout>|undefined;
- try{
-  return await Promise.race([(async()=>{
-   const pdf=await task.promise;ensure(pdf.numPages<=500,'TOO_MANY_PAGES','O limite desta versão é 500 páginas.');
-   const blocks:Block[]=[],warnings=['Extração de PDF não verificada: confira a ordem, fórmulas, notas, tabelas e figuras no original. Imagens não foram interpretadas.'];let empty=0;
-   for(let page=1;page<=pdf.numPages;page++){
-    const p=await pdf.getPage(page),content=await p.getTextContent();let text='';
-    for(const item of content.items){if('str'in item)text+=item.str+(item.hasEOL?'\n':' ');}
-    if(!text.trim()){empty++;blocks.push({kind:'unknown',text:'Página sem texto extraível. Forneça uma transcrição vinculada a esta página.',locator:`página ${page}`,meta:{page,extraction:'missing',image_observed:false}});}
-    else blocks.push({kind:'paragraph',text:text.trim(),locator:`página ${page}`,meta:{page,extraction:'unverified'}});
-    p.cleanup();
-   }
-   if(empty)warnings.push(`${empty} página(s) sem camada textual. OCR não executado; extração parcial.`);
-   return {blocks,warnings};
-  })(),new Promise<never>((_,reject)=>{timeout=setTimeout(()=>{void task.destroy();reject(new AppError('PDF_TIMEOUT','Extração demorou demais. Preserve o arquivo e forneça transcrição.'));},15000);})]);
- }catch(e){if(e instanceof AppError)throw e;throw new AppError('INVALID_PDF','PDF protegido, danificado ou sem extração segura. Forneça uma transcrição autorizada.');}finally{clearTimeout(timeout);await task.destroy();}
-}
 export async function extract(input:ImportInput):Promise<Extraction>{
  let bytes:Buffer;
  if(input.format==='url'){ensure(input.url,'VALIDATION','Informe o URL público.');bytes=await fetchPublicHtml(input.url);}
@@ -111,12 +76,16 @@ export async function extract(input:ImportInput):Promise<Extraction>{
  else if(input.format==='structured'){ensure(input.blocks?.length,'VALIDATION','Forneça blocos estruturados.');bytes=Buffer.from(JSON.stringify(input.blocks),'utf8');}
  else {ensure(input.text!==undefined,'VALIDATION','Forneça texto ou arquivo.');bytes=Buffer.from(input.text,'utf8');}
  ensure(bytes.length>0&&bytes.length<=MAX,'TOO_LARGE','Forneça um original de até 8 MiB.',413);
- let blocks:Block[],warnings:string[]=[],mime='text/plain';
- if(input.format==='pdf'){const result=await pdfBlocks(bytes);blocks=result.blocks;warnings=result.warnings;mime='application/pdf';}
+ let blocks:Block[],warnings:string[]=[],mime='text/plain',removed=0,metadata={title:'',author:'',edition:''};
+ if(input.format==='pdf'){const result=await extractPdf(bytes);blocks=result.blocks;warnings=result.warnings;removed=result.removed;mime='application/pdf';}
  else if(input.format==='structured'){blocks=input.blocks!.map(x=>blockSchema.parse(x));mime='application/json';}
- else if(['url','html'].includes(input.format)){blocks=htmlBlocks(utf8(bytes));mime='text/html';warnings=['HTML: imagens não interpretadas; scripts e componentes interativos não foram executados. Confira a representação extraída.'];}
+ else if(['url','html'].includes(input.format)){const result=extractHtml(utf8(bytes));blocks=result.blocks;warnings=result.warnings;removed=result.removed;metadata=result.metadata;mime='text/html';}
  else {blocks=textBlocks(utf8(bytes),input.format==='markdown');if(input.format==='markdown')mime='text/markdown';}
  ensure(blocks.length>0&&blocks.length<=20000,'EMPTY_SOURCE','A fonte não contém texto extraível dentro do limite de 20 mil elementos.');
  for(const b of blocks)ensure(blockSchema.safeParse(b).success,'ELEMENT_LIMIT','Um elemento excede 100 mil caracteres ou possui metadados inválidos. Forneça uma transcrição dividida por sentido; não divida fórmulas ou provas automaticamente.');
- return {blocks,warnings,original:bytes,mime,filename:input.filename||({pdf:'original.pdf',markdown:'original.md',html:'original.html',url:'original.html',structured:'original.json'} as Record<string,string>)[input.format]||'original.txt'};
+ if(input.ocr){ensure(input.format==='pdf','INVALID_OCR','Preparo OCR exige o PDF original.');blocks=applyOcr(blocks,bytes,ocrSchema.parse(input.ocr));warnings.push('OCR preparado localmente com Tesseract; proveniência declarada, sem certificação humana. Confira negações, fórmulas, tabelas e ordem no original.');}
+ const labels:Record<string,string>={paragraph:'parágrafo',heading:'título',list:'item',quote:'citação',note:'nota',verse:'estrofe',equation:'fórmula',table:'tabela',code:'código',figure:'figura'},counts:Record<string,number>={};
+ blocks=blocks.map(b=>({...b,locator:b.locator||`${labels[b.kind]||'elemento'} ${counts[b.kind]=(counts[b.kind]||0)+1}`}));
+ const quality=assessExtraction(blocks,warnings,input.format==='pdf'?'pdfjs-positional-v1':input.format==='html'||input.format==='url'?'semantic-html-v1':'text-v1',removed);
+ return {blocks,warnings,quality,metadata,canonical_hash:canonicalHash(blocks),original:bytes,mime,filename:input.filename||({pdf:'original.pdf',markdown:'original.md',html:'original.html',url:'original.html',structured:'original.json'} as Record<string,string>)[input.format]||'original.txt'};
 }

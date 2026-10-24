@@ -1,10 +1,10 @@
 # AraRead
 
-Uma biblioteca pessoal para ler obras difíceis em períodos curtos, na ordem do original, guardar explicações e retomar em outra sessão. A aplicação conserva o material e o estado; o assistente conectado faz a reescrita e responde às perguntas. O núcleo funciona sem chave de modelo.
+Um ambiente pessoal para estudar obras difíceis pelo chat. Peça uma leitura, acompanhe a passagem nas abas **Leitura facilitada | Tradução | Original** e converse para entender conceitos, consultar fontes, escolher outra seção ou retomar o estudo. O AraRead conserva obras, versões, notas, progresso e preferências explícitas. A IA continua no assistente conectado, sem chave de modelo no backend.
 
-A versão 0.2.0 acrescenta perspectivas versionadas, vocabulário contextual, fontes bibliográficas, variantes comparáveis, cadernos privados e continuidade de envios na mesma leitura. Todas as telas mantêm uma coluna de celular, com largura máxima de 480 px inclusive no desktop, seguindo a identidade visual Ara. O original e a reescrita/tradução compartilham a mesma referência; consultar, comparar ou perguntar não marca progresso.
+A evolução 0.3 acrescenta ingestão editorial validada, armazenamento textual, OCR local aberto, navegação conversacional e perfis reutilizáveis. A tradução permanece fiel ao original e separada de lentes interpretativas. A primeira explicação deve construir os conhecimentos necessários à passagem; verificações automáticas não certificam compreensão nem fidelidade acadêmica universal. Todas as telas mantêm largura máxima de 480 px.
 
-**Disponível em 24/10/2026:** abra o [AraRead no GitHub Pages](https://fabio-ara.github.io/AraRead/) e entre com sua conta de leitor. API, autenticação e [MCP OAuth](https://ltzoontstgpbegtakrgk.supabase.co/functions/v1/araread/mcp) usam o projeto Supabase exclusivo Free. O [repositório público](https://github.com/fabio-ara/AraRead) e a documentação própria estão sob MIT, após auditoria do histórico e do artefato. As provas locais, hospedadas e no ChatGPT real constam no [estado verificável](STATUS.md). A interface web funciona independentemente do ChatGPT; o painel MCP Apps é opcional e depende de suporte do cliente. Veja a [evolução e matriz F01–F10](docs/evolucao.md).
+**Situação da entrega:** veja [STATUS](STATUS.md) para distinguir a branch 0.3, os gates locais, a versão publicada e as provas no ChatGPT. O destino existente é o [GitHub Pages](https://fabio-ara.github.io/AraRead/), com API/Auth/[MCP OAuth](https://ltzoontstgpbegtakrgk.supabase.co/functions/v1/araread/mcp) no Supabase exclusivo Free. Não há serviços pagos, cadastro público nem descoberta de bibliotecas alheias. Conheça o [comportamento da 0.3](docs/leitura-0.3.md).
 
 ## Usar localmente
 
@@ -23,7 +23,7 @@ npm run dev
 
 Abra **http://127.0.0.1:4317**. Para uso pessoal local, preencha e-mail e uma senha exclusiva de teste e use “Criar conta local de teste”. As duas identidades geradas pelo comando são exclusivamente sintéticas para a suíte; suas credenciais ficam em `.local/test-accounts.json`, ignorado pelo Git. Não use senhas reais de outros serviços nesse ambiente de desenvolvimento.
 
-Cole um trecho em “Importar”, abra o original e guarde perguntas. Quando houver um assistente conectado, ele pode consultar a passagem e salvar uma mediação. “Continuar” confirma apenas a porção apresentada. “Voltar” conserva a retomada principal. Não há geração automática interna nem respostas fictícias apresentadas como IA.
+Diga ao assistente: “Quero estudar este artigo”, “Explique o problema antes dos termos”, “Mostre o mapa da obra” ou “Retome meu percurso principal”. O chat prepara e guarda as representações antes de apresentar um único painel. A página web oferece autenticação, visualização e recuperação técnica; os controles de estudo ficam no chat. Sem MCP Apps, o assistente apresenta o conteúdo em texto.
 
 ## Verificar e conhecer
 
@@ -32,6 +32,8 @@ npm run check
 npm test
 npm run test:e2e
 npm run docs:check
+npm run audit:public
+npm run build
 npm audit --audit-level=moderate
 ```
 

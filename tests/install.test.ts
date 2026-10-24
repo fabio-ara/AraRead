@@ -30,7 +30,7 @@ test('banco vazio, schema real do GoTrue, primeira migration e evolução preser
   const preserved=(await db.query('select * from araread.readings where id=$1',[reading])).rows[0];assert.equal(preserved.revision,7);assert.deepEqual(preserved.covered,[ref]);assert.deepEqual(preserved.resume,ref);
   assert.equal((await db.query('select source_id from araread.reading_segments where reading_id=$1',[reading])).rows[0].source_id,source);
   const old=(await db.query('select * from araread.mediations where id=$1',[mediation])).rows[0];assert.equal(old.rewrite,'Não é uma certeza.');assert.equal(old.context_id,null);assert.equal(old.context_signature,null);
-  const policies=(await db.query("select count(*)::int n from pg_tables where schemaname='araread' and rowsecurity")).rows[0].n;assert.equal(policies,16);
+  const policies=(await db.query("select count(*)::int n from pg_tables where schemaname='araread' and rowsecurity")).rows[0].n;assert.equal(policies,19);
   assert.equal((await db.query("select to_regprocedure('araread_private.token_hook(jsonb)') is not null ok")).rows[0].ok,true);
  }finally{await db?.end();await admin.query(`drop database if exists "${name}"`);await admin.end();}
 });

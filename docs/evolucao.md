@@ -1,8 +1,10 @@
-# Evolução da leitura e critérios F01–F10
+# Evolução 0.2 e critérios F01–F10 — histórico
+
+A experiência corrente está descrita em [Leitura 0.3](leitura-0.3.md): chat conduz o estudo, painel tem três abas e fontes passam por pré-verificação. As provas de versões anteriores abaixo são históricas; o [STATUS](../STATUS.md) identifica a revisão efetivamente verificada.
 
 A versão 0.2.0 conserva o domínio anterior e acrescenta estudo rastreável. A fonte determina a ordem; o assistente conectado faz a mediação intelectual. O aplicativo não chama um modelo nem promete que referências válidas ou cobertura de caracteres comprovem fidelidade. O [estado verificável](../STATUS.md) separa revisão local, CI, serviço hospedado e cliente externo.
 
-## Rastreabilidade
+## Rastreabilidade histórica 0.2
 
 | Incremento | Implementação e contrato | Prova reproduzível e documentação |
 |---|---|---|

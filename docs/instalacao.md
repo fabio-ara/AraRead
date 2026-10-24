@@ -61,7 +61,7 @@ Render foi retirado por decisão do titular. A instalação não depende de outr
 
 ## Publicar a função e atualizar a interface
 
-Após conferir identidade/organização/projeto exclusivos e configurar os segredos, execute `npx tsx scripts/prepare-edge.ts`. O pacote gerado fica em `.local/edge-release`, sem credenciais. Publique pela CLI Supabase 2.122.0, com `functions deploy araread --workdir .local/edge-release --project-ref <ref-confirmado>`, usando a autenticação legítima da conta independente. Preserve o projeto de destino em cada comando; não use `--prune`. O pacote aprovado tem cerca de 3 MB.
+Após conferir identidade/organização/projeto exclusivos e configurar os segredos, execute `npx tsx scripts/prepare-edge.ts`. O pacote gerado fica em `.local/edge-release`, sem credenciais. Publique pela CLI Supabase 2.122.0, com `functions deploy araread --workdir .local/edge-release --project-ref <ref-confirmado>`, usando a autenticação legítima da conta independente. Preserve o projeto de destino em cada comando; não use `--prune`. O tamanho e a compatibilidade de cada pacote precisam ser conferidos no gate da revisão corrente.
 
 O adaptador verifica JWT ES256/RS256, emissor, audiência, sessão, cliente e permissão antes dos dados. `verify_jwt=false` desativa somente o verificador legado do gateway, necessário para descoberta OAuth pública e para os tokens assimétricos destinados ao recurso próprio; não habilita dados anônimos. Os gates comprovam 401 sem token, rejeição de audiência incorreta e revogação imediata. Veja [segurança](seguranca.md).
 
@@ -70,7 +70,7 @@ Para publicar a interface, configure a variável do repositório `ARAREAD_API_BA
 ## Artefato e gates externos
 
 ```powershell
-docker build -t araread:local-0.2.0 .
+docker build -t araread:local-0.3.0 .
 ```
 
 A imagem contém app/build/dependências e roda como usuário `node`, sem `.env`, dados ou chaves locais. Um build bem-sucedido não demonstra implantação. Confira saúde, interface, migrações novas, originais privados, OAuth/PKCE pelo gateway, revogação, duas contas e escrita/retomada reais. Só depois execute a [prova no cliente externo](conectar-assistente.md). Na reversão, retorne o artefato compatível sem apagar banco; migrations com dados não são desfeitas automaticamente. Use backup e uma migration corretiva revisada quando necessário.
@@ -79,4 +79,21 @@ A imagem contém app/build/dependências e roda como usuário `node`, sem `.env`
 
 `hosting/frontend.json` identifica URL completa, origem (sem caminho), base path e API. `APP_ORIGIN` recebe só a origem CORS; o Auth recebe a URL da interface e redirect exato no caminho do projeto. A página de consentimento usa o mesmo aplicativo com `authorization_id` na query, sem depender de rota SPA inexistente. Confira o redirecionamento real pelo SDK após qualquer alteração do Auth. Conserve consentimentos existentes; mudar frontend não exige apagar contas/concessões. Nesta instalação: site_url e redirect permitido são https://fabio-ara.github.io/AraRead/; APP_ORIGIN é https://fabio-ara.github.io; oauth_server_authorization_path é /, que o provedor combina com o site_url. Não use /AraRead/ novamente como authorization_path, pois duplicaria o caminho. O SDK hospedado comprovou o redirecionamento e o consentimento reais.
 
-A terceira migration acrescenta seis tabelas com RLS forçado e preenche o segmento raiz de leituras existentes. Não reescreva os checksums anteriores. O gate cria banco temporário com dados anteriores à evolução e verifica posição, histórico e vínculos após as três migrations. Faça backup consistente antes de aplicar no destino confirmado. O empacotador Edge copia recursivamente `src/study`; publicar só os arquivos da raiz é incompleto.
+A terceira migration acrescenta seis tabelas com RLS forçado e preenche o segmento raiz de leituras existentes. Não reescreva os checksums anteriores. O gate cria banco temporário com dados anteriores à evolução e verifica posição, histórico e vínculos após as três migrations. Faça backup consistente antes de aplicar no destino confirmado. A 0.3 acrescenta três migrations: ingestão/mapas, perfis/preferências e propriedade das referências de preferência. O empacotador Edge copia recursivamente `src/study` e `src/ingestion`; publicar só os arquivos da raiz é incompleto.
+
+## OCR local opcional
+
+O servidor e o Edge não executam OCR. Para PDF digitalizado autorizado, construa o adaptador aberto e produza um payload fora da interface. O diretório de saída deve ser privado, novo e gravável pelo UID 65534; o comando recusa sobrescrever um arquivo.
+
+```powershell
+docker build -f Dockerfile.ocr -t araread-ocr:local .
+New-Item -ItemType Directory -Force .local/ocr
+$ocrInput = (Resolve-Path tests/fixtures).Path
+$ocrOutput = (Resolve-Path .local/ocr).Path
+docker run --rm --network none --memory 512m --cpus 1 --pids-limit 64 --read-only --tmpfs /tmp:rw,noexec,nosuid,size=128m -v "${ocrInput}:/input:ro" -v "${ocrOutput}:/output" araread-ocr:local /input/synthetic-scanned.pdf /output/scanned-import.json --language eng
+node --import tsx --env-file-if-exists=.env scripts/verify-ingestion-v3.ts .local/ocr/scanned-import.json
+```
+
+O último comando usa somente as identidades sintéticas locais. Para material pessoal, encaminhe o payload por API/conector autorizado, acrescente título/idioma e confira `source_preview` antes de importar; não publique esse JSON, que inclui o PDF. Também é possível executar `python scripts/ocr-pdf.py entrada.pdf novo-payload.json --language por+eng` com Poppler/Tesseract instalados, sob os mesmos limites de recursos. Confira os [avisos dos componentes](../THIRD_PARTY_NOTICES.md).
+
+A CI testa o container sem rede e a ingestão real do OCR; o site Stanford é prova pontual explícita, não dependência permanente da suíte. O gerador das três fixtures PDF usa ReportLab/Pillow/MuPDF somente no preparo de material sintético, fora do runtime e do Edge.

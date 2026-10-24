@@ -33,9 +33,9 @@ test('intervalos Unicode [início,fim) cobrem texto longo sem perder espaços',(
 });
 test('tipo desconhecido e figura permanecem preservados sem interpretação fabricada',async()=>{
  const blocks=[{kind:'ritual_structure',text:'א ב ג',locator:'região A',meta:{interpretation:'pending'}},{kind:'figure',text:'Imagem fornecida sem transcrição',meta:{observed:false}}];
- const x=await extract({format:'structured',blocks});assert.deepEqual(x.blocks,blocks);assert.equal(JSON.parse(x.original.toString())[0].kind,'ritual_structure');
+ const x=await extract({format:'structured',blocks});assert.deepEqual(x.blocks,blocks.map(b=>({...b,locator:b.locator||'figura 1'})));assert.equal(JSON.parse(x.original.toString())[0].kind,'ritual_structure');
 });
 test('PDF textual preserva bytes e declara página sem texto sem inventar imagem',async()=>{
  const original=await readFile('tests/fixtures/synthetic-extraction.pdf');const x=await extract({format:'pdf',filename:'synthetic-extraction.pdf',file_base64:original.toString('base64')});
- assert.deepEqual(x.original,original);assert.equal(x.blocks.length,2);assert.match(x.blocks[0].text,/Association is not a proof/);assert.equal(x.blocks[1].meta.extraction,'missing');assert.match(x.warnings.join(' '),/OCR não executado/);assert.equal(x.blocks[1].locator,'página 2');
+ assert.deepEqual(x.original,original);assert.ok(x.blocks.length>2);assert.ok(x.blocks.some(b=>/Association is not a proof/.test(b.text)));assert.equal(x.blocks.at(-1)!.meta.extraction,'missing');assert.match(x.warnings.join(' '),/OCR não executado/);assert.equal(x.blocks.at(-1)!.locator,'página 2');
 });

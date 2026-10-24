@@ -1,5 +1,7 @@
 # Ler com continuidade
 
+A experiência corrente está descrita em [Leitura 0.3](leitura-0.3.md): chat conduz o estudo, painel tem três abas e fontes passam por pré-verificação. As provas de versões anteriores abaixo são históricas; o [STATUS](../STATUS.md) identifica a revisão efetivamente verificada.
+
 O usuário pode ter poucos minutos no transporte público. Ele precisa entender uma passagem difícil, perguntar sem perder a posição e encontrar a mesma explicação mais tarde. O AraRead guarda esse percurso de forma independente da conversa e do modelo de IA escolhido. Não gera cursos, avaliações ou pontos.
 
 ## A fonte determina a ordem
@@ -27,7 +29,7 @@ Afirmações empíricas, normativas, filosóficas e teológicas exigem critério
 | Percorrido | Intervalos explicitamente confirmados; podem existir lacunas |
 | Marca pessoal | Compreensão, dúvida, revisão ou favorito declarado pelo usuário |
 
-Consultar, gerar ou salvar uma explicação não marca leitura. Responder a uma dúvida mantém a retomada. “Continuar” marca apenas a porção confirmada da retomada e avança. Rever ou abrir pelo índice não cobre intervalos omitidos. Não existe conclusão intelectual automática, pontuação ou bloqueio pedagógico.
+Consultar, gerar ou salvar uma explicação não marca leitura. Responder a uma dúvida mantém a retomada. “Continuar” marca apenas a porção confirmada da posição aberta e avança; fora do percurso principal, conserva a retomada anterior. Rever ou abrir pelo mapa não cobre intervalos omitidos. Não existe conclusão intelectual automática, pontuação ou bloqueio pedagógico.
 
 ## Gêneros combináveis
 

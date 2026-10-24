@@ -46,7 +46,7 @@ export async function edgeFetch(request:Request):Promise<Response>{
   if(path.startsWith('/api/original/')&&request.method==='GET'){
    await active(identity);const id=path.slice('/api/original/'.length);ensure(/^[a-f0-9-]{36}$/i.test(id),'INVALID_REFERENCE','Referência inválida.',400);
    const row=await transaction(identity,async c=>(await c.query('select original,sha256 from araread.sources where id=$1',[id])).rows[0]);
-   ensure(row,'NOT_FOUND','Original não encontrado.',404);headers.set('content-type','application/octet-stream');headers.set('content-disposition','attachment; filename="original"');headers.set('x-original-sha256',row.sha256);return new Response(new Uint8Array(row.original),{headers});
+   ensure(row,'NOT_FOUND','Original não encontrado.',404);ensure(row.original!==null,'ORIGINAL_NOT_RETAINED','Esta edição conserva o texto canônico e sua estrutura. Os bytes do arquivo original não foram retidos.',410);headers.set('content-type','application/octet-stream');headers.set('content-disposition','attachment; filename="original"');headers.set('x-original-sha256',row.sha256);return new Response(new Uint8Array(row.original),{headers});
   }
   const name=path.slice('/api/'.length) as ToolName;ensure(path.startsWith('/api/')&&request.method==='POST'&&Object.hasOwn(schemas,name),'NOT_FOUND','Rota não encontrada.',404);
   await active(identity);const body=await jsonBody(request,name==='data_restore'?32*1024*1024:16*1024*1024);

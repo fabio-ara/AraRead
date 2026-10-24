@@ -34,7 +34,7 @@ try{
  pass('duas identidades sinteticas; assinatura, emissor e audiencia reais');
  const signup=await clients[1].auth.signUp({email:`araread-${run}-blocked@example.invalid`,password:randomBytes(32).toString('base64url')});
  assert.ok(signup.error,'Cadastro publico deve continuar fechado');pass('cadastro publico desativado');
- reading=await execute('source_import',{operation_id:randomUUID(),title,format:'text',text:sourceText,original_language:'pt',partial:true},alice);
+ reading=await execute('source_import',{operation_id:randomUUID(),title,format:'text',text:sourceText,retain_original:true,original_language:'pt',partial:true},alice);
  let context:any=await execute('reading_context',{reading_id:reading.reading_id},alice);
  assert.equal(context.effective_language,'pt-BR');assert.ok(context.ref.end<Array.from(sourceText).length);
  const original=await transaction(alice,async c=>(await c.query('select original,sha256 from araread.sources where id=$1',[reading.source_id])).rows[0]);

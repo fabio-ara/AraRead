@@ -4,6 +4,7 @@ import {z} from 'zod';
 export const studySelection=z.object({
  representation:z.enum(['rewrite','translation']).optional(),support_mode:z.enum(['brief','standard','extended']).optional(),
  perspective_id:z.uuid().nullable().optional(),include_notes:z.boolean().optional(),note_ids:z.array(z.uuid()).max(40).optional(),
+ active_profile:z.uuid().nullable().optional(),
  repertoire:z.string().max(1200).optional(),goal:z.string().max(1200).optional(),
  provider:z.string().max(100).optional(),model:z.string().max(100).optional(),
 }).strict();

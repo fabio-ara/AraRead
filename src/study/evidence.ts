@@ -6,7 +6,7 @@ export async function withdrawEvidence(c:PoolClient,ids:string[]){
  const contexts=(await c.query("select id from araread.contexts where exists(select 1 from jsonb_array_elements(materials->'references') r where r->>'id'=any($1::text[]))",[ids])).rows.map(x=>x.id);
  const readings=new Set<string>(),seeds=new Map<string,string[]>();
  for(const [table,where,args] of [
-  ['mediations','evidence_ids ?| $1::text[] or context_id=any($2::uuid[])',[ids,contexts]],
+  ['mediations',"evidence_ids ?| $1::text[] or context_id=any($2::uuid[]) or exists(select 1 from jsonb_array_elements(coalesce(editorial->'review'->'claims','[]'::jsonb)) claim where (claim->'evidence_ids') ?| $1::text[])",[ids,contexts]],
   ['notes','evidence_ids ?| $1::text[]',[ids]],
   ['terms',"(details->'evidence_ids') ?| $1::text[]",[ids]],
  ] as const){const rows=(await c.query(`update araread.${table} set status='needs_review' where ${where} returning id,reading_id`,args as any)).rows;for(const row of rows){readings.add(row.reading_id);if(table==='mediations')seeds.set(row.reading_id,[...(seeds.get(row.reading_id)||[]),row.id]);}}

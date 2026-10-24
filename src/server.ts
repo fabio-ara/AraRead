@@ -54,6 +54,7 @@ export async function createApp(){
   const identity=await authenticate(req.headers.authorization);
   const row=await transaction(identity,async c=>{ensure((await c.query('select araread_private.session_active($1,$2) as active',[identity.id,identity.session_id])).rows[0].active,'SESSION_REVOKED','Sessão revogada.',401);return (await c.query('select original,mime,filename,sha256 from araread.sources where id=$1',[req.params.id])).rows[0];});
   ensure(row,'NOT_FOUND','Original não encontrado.',404);
+  ensure(row.original!==null,'ORIGINAL_NOT_RETAINED','Esta edição conserva o texto canônico e sua estrutura. Os bytes do arquivo original não foram retidos.',410);
   // Servido como bytes sem executar HTML/SVG. A automação obtém pela API, nunca por download na UI.
   res.set({'Content-Type':'application/octet-stream','Content-Disposition':`attachment; filename="original"`,'X-Original-SHA256':row.sha256}).send(row.original);
  });

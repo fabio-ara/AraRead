@@ -1,6 +1,6 @@
 {
   "name": "araread",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Biblioteca pessoal de leitura assistida, na ordem da obra e com memória persistente.",
   "private": true,
   "engines": {
