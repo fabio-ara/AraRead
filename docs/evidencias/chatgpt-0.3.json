@@ -1,0 +1,117 @@
+{
+  "version": "0.3.0",
+  "date": "2026-10-24",
+  "code_revision": "18e9855b2865cf61bd6ccc37f0fb3f6c63b16d40",
+  "edge_version": 7,
+  "client": "ChatGPT web, existing authenticated Chrome session, MCP OAuth and native MCP Apps",
+  "complete": true,
+  "connection": {
+    "guidance": "1.2.0",
+    "tools": 41,
+    "catalog_refreshed": true,
+    "existing_oauth_grant_preserved": true,
+    "global_permission_policy_changed": false,
+    "point_approval": "One fixture preference write and deletion of the synthetic work were allowed once after argument inspection; global permissions unchanged"
+  },
+  "fixture": {
+    "kind": "Synthetic authorized HTML",
+    "title": "Homologação sintética AraRead 0.3 — 24/10/2026",
+    "elements": 6,
+    "headings": 3,
+    "paragraphs": 3,
+    "navigation_removed": true,
+    "original_changed": false
+  },
+  "first_presentation": {
+    "ready": true,
+    "three_tabs_clicked": true,
+    "visually_inspected": true,
+    "exact_same_passage": true,
+    "negation_modality_conditions_preserved": true,
+    "source_language": "en",
+    "target_language": "pt-BR",
+    "notes_about_errors": "A critical-note save lacking required documentation was rejected; the assistant corrected the proposal and saved it with explicit editorial limits."
+  },
+  "navigation": {
+    "outside_main": true,
+    "continue_opened_confirmed": true,
+    "not_at_resume_error": false,
+    "covered_characters": 201,
+    "total_paragraph_characters": 639,
+    "percentage": 31.46,
+    "covered_paragraphs": 1,
+    "opened_paragraph": 3,
+    "main_resume": "Original title; unchanged during out-of-order navigation",
+    "understanding_inferred": false
+  },
+  "memory": {
+    "questions": 1,
+    "answers": 1,
+    "answer_link_verified": true,
+    "terms": 1,
+    "references": 1,
+    "reference": "The synthetic primary text with a literal passage; no external bibliography or scientific consensus claimed",
+    "map": "Original hierarchy and organizational summaries retrieved in chat"
+  },
+  "preferences": {
+    "brief_extended_unset_verified": true,
+    "scope": "reading only",
+    "effective_origin_verified": true,
+    "general_account_values_unchanged": true,
+    "sensitive_identity_inferred": false
+  },
+  "profiles": {
+    "created": 3,
+    "names": [
+      "Homologação 0.3 — Base",
+      "Homologação 0.3 — Condições",
+      "Private imported copy of Condições"
+    ],
+    "selected_lens_export_authorized": true,
+    "declared_author": "Fixture sintética autorizada",
+    "declared_license": "MIT",
+    "import_initially_inactive": true,
+    "explicitly_enabled_and_selected": true,
+    "returned_to_base": true,
+    "translation_id_and_text_unchanged_during_profile_switch": true,
+    "notes_original_and_coverage_preserved": true,
+    "publication": false
+  },
+  "resume": {
+    "new_conversation": true,
+    "used_persisted_effective_preferences": true,
+    "ready_without_new_preparation": true,
+    "profile": "Base",
+    "reading_revision_before": 27,
+    "reading_revision_after": 27,
+    "variants_before": 7,
+    "variants_after": 7,
+    "mediation_id_unchanged": true,
+    "covered_and_positions_unchanged": true,
+    "notes_terms_references_unchanged": true,
+    "read_only_verified": true,
+    "independently_checked_through": "Authenticated AraRead reader connector"
+  },
+  "cleanup": {
+    "synthetic_work_removed": true,
+    "synthetic_profiles_removed": true,
+    "profile_creation_and_deletion_receipts": 3,
+    "profile_verification": "Independent authenticated connector confirmed deletion receipts for exactly the three created profile IDs; ChatGPT rechecked the profile catalog",
+    "previous_data_preserved": true,
+    "previous_data_verification": "Post-cleanup reader exports match every preexisting field and row count for works, sources including original bytes, elements, readings, notes and terms; general preference values preserved",
+    "account_revision_note": "The account revision advances for explicit profile lifecycle operations; no general preference value changed."
+  },
+  "screenshots": [
+    "../assets/chatgpt-v3-facilitated.png",
+    "../assets/chatgpt-v3-translation.png",
+    "../assets/chatgpt-v3-original.png",
+    "../assets/chatgpt-v3-resume.png"
+  ],
+  "limits": [
+    "The host displayed CSP disabled in its preexisting development configuration; no setting was changed and enforcement by the host is not certified.",
+    "Editorial comparison was by AI, not a human specialist; no pedagogical efficacy study.",
+    "Native screenshots were returned as bytes and written outside the UI; tool filePath saving was unavailable.",
+    "This acceptance used a synthetic article; actual external HTML/PDF/OCR ingestion has separate evidence."
+  ],
+  "checked_at": "2026-10-24T19:20:32.640Z"
+}

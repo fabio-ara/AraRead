@@ -4,7 +4,7 @@ Um ambiente pessoal para estudar obras difíceis pelo chat. Peça uma leitura, a
 
 A evolução 0.3 acrescenta ingestão editorial validada, armazenamento textual, OCR local aberto, navegação conversacional e perfis reutilizáveis. A tradução permanece fiel ao original e separada de lentes interpretativas. A primeira explicação deve construir os conhecimentos necessários à passagem; verificações automáticas não certificam compreensão nem fidelidade acadêmica universal. Todas as telas mantêm largura máxima de 480 px.
 
-**Situação da entrega:** veja [STATUS](STATUS.md) para distinguir a branch 0.3, os gates locais, a versão publicada e as provas no ChatGPT. O destino existente é o [GitHub Pages](https://fabio-ara.github.io/AraRead/), com API/Auth/[MCP OAuth](https://ltzoontstgpbegtakrgk.supabase.co/functions/v1/araread/mcp) no Supabase exclusivo Free. Não há serviços pagos, cadastro público nem descoberta de bibliotecas alheias. Conheça o [comportamento da 0.3](docs/leitura-0.3.md).
+**Disponível: 0.3.0, validada também no ChatGPT real.** Veja [STATUS](STATUS.md) para revisões, testes locais/hospedados, evidências e limites. O destino existente é o [GitHub Pages](https://fabio-ara.github.io/AraRead/), com API/Auth/[MCP OAuth](https://ltzoontstgpbegtakrgk.supabase.co/functions/v1/araread/mcp) no Supabase exclusivo Free. Não há serviços pagos, cadastro público nem descoberta de bibliotecas alheias. Conheça o [comportamento da 0.3](docs/leitura-0.3.md).
 
 ## Usar localmente
 
