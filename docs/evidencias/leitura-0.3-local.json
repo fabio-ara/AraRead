@@ -1,6 +1,6 @@
 {
   "version": "0.3.0",
-  "code_revision": "6f0fcd5e7cbb84fde072ade451c0835916b90532",
+  "code_revision": "18e9855b2865cf61bd6ccc37f0fb3f6c63b16d40",
   "base_revision": "bf9cf1abe1198924aca9b97ae03405de354f6876",
   "date": "2026-10-24",
   "environment": {
@@ -12,9 +12,9 @@
   },
   "local": {
     "core_tests": {
-      "passed": 70,
+      "passed": 78,
       "failed": 0,
-      "log_sha256": "ba218a962f84d994fefb5306481777f56a769f7138c769ed5e9cffc7d20b9e96"
+      "log_sha256": "b6e44d04fd359ced9f110c929b52a74511a52b09e13fb4fb55afbc1b1aedf58f"
     },
     "last_ingestion_warning_change": {
       "targeted_passed": 6
@@ -22,7 +22,7 @@
     "browser_tests": {
       "passed": 7,
       "failed": 0,
-      "log_sha256": "4482da8754e933ba5435065d4c71f00490fdcfd8feaf1889f74bf24e1c4b8fe4"
+      "log_sha256": "c5431aecc99aba8efb24badfdcd7b5f2fe0e41e343b2f64235139a31e725e912"
     },
     "types": true,
     "build": true,
@@ -30,9 +30,9 @@
     "edge_package": true,
     "docs_links": true,
     "public_audit": {
-      "commits": 8,
-      "blobs": 222,
       "artifact_files": 69,
+      "commits": 11,
+      "blobs": 317,
       "alerts": 0
     },
     "npm_audit_vulnerabilities": 0,
@@ -45,7 +45,8 @@
       "css_zoom": 2,
       "dark": true,
       "keyboard": true,
-      "mcp_bridge": "local harness; no study writes"
+      "mcp_bridge": "local harness; no study writes",
+      "unprepared_panel": "320px, no tabs before preparation; native screenshot visually inspected"
     }
   },
   "migrations": [
@@ -55,8 +56,7 @@
   ],
   "rls_tables": 19,
   "pending": [
-    "Independent review: subagent attempts failed with capacity 429; local CLI fallback in progress",
-    "Exact-branch CI",
+    "Exact-branch CI after review fixes",
     "Hosted deployment and 0.3 gates",
     "Real ChatGPT 0.3 acceptance"
   ],
@@ -66,5 +66,26 @@
     "OCR remains unreviewed and original retained",
     "Synthetic benchmark is not a Supabase Free capacity forecast",
     "0.2 hosted/client evidence is historical; no remote changes in this checkpoint"
-  ]
+  ],
+  "independent_review": {
+    "method": "Independent Codex CLI read-only review; findings reproduced and corrected by implementation agent",
+    "reviewed_revision": "6f0fcd5e7cbb84fde072ade451c0835916b90532",
+    "base_revision": "bf9cf1abe1198924aca9b97ae03405de354f6876",
+    "findings": 8,
+    "resolved": 8,
+    "baseline_regressions": {
+      "revision": "bdaabafe12590923eb97e1836a310e5c7c8f8325",
+      "service_failed": 7,
+      "service_existing_guard_passed": 1,
+      "browser_failed": 1,
+      "service_log_sha256": "692aded1f415a382a1be53b8d3d6c04254523f3761acfdb309c6d2890014e406",
+      "browser_log_sha256": "3a721a8dc88941d57649d3fadf764aedece062c50a4febb87c78e07686e9eb84"
+    },
+    "fixed_regressions": {
+      "service_passed": 8,
+      "browser_passed": 7,
+      "code_revision": "18e9855b2865cf61bd6ccc37f0fb3f6c63b16d40"
+    },
+    "details": "revisao-0.3.md"
+  }
 }

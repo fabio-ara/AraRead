@@ -1,14 +1,16 @@
 # Estado verificável
 
-A evolução **0.3.0 está em implementação e validação**, na branch `feat/araread-0.3.0`, iniciada sobre `bf9cf1abe1198924aca9b97ae03405de354f6876`, com implementação no commit `6f0fcd5e7cbb84fde072ade451c0835916b90532`. A branch principal e a instalação hospedada 0.2 permanecem preservadas. A implementação atual e seus limites estão em [Leitura 0.3](docs/leitura-0.3.md).
+A evolução **0.3.0 está em implementação e validação**, na branch `feat/araread-0.3.0`, iniciada sobre `bf9cf1abe1198924aca9b97ae03405de354f6876`, com implementação inicial em `6f0fcd5` e correções verificadas em `18e9855b2865cf61bd6ccc37f0fb3f6c63b16d40`. A branch principal e a instalação hospedada 0.2 permanecem preservadas. A implementação atual e seus limites estão em [Leitura 0.3](docs/leitura-0.3.md).
 
 Já há pipeline HTML/PDF com pré-verificação, OCR local real, fontes textuais canônicas, migrations compatíveis, três abas sem operações de estudo, apresentação separada da preparação, revisão editorial, mapa/progresso, preferências com precedência e perfis privados. A geração continua no assistente externo. Node/Compose e empacotamento Edge usam o mesmo domínio.
 
-**Checkpoint local:** 70/70 testes do núcleo e 7/7 jornadas de navegador aprovados, PostgreSQL/Auth reais e duas contas, SDK MCP oficial, RLS direto, migrações e backup v1/v2/v3. Tipos, build, Docker, links, auditoria de histórico/árvore e npm audit passaram. Três migrations aplicadas somente ao banco isolado; 19 tabelas mantêm RLS forçado. Capturas nativas de 320/480/1440 px, escuro, teclado e zoom 200% inspecionadas; sem certificação de acessibilidade. OCR real com Tesseract 5.3.0 preservou negações e reteve o PDF. O caso vivo de Platão preservou preâmbulo/autoria/bibliografia, com 140 elementos úteis e sem menu inicial; não foi persistido no repositório.
+**Checkpoint local:** 78/78 testes do núcleo e 7/7 jornadas de navegador aprovados, PostgreSQL/Auth reais e duas contas, SDK MCP oficial, RLS direto, migrações e backup v1/v2/v3. Tipos, build, Docker, links, auditoria de histórico/árvore e npm audit passaram. Três migrations aplicadas somente ao banco isolado; 19 tabelas mantêm RLS forçado. Capturas nativas de 320/480/1440 px, escuro, teclado e zoom 200% inspecionadas; sem certificação de acessibilidade. OCR real com Tesseract 5.3.0 preservou negações e reteve o PDF. O caso vivo de Platão preservou preâmbulo/autoria/bibliografia, com 140 elementos úteis e sem menu inicial; não foi persistido no repositório.
 
 **Economia medida:** dezesseis documentos sintéticos por política, duas variantes por leitura, tabelas TEMP com schema/compressão/índices reais. Texto canônico reduziu o físico de 2.678.784 para 2.457.600 bytes (8,26%) e o backup de 2.582.621 para 1.386.369 bytes (46,32%). TOAST/LZ4 já comprime o bruto; remover bytes não elimina custos de metadados/índices. Medição local no commit `6f0fcd5`, sem promessa de capacidade Free.
 
-**Pendências:** revisão independente (subagentes receberam 429; tentativa pela CLI local em curso), consolidação do PR/CI, gates hospedados e ChatGPT 0.3. Nenhuma prova anterior substitui esses gates. Não há homologação 0.3 no cliente externo neste checkpoint.
+**Revisão independente:** oito falhas reproduzidas e corrigidas, com regressões antes/depois: originais visuais, contexto, referências editoriais, backup, idioma, recibos antigos e painel sem preparação. [Relatório](docs/evidencias/revisao-0.3.md). O [PR #1](https://github.com/fabio-ara/AraRead/pull/1) está em rascunho; CI de `bdaabaf` aprovada.
+
+**Pendências:** CI após as correções, gates hospedados e ChatGPT 0.3. Nenhuma prova anterior substitui esses gates. Não há homologação 0.3 no cliente externo neste checkpoint.
 
 ## Entrega 0.2.0 — histórica
 
