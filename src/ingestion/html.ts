@@ -42,8 +42,8 @@ export function extractHtml(html:string){
   if(chrome.test(label(node))&&density(node)>.45)return;
   if(tag==='img'||tag==='figure'){
    const img=tag==='img'?node:node.querySelector('img'),alt=prose(img?.getAttribute('alt')||''),caption=prose(node.querySelector?.('figcaption')?.textContent||'');
-   if(!caption&&(!alt||img?.getAttribute('role')==='presentation'))return;
-   add('figure',[alt,caption].filter(Boolean).join('\n'),{alt,caption,observed:false,essential_visual:true});return;
+   if(!caption&&(img?.getAttribute('role')==='presentation'||img?.hasAttribute('alt')&&!alt))return;
+   add('figure',[alt,caption].filter(Boolean).join('\n')||'Imagem sem descrição textual na fonte.',{alt,caption,observed:false,essential_visual:true});return;
   }
   if(tag==='table'){
    const rows=Array.from(node.querySelectorAll('tr')).map((r:any)=>Array.from(r.querySelectorAll('th,td')).map((c:any)=>prose(c.textContent)));
@@ -52,7 +52,7 @@ export function extractHtml(html:string){
   if(tag==='math'||tag==='svg'){add(tag==='math'?'equation':'unknown',node.outerHTML,{representation:'original_markup_as_text',interpretation:'not_verified',essential_visual:tag==='svg'});return;}
   const kind=/^h[1-6]$/.test(tag)?'heading':({p:'paragraph',pre:'code',blockquote:'quote',li:'list',aside:'note'} as Record<string,string>)[tag];
   // Do not flatten formulas or meaningful child blocks into their parent paragraph.
-  if(kind&&node.querySelector('math,table,pre,figure,svg,p')){const first=blocks.length;for(const child of node.childNodes)walk(child);if(kind==='note'||kind==='quote'||node.getAttribute('role')==='doc-footnote')for(const b of blocks.slice(first))if(b.kind==='paragraph')b.kind=kind==='quote'?'quote':'note';return;}
+  if(kind&&node.querySelector('math,table,pre,figure,img,svg,p')){const first=blocks.length;for(const child of node.childNodes)walk(child);if(kind==='note'||kind==='quote'||node.getAttribute('role')==='doc-footnote')for(const b of blocks.slice(first))if(b.kind==='paragraph')b.kind=kind==='quote'?'quote':'note';return;}
   if(kind){
    const verse=node.getAttribute('data-kind')==='verse'||/(?:^|\s)(poem|poetry|verse)(?:\s|$)/.test(label(node));
    if(verse||kind==='code'){node.querySelectorAll('br').forEach((b:any)=>b.replaceWith('\n'));add(verse?'verse':kind,node.textContent.trim(),{preserve_lines:true});}

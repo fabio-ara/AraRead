@@ -14,6 +14,9 @@ test('leitor apresenta três abas, preserva estudo pelo chat, responsividade e c
  await page.getByRole('button',{name:'Importar',exact:true}).click();await page.getByLabel('Título da obra',{exact:true}).fill(title);await page.getByLabel('Autoria',{exact:true}).fill('Autoria sintética');await page.getByLabel('Texto ou transcrição',{exact:true}).fill('Uma hipótese pode explicar uma observação. Isso não estabelece certeza.');await page.getByRole('button',{name:'Preservar e abrir leitura',exact:true}).click();await expect(page.getByRole('heading',{name:title,exact:true})).toBeVisible();
  const work=(await api('library_list',{query:title})).items[0];
  try{
+  await expect(page.getByRole('tab')).toHaveCount(0);await expect(page.getByRole('tabpanel')).toHaveCount(0);
+  await expect(page.getByRole('status').filter({hasText:'Peça ao assistente, no chat, para preparar e conferir esta passagem.'})).toBeVisible();
+  await mkdir('.local/evidence',{recursive:true});await page.setViewportSize({width:320,height:900});await page.screenshot({path:'.local/evidence/v3-reader-unprepared.png',fullPage:true});
   let c=await api('reading_context',{reading_id:work.reading_id});const prepared=await api('context_prepare',{operation_id:randomUUID(),reading_id:work.reading_id,expected_revision:c.reading.revision,ref:c.ref,language:'pt-BR'});
   const text='Uma hipótese é uma proposta para explicar algo que observamos. Ela pode ajudar a compreender o caso, mas não estabelece certeza.';
   await api('mediation_save',{operation_id:randomUUID(),reading_id:work.reading_id,expected_revision:prepared.revision,ref:c.ref,context_id:prepared.context_id,rewrite:text,editorial_review:editorialReview,provenance:{agent:'Fixture sintética de interface',guidance_version:'1.2.0'}});

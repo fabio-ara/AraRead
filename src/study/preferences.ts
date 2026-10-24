@@ -22,6 +22,7 @@ export async function resolvePreferences(c:PoolClient,r:any,identity?:Identity,o
  if(profile)for(const [key,value]of Object.entries(profile.definition.values))if(keys.includes(key as Parameter)&&!['active_profile','perspective_id'].includes(key))effective[key]={value,origin:'profile',scope:'profile',profile_id:profile.id,profile_version:profile.version,profile_selection_scope:selection.active_profile.scope||'operation',temporary:['session','operation'].includes(selection.active_profile.scope||'operation'),state:'active'};
  apply(effective,'reading',legacy(r));apply(effective,'session',{});
  for(const key of keys)if(operation[key]!==undefined)effective[key]={value:operation[key],origin:'operation',scope:'operation',temporary:true,state:'active'};
+ effective.language.value=Intl.getCanonicalLocales(effective.language.value)[0];
  if(profileId&&!profile)effective.active_profile={...effective.active_profile,value:null,unavailable:true};
  return {catalog_version:'1',revision:r?.revision??pref?.revision??0,values:Object.fromEntries(keys.map(key=>[key,effective[key].value])),effective,records,profile};
 }
@@ -57,6 +58,7 @@ export async function dispatchPreferences(name:string,a:any,identity:Identity,c:
   const rid=r?.id||null,sid=scope==='session'?identity.session_id:null;
   const values:any={...a.values,...(a.language!==undefined&&a.language!==null?{language:Intl.getCanonicalLocales(a.language)[0]}:{}),...(a.portion_size?{portion_size:a.portion_size}:{}),...a.study};
   // Legacy study selectors remain supported at their original reading scope.
+  if(values.language)values.language=Intl.getCanonicalLocales(values.language)[0];
   const legacyStudy:any={};for(const k of Object.keys(values))if(!keys.includes(k as Parameter)){ensure(r&&['representation','note_ids','provider','model'].includes(k),'INVALID_SCOPE','Este seletor pertence a uma leitura.');legacyStudy[k]=values[k];delete values[k];}
   if(a.study?.perspective_id&&!a.values)values.perspective_id=a.study.perspective_id;
   if(name==='preferences_set')await validateValues(c,values,r,a.explicit_request);
