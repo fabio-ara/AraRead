@@ -4,7 +4,7 @@ Uma biblioteca pessoal para ler obras difíceis em períodos curtos, na ordem do
 
 Esta versão oferece biblioteca privada, importação, leitor responsivo, idiomas, notas, glossário, histórico, continuidade por intervalos, exportação/restauração e MCP próprio com autenticação real. Original, reescrita e comentários têm identidades e apresentações distintas. Abrir uma passagem não significa tê-la lido ou compreendido.
 
-**Estado em 24/10/2026, horário de Brasília:** núcleo implementado e validado localmente; implantação na conta Supabase independente e teste no ChatGPT aguardam a identidade do titular. Consulte o [estado verificável](STATUS.md) para resultados e impedimentos. Não existe URL hospedada homologada. O [repositório remoto é privado](https://github.com/fabio-ara/AraRead).
+**Estado em 24/10/2026, horário de Brasília:** aplicação publicada e testada no projeto Supabase exclusivo, com [interface privada](https://araread-biblioteca.stonyrain65.chatgpt.site) e [MCP OAuth](https://ltzoontstgpbegtakrgk.supabase.co/functions/v1/araread/mcp). O cliente oficial passou pela leitura/escrita e retomada no HTTPS real, com conferência na interface desktop/mobile. A homologação pessoal no ChatGPT ainda depende do consentimento do titular. Consulte o [estado verificável](STATUS.md). O [repositório é privado](https://github.com/fabio-ara/AraRead).
 
 ## Usar localmente
 

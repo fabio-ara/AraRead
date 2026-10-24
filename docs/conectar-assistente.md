@@ -2,7 +2,7 @@
 
 O assistente precisa receber a orientação e usar o MCP para que as explicações sobrevivam à conversa. Um arquivo local no repositório não é carregado automaticamente pelo ChatGPT. A instalação expõe a orientação por três caminhos: instruções do servidor, ferramenta `assistant_guidance` e recurso `araread://assistant/guidance`; o prompt `retomar-leitura` também inclui o texto versionado.
 
-**Estado:** a cadeia OAuth e o MCP foram testados com o SDK oficial em loopback. Não houve homologação no ChatGPT, nem prova através de gateway hospedado. O endereço local `http://127.0.0.1:4317/mcp` não é acessível à nuvem do ChatGPT. Não há túnel ou URL pública anunciada.
+**Estado:** OAuth/PKCE, descoberta, 16 ferramentas, leitura/escrita, retomada em nova sessão, revogação e reconexão passaram com o SDK oficial também no HTTPS hospedado. Essa prova é de um cliente compatível, fora do servidor; não é homologação no ChatGPT. A [interface privada](https://araread-biblioteca.stonyrain65.chatgpt.site) e o [endpoint MCP](https://ltzoontstgpbegtakrgk.supabase.co/functions/v1/araread/mcp) já foram publicados. O endpoint exige OAuth; não cole chave administrativa no cliente.
 
 ## Preparar uma conexão hospedada
 
@@ -10,7 +10,7 @@ Após concluir a [implantação exclusiva](instalacao.md), use a URL HTTPS real 
 
 No cliente compatível, cadastre a URL MCP com OAuth, confira a conta no consentimento e autorize somente se o cliente/destino estiverem corretos. A tela do AraRead informa que o acesso permite consultar biblioteca, guardar conteúdo, marcar continuidade e executar exclusões explicitamente solicitadas. A permissão padrão emitida pelo hook é de escrita para essa instalação; não é um escopo fino por ferramenta. O servidor valida a permissão em toda operação. A retirada da autorização no provedor bloqueia as operações imediatamente, por consulta de sessão/concessão no banco.
 
-Metadados de descoberta ficam em `/.well-known/oauth-protected-resource` e, no local, em `/.well-known/oauth-authorization-server/auth/v1`. No hospedado, o emissor é o URL Auth real do projeto exclusivo. As configurações precisam concordar entre emissor, audiência, hook e endpoint; um 401 isolado não prova a cadeia completa.
+No hospedado, o desafio `WWW-Authenticate` aponta para os metadados em `/functions/v1/araread/.well-known/oauth-protected-resource/mcp`. O emissor é o Auth real do projeto exclusivo. Localmente existem `/.well-known/oauth-protected-resource` e `/.well-known/oauth-authorization-server/auth/v1`. Emissor, audiência, hook e endpoint precisam concordar; um 401 isolado não prova a cadeia.
 
 ## Primeiro uso e teste verificável
 

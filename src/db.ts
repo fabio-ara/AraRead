@@ -1,6 +1,13 @@
 import pg from 'pg';
 import { config } from './config.ts';
-export const pool = new pg.Pool({connectionString:config.database,max:8,connectionTimeoutMillis:5000,application_name:'araread'});
+// Uma CA fornecida explicitamente tem precedência sobre parâmetros de URL;
+// pg substitui o objeto ssl quando esses parâmetros permanecem na string.
+const databaseUrl=new URL(config.database),ca=process.env.DATABASE_CA_CERT;
+if(ca)for(const key of ['sslmode','sslrootcert','sslcert','sslkey'])databaseUrl.searchParams.delete(key);
+const edge=process.env.ARAREAD_RUNTIME==='edge';
+export const pool = new pg.Pool({connectionString:ca?databaseUrl.href:config.database,ssl:ca?{ca,rejectUnauthorized:true}:undefined,max:edge?1:8,idleTimeoutMillis:edge?1000:10000,connectionTimeoutMillis:5000,application_name:'araread'});
+// Falhas em conexão ociosa não podem derrubar o processo nem registrar consultas.
+pool.on('error',error=>console.error(JSON.stringify({event:'database_idle_error',code:(error as any)?.code||'CONNECTION'})));
 export interface Identity {id:string;session_id:string;client_id?:string;permissions:'read'|'write';}
 export async function transaction<T>(identity:Identity,fn:(client:pg.PoolClient)=>Promise<T>):Promise<T>{
  const c=await pool.connect();

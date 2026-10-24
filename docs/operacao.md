@@ -11,12 +11,13 @@ O servidor é o registro canônico; uma resposta de sucesso ou uma cópia offlin
 | Recibo desconhecido | Ainda não há confirmação; repetir a mesma intenção/chave é seguro, sem concluir que falhou |
 | Conflito de revisão | Consulte contexto atualizado e confira novamente sua intenção; não sobrescreva |
 | Sessão expirada/revogada | Entre ou autorize novamente pelo provedor; não troque por chave administrativa |
+| Senha esquecida | Informe o e-mail no login e use “Esqueci minha senha”; abra pessoalmente o link e defina a nova senha. Confira spam e limites do provedor; não encaminhe o link ao assistente |
 | Provedor/banco indisponível | Consulte só a cópia já carregada; não afirme que rascunho foi sincronizado |
 | Fim de fonte parcial | Forneça material adicional vinculado; não complete por memória |
 | PDF incompleto | Preserve bytes e forneça transcrição com página/região em nova versão |
 | Cota atingida | Exporte, confira backup e exclua explicitamente o material escolhido; não aumente plano automaticamente |
 
-A cota de 80 MiB conta bytes de originais, texto dos elementos, reescritas/acréscimos, notas e definições. Não é medição completa do tamanho físico do PostgreSQL: índices, eventos, recibos e overhead também ocupam espaço. O operador precisa acompanhar a quota real do provedor. Exclusão é permitida mesmo quando não há espaço para nova importação. Limites por arquivo, corpo HTTP e importador continuam aplicáveis separadamente.
+A cota conta originais, texto dos elementos, reescritas/acréscimos, notas e definições: 16 MiB no perfil Edge hospedado e 80 MiB no Node local. O valor ativo aparece nas capacidades da conta. Isso não mede o tamanho físico completo do PostgreSQL: índices, eventos, recibos e overhead também ocupam espaço. Acompanhe a quota do provedor. Exclusão é permitida mesmo sem espaço para nova importação. Limites por arquivo, corpo HTTP e importador são separados.
 
 ## Backup privado
 
@@ -35,7 +36,7 @@ A restauração aceita `araread/1`, valida originais por SHA-256 e relações/in
 
 Para evitar duplicação em falha de rede, a CLI grava antes um arquivo `.restore-request.json` ao lado do backup, com identidade e hash da intenção. Reexecutar com o mesmo arquivo recupera o recibo ou repete a mesma chave. Não remova esse arquivo enquanto houver resultado incerto. O recibo confirmado fica em `.restore-receipt.json`; se ele já existir, a escrita local protegida não o substitui. A interface também conserva intenção pendente no IndexedDB e permite consultá-la/repeti-la em Configurações.
 
-MCP e operações HTTP comuns limitam o corpo a 16 MiB. A rota de restauração web/CLI aceita até 128 MiB, após verificar identidade e sessão ativa, para comportar originais em Base64 dentro da cota de conteúdo. Backups excepcionalmente maiores por overhead/histórico de recibos precisam de tratamento operacional revisado; não há restauração multipart. Os testes cobrem também backup acima de 16 MiB e rejeição transacional de referências adulteradas. A cota é verificada pelo conteúdo efetivamente restaurado, não pelo tamanho maior da codificação Base64.
+MCP e operações HTTP comuns limitam o corpo a 16 MiB. A restauração web/CLI aceita até 32 MiB no Edge ou 128 MiB no Node, após verificar identidade e sessão ativa. O limite maior comporta Base64 dentro da cota de conteúdo; ela é verificada pelo conteúdo restaurado, não pela codificação. Backups maiores por overhead/histórico de recibos exigem tratamento operacional revisado; não há restauração multipart. O gate local cobre backup acima de 16 MiB e rejeição transacional de referências adulteradas.
 
 ## Exclusão e reversão
 

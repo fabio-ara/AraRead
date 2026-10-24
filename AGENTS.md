@@ -6,6 +6,8 @@ Preserve original imutável, versões identificáveis e referências por UUID de
 
 UI e MCP passam pelos mesmos casos de uso. Leituras não modificam estado. Escritas exigem identidade verificada, sessão ativa, permissão, revisão e recibo idempotente. Teste sob papel autenticado comum, inclusive duas contas e referências cruzadas. Não use chave administrativa para contornar RLS. Não altere migration aplicada; adicione outra e teste evolução.
 
+Produção usa o adaptador Web em Supabase Edge e frontend estático privado no Sites; Node/Compose continua reproduzível. O gateway delega JWT assimétrico à função: nunca retire as verificações de assinatura, emissor, audiência, sessão e concessão. URLs usam IP público validado e TLS com hostname original, sem nova resolução. Preserve o empacotamento restrito do PDF.js. Edge tem cota de 16 MiB e restauração de 32 MiB; Node mantém 80/128 MiB, ambos com original de até 8 MiB. O script de frontend preserva o Site existente em `hosting/frontend.json`; não crie outra instalação por acidente.
+
 Trabalhe até o gate proporcional passar. UI exige interação e inspeção visual. Integração exige PostgreSQL e Auth reais. Distinga prova local, hospedada e no cliente externo. A suíte usa apenas o banco isolado e material sintético; não execute reset em produção. Preserve trabalho existente. Em compactação, mantenha um checkpoint corrente, sem repetir provas válidas. Delegue somente tarefas independentes e verifique críticas de revisores.
 
 ## Controle de navegador e obtenção de arquivos

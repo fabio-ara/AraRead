@@ -165,6 +165,7 @@ Nenhum código foi copiado dos repositórios AraLearn/AraHub: foram consultados 
 | content-type | 2.1.0 | MIT |
 | typescript | 5.9.3 | Apache-2.0 |
 | uhyphen | 0.2.0 | ISC |
+| undici | 7.30.1 | MIT |
 | undici-types | 7.16.0 | MIT |
 | unpipe | 1.0.0 | MIT |
 | vary | 1.1.2 | MIT |

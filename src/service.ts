@@ -19,7 +19,7 @@ async function reading(c:PoolClient,id:string,lock=false){const r=await one(c,`s
 async function element(c:PoolClient,ref:Ref,sourceId:string){const e=await one(c,'select * from araread.elements where id=$1 and source_id=$2',[ref.element_id,sourceId]);ensure(e,'INVALID_REF','Referência não encontrada nesta leitura.');validateRef(ref,e,sourceId);return e as Element;}
 async function quota(c:PoolClient,additional:number){
  const usage=await one(c,`select coalesce((select sum(octet_length(original)) from araread.sources),0)+coalesce((select sum(octet_length(text)) from araread.elements),0)+coalesce((select sum(octet_length(rewrite)+octet_length(additions::text)) from araread.mediations),0)+coalesce((select sum(octet_length(text)) from araread.notes),0)+coalesce((select sum(octet_length(definition)) from araread.terms),0) as bytes`);
- ensure(Number(usage.bytes)+additional<=config.maxAccountBytes,'QUOTA','A biblioteca atingiu a cota de 80 MiB. Exporte e remova material explicitamente antes de importar mais.',413);
+  ensure(Number(usage.bytes)+additional<=config.maxAccountBytes,'QUOTA',`A biblioteca atingiu a cota de ${config.maxAccountBytes/1024/1024} MiB. Exporte e remova material explicitamente antes de importar mais.`,413);
  return Number(usage.bytes);
 }
 async function neighbor(c:PoolClient,e:Element,ref:Ref,size:string,direction:'next'|'previous'):Promise<Ref|null>{

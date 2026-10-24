@@ -14,11 +14,13 @@ let fieldId=0;
 const field=(label:string,input:HTMLElement,help?:string)=>{const id=input.id||`field-${++fieldId}`;input.id=id;if(help)input.setAttribute('aria-describedby',`${id}-help`);return el('div',{class:'field'},el('label',{htmlFor:id},label),input,help?el('small',{id:`${id}-help`},help):null);};
 const tag=(text:string)=>el('span',{class:'tag'},text);
 const app=document.querySelector<HTMLDivElement>('#app')!;
-const config=await fetch('/api/config').then(r=>r.json()).catch(()=>JSON.parse(localStorage.getItem('araread-public-config')||'null'));
+const apiBase=(import.meta.env.VITE_API_BASE||'').replace(/\/$/,'');
+const config=await fetch(`${apiBase}/api/config`).then(r=>{if(!r.ok)throw new Error('Configuração indisponível.');return r.json();}).catch(()=>JSON.parse(localStorage.getItem('araread-public-config')||'null'));
 if(!config)throw new Error('A primeira abertura exige conexão.');
 localStorage.setItem('araread-public-config',JSON.stringify(config));document.title=config.name;
 const auth=createClient(config.supabase_url,config.publishable_key,{auth:{storageKey:'araread-auth-v1',persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 let session:Session|null=(await auth.auth.getSession()).data.session;
+let passwordSetup=new URLSearchParams(location.search).get('account')==='setup';
 let account:any,library:any={items:[],pagination:{}},ctx:any,screen='library',languageOverride:string|undefined,query='',offset=0,busy=false,mode:'mediation'|'original'='mediation';
 let message='',severity='info',panel='',panelData:any,noteDraft='',pending:any=null;
 const owner=()=>session?.user.id||'';
@@ -29,7 +31,7 @@ function renderNotice(){const old=document.querySelector('#notice');const next=e
 async function guard(action:()=>unknown){try{await action();}catch(e:any){notice(e.message||'A operação não pôde ser concluída.','error');}}
 class ApiError extends Error {constructor(public code:string,message:string){super(message);}}
 async function raw(tool:string,args:any={}){
- const current=(await auth.auth.getSession()).data.session;const response=await fetch(`/api/${tool}`,{method:'POST',headers:{'content-type':'application/json',authorization:`Bearer ${current?.access_token||session?.access_token||''}`},body:JSON.stringify(args)});
+ const current=(await auth.auth.getSession()).data.session;const response=await fetch(`${apiBase}/api/${tool}`,{method:'POST',headers:{'content-type':'application/json',authorization:`Bearer ${current?.access_token||session?.access_token||''}`},body:JSON.stringify(args)});
  const data=await response.json();if(!response.ok||!data.ok)throw new ApiError(data.error?.code||'ERROR',data.error?.message||`Falha ${response.status}`);return data.data;
 }
 async function call(tool:string,args:any={}){
@@ -78,7 +80,7 @@ function render(){
  const main=el('main',{id:'main',tabIndex:-1});main.append(el('div',{id:'notice',class:'notice',hidden:true}));
  if(!online())main.append(el('p',{class:'offline',role:'status'},'Sem conexão · você pode consultar a última porção carregada. Salvar e avançar exigem rede.'));
  if(pending)main.append(el('p',{class:'offline'},'Existe uma operação sem confirmação. Consulte o recibo em Configurações.'));
- if(!session)main.append(loginView());else if(new URLSearchParams(location.search).has('authorization_id'))main.append(consentView());else if(screen==='library')main.append(libraryView());else if(screen==='import')main.append(importView());else if(screen==='settings')main.append(settingsView());else main.append(readerView());
+ if(!session)main.append(loginView());else if(passwordSetup)main.append(passwordView());else if(new URLSearchParams(location.search).has('authorization_id'))main.append(consentView());else if(screen==='library')main.append(libraryView());else if(screen==='import')main.append(importView());else if(screen==='settings')main.append(settingsView());else main.append(readerView());
  app.append(main,el('footer',{class:'footer'},`${config.name} · leitura na ordem da obra`,el('span',{},config.local?'Ambiente local exclusivo · dados sintéticos de teste disponíveis':'Biblioteca privada')));renderNotice();
  if(busy)document.querySelectorAll<HTMLButtonElement>('button').forEach(b=>b.disabled=true);
 }
@@ -86,7 +88,13 @@ function loginView(){
  const email=el('input',{type:'email',name:'email',autocomplete:'username',required:true,placeholder:'voce@exemplo.com'}),password=el('input',{type:'password',name:'password',autocomplete:'current-password',required:true,minLength:8});
  const form=el('form',{class:'login-card',onsubmit:(event:Event)=>{event.preventDefault();void guard(async()=>{const result=await auth.auth.signInWithPassword({email:email.value,password:password.value});if(result.error)throw new Error('Não foi possível entrar. Confira os dados e tente novamente.');session=result.data.session;await switchOwner();await load();});}},el('p',{class:'eyebrow'},'CONTINUIDADE PARA O SEU ESTUDO'),el('h1',{},'Uma passagem de cada vez.'),el('p',{class:'lead'},'Leia na ordem da obra, guarde suas explicações e volte ao ponto em que parou.'),field('E-mail',email),field('Senha',password),el('button',{type:'submit',class:'primary'},'Entrar na biblioteca'));
  if(config.local)form.append(button('Criar conta local de teste',async()=>{const result=await auth.auth.signUp({email:email.value,password:password.value});if(result.error)throw new Error('Não foi possível criar a conta local. Use e-mail e senha de ao menos 8 caracteres.');session=result.data.session;await switchOwner();await load();},{class:'quiet'}),el('small',{class:'muted'},'Cadastro disponível somente neste ambiente local. Não use sua senha de outros serviços.'));
+ form.append(button('Esqueci minha senha',async()=>{if(!email.reportValidity())return;const result=await auth.auth.resetPasswordForEmail(email.value,{redirectTo:`${location.origin}/?account=setup`});if(result.error)throw new Error('Não foi possível enviar o link agora. Tente novamente mais tarde.');notice('Se este e-mail tiver acesso permitido, receberá as instruções de recuperação. Confira também a pasta de spam.');},{class:'quiet',disabled:!online()}));
  return form;
+}
+function closePasswordSetup(){passwordSetup=false;const url=new URL(location.href);url.searchParams.delete('account');history.replaceState(null,'',url.pathname+url.search);}
+function passwordView(){
+ const password=el('input',{type:'password',autocomplete:'new-password',required:true,minLength:12}),confirmation=el('input',{type:'password',autocomplete:'new-password',required:true,minLength:12});
+ return el('form',{class:'paper form-panel',onsubmit:(event:Event)=>{event.preventDefault();void guard(async()=>{if(password.value!==confirmation.value)throw new Error('As duas senhas precisam ser iguais.');const result=await auth.auth.updateUser({password:password.value});if(result.error)throw new Error('Não foi possível definir a senha. Use uma senha nova com ao menos 12 caracteres; se o link expirou, solicite outro.');closePasswordSetup();await load();notice('Senha definida. Use seu e-mail e a nova senha nas próximas entradas.');});}},el('h1',{},'Definir sua senha'),el('p',{},`Conta: ${session?.user.email||''}`),el('p',{},'Escolha uma senha exclusiva com pelo menos 12 caracteres. Não a envie ao assistente.'),field('Nova senha',password),field('Repita a nova senha',confirmation),el('button',{type:'submit',class:'primary',disabled:!online()},'Salvar senha'),button('Voltar para a biblioteca',async()=>{closePasswordSetup();await load();},{class:'quiet'}));
 }
 function libraryView(){
  const section=el('section',{},el('div',{class:'page-heading'},el('div',{},el('p',{class:'eyebrow'},'TEMPO PARA ENTENDER'),el('h1',{},'Minha biblioteca'),el('p',{class:'lead'},'O percurso é da obra. O ritmo é seu.')),button('+ Importar uma obra',()=>{screen='import';render();},{class:'primary'})));
@@ -165,7 +173,7 @@ function settingsView(){
  if(pending)recovery.append(el('p',{class:'warning'},'Operação com resultado desconhecido.'),el('code',{class:'wrap'},pending.args.operation_id),button('Consultar recibo',()=>resolvePending(),{disabled:!online()}),button('Repetir mesma operação',()=>resolvePending(true),{disabled:!online()}));
  const backupText=el('textarea',{rows:5,'aria-label':'Backup privado',placeholder:'Exporte para obter o JSON privado, ou cole um backup completo para restaurar.'});
  recovery.append(el('h3',{},'Exportação privada'),el('p',{class:'muted'},'O backup inclui originais e notas. Proteja o arquivo. A ferramenta de linha de comando grava os bytes diretamente, sem download pelo navegador.'),backupText,el('div',{class:'note-actions'},button('Preparar JSON de exportação',async()=>{const sections:Record<string,unknown[]>={};for(const section of ['works','sources','elements','readings','mediations','notes','terms','events','preferences','receipts']){let next:number|null=0;sections[section]=[];while(next!==null){const data=await call('data_export',{section,offset:next,limit:50,include_original:true});sections[section].push(...data.items);next=data.pagination.next_offset;}}backupText.value=JSON.stringify({format:'araread/1',sections});notice('Backup privado preparado no campo. Nenhum arquivo foi publicado.');},{disabled:!online()}),button('Restaurar como novas leituras',async()=>{const result=await mutate('data_restore',{bundle:JSON.parse(backupText.value)});await load();notice(`${result.restored_readings} leitura(s) restaurada(s) com novos IDs. As leituras existentes foram preservadas.`);},{disabled:!online()})));
- section.append(prefs,connection,recovery);return section;
+ section.append(prefs,connection,recovery,el('section',{class:'paper form-panel'},el('h2',{},'Acesso à conta'),button('Definir ou alterar minha senha',()=>{passwordSetup=true;render();},{disabled:!online()})));return section;
 }
 function consentView(){
  const section=el('section',{class:'paper form-panel'},el('h1',{},'Autorizar assistente'),el('p',{},'Carregando informações do cliente…'));const id=new URLSearchParams(location.search).get('authorization_id')!;
@@ -176,6 +184,6 @@ function consentView(){
 async function switchOwner(){const previous=localStorage.getItem('araread-cache-owner');if(owner()&&previous!==owner()){await clearPrivate();localStorage.setItem('araread-cache-owner',owner());}ctx=null;account=null;pending=null;screen='library';}
 async function logout(){const result=await auth.auth.signOut({scope:'local'});await clearPrivate();localStorage.removeItem('araread-auth-v1');localStorage.removeItem('araread-auth-v1-code-verifier');localStorage.removeItem('araread-cache-owner');session=null;ctx=null;account=null;pending=null;screen='library';message=result.error?'Sessão removida deste dispositivo. A revogação remota exige conexão.':'';render();}
 window.addEventListener('online',()=>void guard(async()=>{notice('Conexão restabelecida. Confira suas alterações antes de enviar.');await load();}));window.addEventListener('offline',()=>{render();});
-auth.auth.onAuthStateChange((event,next)=>{if(next&&session?.user.id===next.user.id){session=next;return;}if(event==='SIGNED_OUT'||(session&&next?.user.id!==session.user.id)){session=next;queueMicrotask(()=>void guard(async()=>{await switchOwner();if(!next)message='Sessão encerrada. Entre novamente para sincronizar.';await load();render();}));}});
+auth.auth.onAuthStateChange((event,next)=>{if(event==='PASSWORD_RECOVERY'&&next){session=next;passwordSetup=true;queueMicrotask(()=>void guard(async()=>{await switchOwner();render();}));return;}if(next&&session?.user.id===next.user.id){session=next;return;}if(event==='SIGNED_OUT'||(session&&next?.user.id!==session.user.id)){session=next;queueMicrotask(()=>void guard(async()=>{await switchOwner();if(!next)message='Sessão encerrada. Entre novamente para sincronizar.';await load();render();}));}});
 await switchOwner();await guard(load);render();
 if(import.meta.env.PROD&&'serviceWorker'in navigator)void navigator.serviceWorker.register('/sw.js');

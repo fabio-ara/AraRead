@@ -7,5 +7,5 @@ export const config = {
  mcpAudience:process.env.MCP_AUDIENCE || 'http://127.0.0.1:4317/mcp',
  database:process.env.DATABASE_URL || 'postgres://araread_app:araread-local-only@127.0.0.1:56432/araread',
  local:process.env.APP_MODE === 'local',
- maxBytes:8*1024*1024,maxAccountBytes:80*1024*1024,
+ maxBytes:8*1024*1024,maxAccountBytes:process.env.ARAREAD_RUNTIME==='edge'?16*1024*1024:80*1024*1024,
 };

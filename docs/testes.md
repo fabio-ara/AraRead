@@ -60,7 +60,38 @@ Playwright grava diretamente pelo retorno nativo as imagens `.local/evidence/rea
 
 Chrome DevTools foi usado para DOM, viewport, rede, screenshot nativa e console. Foi encontrado e corrigido um destino incorreto de HMR no CSP de desenvolvimento e uma fonte embutida bloqueada pelo CSP de produção; o build passou a emitir fontes como arquivos. A nova consulta do console ficou sem erros/avisos no login da aplicação. O teste E2E também observa erros de página e impede downloads. A ferramenta DevTools recusou gravação direta em disco por limite de raízes configuradas; não houve tentativa pela interface nem alteração de preferências para contornar isso. As evidências em disco vieram da API nativa de screenshot do Playwright.
 
-Computer Use foi usado no fluxo oficial de cadastro, sem executar senha/termos. O usuário pediu transferência para o Chrome dedicado, e o cadastro foi aberto por Chrome DevTools em contexto isolado, com o e-mail indicado. Essa jornada é preparação de identidade, não conta criada ou integração homologada. Nenhuma outra aba autenticada foi usada para obter dados do usuário.
+Computer Use e Chrome DevTools foram usados na preparação do fluxo oficial de identidade e no painel do projeto exclusivo, sem executar senha/termos pessoais. O titular concluiu cadastro e autorização da CLI na nova conta. Essa autorização permitiu provisionar somente AraRead; não constitui prova do MCP no ChatGPT. Abas sem necessidade foram fechadas; a edição não salva do eXeLearning foi preservada por decisão expressa do titular.
+
+A jornada `tests/e2e/account.spec.ts` cria uma identidade sintética, gera um link real de recuperação no GoTrue local, abre a tela de senha, rejeita confirmação divergente, altera a senha e entra novamente. Remove a identidade ao final. A screenshot nativa `.local/evidence/password-setup.png`, sem senha preenchida, foi inspecionada. O teste encontrou o caminho incorreto `/verify`; a configuração local do mailer foi corrigida para `/auth/v1/verify`.
+
+## Gate remoto parcial
+
+`tests/hosted-backend.ts` é separado da suíte local e não roda automaticamente na CI. Execute somente após conferir conta/organização/projeto exclusivos e disponibilizar por variáveis de processo `APP_MODE=production`, `AUTH_URL`, `AUTH_ISSUER`, `AUTH_AUDIENCE=authenticated`, `AUTH_PUBLISHABLE_KEY`, `DATABASE_URL`, `HOSTED_AUTH_ADMIN_KEY` e `CONFIRMED_ARAREAD_PROJECT_REF`. Com esses valores já definidos, use `npx tsx tests/hosted-backend.ts`. Não passe segredos na linha de comando nem crie um arquivo de credenciais rastreado pelo Git.
+
+O gate exige host do Auth igual ao ref confirmado, usuário PostgreSQL `araread_app.<ref>` e TLS `verify-full` com raiz configurada. A chave administrativa cria/remove apenas as duas identidades sintéticas desta execução; as operações do domínio usam identidade comum e RLS. Foram aprovadas sete verificações: identidade/JWKS, cadastro público fechado, fonte/Unicode/idioma, mediação/recibo, continuidade/revisão, isolamento e revogação. Resultado em `.local/evidence/hosted-backend.json`, com as duas identidades removidas. Esse processo de domínio é Node local; as provas seguintes exercitam a aplicação hospedada.
+
+## Aplicação HTTPS e cliente externo
+
+Os gates voluntários exigem `CONFIRMED_ARAREAD_PROJECT_REF`, `HOSTED_API_BASE`, `HOSTED_FRONTEND_ORIGIN`, `AUTH_PUBLISHABLE_KEY` e `HOSTED_AUTH_ADMIN_KEY` em variáveis do processo. Recusam API cujo host ou caminho não correspondam ao projeto confirmado. A chave administrativa somente provisiona e remove as identidades sintéticas; a jornada usa login comum, OAuth e RLS. Confira conta/organização/projeto antes de fornecer essas variáveis.
+
+```powershell
+npx tsx tests/hosted-http.ts
+npx tsx tests/hosted-mcp.ts
+npx tsx tests/hosted-restore.ts
+```
+
+| Prova real | Resultado observado em 24/10/2026 UTC | Relatório privado |
+|---|---|---|
+| Gateway Edge HTTP | Nove verificações: saúde/banco e 401, CORS exato, original/hash/Unicode/idioma, escrita/recibo/segunda leitura, duas contas, PDF com lacuna, URL pública e loopback recusado, 24 chamadas concorrentes alternando identidades, revogação imediata | `.local/evidence/hosted-http.json` |
+| MCP pelo SDK oficial externo | Seis verificações: DCR/PKCE e recusa de verificador errado, orientação e 16 ferramentas, importação/mediação/recibo em nova sessão, audiência web recusada, revogação e nova autorização | `.local/evidence/hosted-mcp.json` |
+| Interface publicada + nova sessão MCP | A interface leu a mediação do MCP, gravou nota e continuidade; outra sessão MCP confirmou ambas. Login real, pt-BR/ja/pt-BR, desktop/celular, sem overflow, logout, sem erro de página ou download | Campo `published_ui` do relatório MCP; `tests/hosted-ui.ts` |
+| Restauração grande no Edge | Quatro verificações: perfil de 16 MiB, backup de 17.085.827 bytes aceito pela rota de 32 MiB, recibo/IDs remapeados e originais com hashes iguais em duas contas | `.local/evidence/hosted-restore.json` |
+
+A prova UI é opcional dentro do gate MCP: recebe `ARAREAD_SITE_SERVICE_ACCESS` por entrada privada do runner e envia essa credencial somente no cabeçalho para a origem exata do Site. Não passa esse valor ao código da página nem ao Supabase; o login de leitor continua separado. Não grave a credencial em comando, arquivo rastreado ou URL. As imagens nativas [desktop hospedado](assets/hosted-reader-desktop.png) e [celular hospedado](assets/hosted-reader-mobile.png) foram inspecionadas visualmente.
+
+O teste UI hospedado bloqueia service workers, porque a credencial de serviço não cria uma sessão de visitante Sites. Portanto, ele não comprova cache offline hospedado. A jornada local com quatro testes E2E cobre o service worker, rede lenta, rascunhos e troca de identidade. Todos os gates remotos removem suas identidades sintéticas; o MCP também remove o cliente OAuth criado por ele.
+
+O [relatório consolidado sem credenciais](evidencias/2026-10-24.json) preserva datas e resultados desses gates no repositório. O formulário real do ChatGPT descobriu automaticamente emissor, endpoints OAuth, DCR e recurso do AraRead. A caixa pessoal de confiança permaneceu desmarcada. Ainda faltam o consentimento do titular e a jornada de ferramentas nesse cliente; descoberta de metadados não comprova leitura/escrita no ChatGPT. O nível externo acima é o cliente oficial compatível, em processo separado do servidor.
 
 ## Avaliação editorial
 
@@ -79,6 +110,6 @@ As reescritas curtas cobrem as proposições fornecidas, mantêm sua sequência 
 
 ## Três níveis e CI
 
-Local usa aplicação completa, banco/Auth reais e cliente SDK. Hospedado exige identidade/destino exclusivo, migrations/configuração, interface, gateway e OAuth/duas contas no destino. Cliente externo real exige leitura/escrita e retomada no ChatGPT ou cliente autorizado, com conferência na interface. A ausência dos dois últimos níveis está no [STATUS](../STATUS.md), sem substituí-los por `/health`, 401 ou token administrativo.
+Local usa aplicação completa, banco/Auth reais e cliente SDK. Hospedado exige identidade/destino exclusivo, migrations/configuração, interface, gateway e OAuth/duas contas no destino. Cliente externo real exige leitura/escrita e retomada no ChatGPT ou cliente autorizado, com conferência na interface. Os três níveis têm evidência no [STATUS](../STATUS.md); a homologação específica no ChatGPT continua pendente, sem substituí-la por descoberta de metadados, `/health`, 401 ou token administrativo.
 
 A [CI](../.github/workflows/ci.yml) fixa Ubuntu 24.04, configura Node, instalação pelo lockfile, tipos/docs/build, Compose real, identidades, testes e Chromium, sem segredos pessoais. O runner é fixado porque Playwright 1.56.1 não suporta Ubuntu 26.04, atualmente selecionado por `ubuntu-latest`. O comando opcional de rede pública não roda na CI. Não faça upload de `.local`, traces, tokens ou backups como artifacts. O estado da execução remota, quando disponível, deve ser registrado separadamente da evidência local.

@@ -1,5 +1,6 @@
 import { lookup } from 'node:dns/promises';
-import { request } from 'node:https';
+import { connect } from 'node:tls';
+import { Client } from 'undici';
 import { parseHTML } from 'linkedom';
 import ipaddr from 'ipaddr.js';
 import { blockSchema,type Block,type Extraction } from './contracts.ts';
@@ -15,16 +16,22 @@ export async function validatePublicUrl(value:string){
 }
 async function getPublic(value:string,maxBytes:number,signal:AbortSignal):Promise<{body:Buffer;mime:string;status:number;location?:string}>{
  const {url,address}=await validatePublicUrl(value);
- return new Promise((resolve,reject)=>{
-  const req=request(url,{method:'GET',signal,headers:{'User-Agent':'AraRead/0.1 (single-page user-directed importer)','Accept':'text/html, text/plain;q=0.8','Accept-Encoding':'identity'},lookup:((_host:any,opts:any,cb:any)=>opts?.all?cb(null,[address]):cb(null,address.address,address.family)) as any},response=>{
-   const status=response.statusCode||500,mime=(response.headers['content-type']||'').split(';')[0].toLowerCase();
-   if(status>=300&&status<400){response.resume();resolve({body:Buffer.alloc(0),mime,status,location:response.headers.location});return;}
-   if(Number(response.headers['content-length']||0)>maxBytes){response.destroy();reject(new AppError('TOO_LARGE','Página excede o limite de bytes.',413));return;}
-   const chunks:Buffer[]=[];let bytes=0;
-   response.on('data',(chunk:Buffer)=>{bytes+=chunk.length;if(bytes>maxBytes){response.destroy();reject(new AppError('TOO_LARGE','Página excede o limite de bytes.',413));}else chunks.push(chunk);});
-   response.on('end',()=>resolve({body:Buffer.concat(chunks),mime,status}));response.on('error',reject);
-  });req.on('error',reject);req.end();
- });
+ // O socket usa somente o IP já validado. SNI e certificado continuam vinculados
+ // ao nome original; não há segunda resolução DNS nem fallback por hostname.
+ const client=new Client(url.origin,{headersTimeout:10000,bodyTimeout:10000,maxResponseSize:maxBytes,connect(_options,callback){
+  const socket=connect({host:address.address,port:443,servername:url.hostname.replace(/^\[|\]$/g,''),rejectUnauthorized:true,ALPNProtocols:['http/1.1']});
+  const failed=(error:Error)=>callback(error,null);socket.once('error',failed);
+  socket.once('secureConnect',()=>{socket.removeListener('error',failed);callback(null,socket);});
+ }});
+ try{
+  const response=await client.request({method:'GET',path:url.pathname+url.search,signal,headers:{'User-Agent':'AraRead/0.1 (single-page user-directed importer)','Accept':'text/html, text/plain;q=0.8','Accept-Encoding':'identity'}});
+  const status=response.statusCode,mime=String(response.headers['content-type']||'').split(';')[0].toLowerCase();
+  if(status>=300&&status<400)return {body:Buffer.alloc(0),mime,status,location:typeof response.headers.location==='string'?response.headers.location:undefined};
+  ensure(Number(response.headers['content-length']||0)<=maxBytes,'TOO_LARGE','Página excede o limite de bytes.',413);
+  const chunks:Buffer[]=[];let bytes=0;for await(const chunk of response.body){bytes+=chunk.length;ensure(bytes<=maxBytes,'TOO_LARGE','Página excede o limite de bytes.',413);chunks.push(Buffer.from(chunk));}
+  return {body:Buffer.concat(chunks),mime,status};
+ }catch(error){if((error as any)?.code==='UND_ERR_RES_EXCEEDED_MAX_SIZE')throw new AppError('TOO_LARGE','Página excede o limite de bytes.',413);throw error;}
+ finally{await client.destroy();}
 }
 export async function fetchPublicHtml(value:string){
  const signal=AbortSignal.timeout(10000);let current=new URL(value);

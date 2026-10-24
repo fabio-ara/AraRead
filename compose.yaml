@@ -25,6 +25,10 @@ services:
       API_EXTERNAL_URL: http://127.0.0.1:4317/auth/v1
       GOTRUE_SITE_URL: http://127.0.0.1:4317
       GOTRUE_URI_ALLOW_LIST: http://127.0.0.1:4317/**
+      GOTRUE_MAILER_URLPATHS_CONFIRMATION: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_RECOVERY: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_INVITE: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: /auth/v1/verify
       GOTRUE_DB_DRIVER: postgres
       GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:araread-local-auth-only@db:5432/araread
       GOTRUE_DB_NAMESPACE: auth

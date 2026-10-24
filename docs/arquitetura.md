@@ -10,11 +10,15 @@ O AraRead precisa conservar o que foi estudado mesmo quando o processo ou a conv
 | Ingestão | `src/importers.ts` | Preservar bytes e representar formatos sem execução |
 | Casos de uso | `src/service.ts` | Única implementação de leitura, progresso, histórico, importação e recuperação |
 | Persistência e identidade | `src/db.ts`, `auth.ts`, migrations | Transações, papel mínimo, RLS, JWT e revogação |
-| Transporte | `src/server.ts`, `mcp.ts` | API web, originais privados, metadados OAuth e Streamable HTTP |
+| Transporte | `src/server.ts`, `edge-http.ts`, `mcp.ts` | Adaptadores Node/Web padrão para a mesma API, identidade, domínio e Streamable HTTP |
 | Orientação | `src/guidance.ts` | Instrução, recurso e prompt versionados |
 | Interface | `src/web`, `public/sw.js` | Leitura responsiva, controles e cache privado |
 
-Um único processo Node serve frontend estático, API e MCP. Supabase Auth fornece identidade e OAuth; o aplicativo não implementa um servidor OAuth próprio. O ambiente local usa PostgreSQL e GoTrue em containers exclusivos. Os originais ficam em `bytea` no PostgreSQL, com o restante da importação na mesma transação; não existe bucket público ou serviço de arquivos separado.
+Localmente, um processo Node serve frontend, API e MCP, com PostgreSQL e GoTrue em containers exclusivos. Na instalação hospedada, a função Supabase `araread` serve API/MCP e o Site privado serve somente a interface estática. `VITE_API_BASE` define esse destino no build; CORS permite somente a origem configurada. Os dois adaptadores chamam os mesmos casos de uso e a mesma autorização. Supabase Auth fornece identidade e OAuth; não existe servidor OAuth artesanal. Originais ficam em `bytea`, com o restante da importação na mesma transação; não há bucket público.
+
+O empacotador `scripts/prepare-edge.ts` copia do lockfile somente os dois módulos PDF.js necessários à extração textual, com licença e worker embutido. Assim não distribui todos os recursos opcionais do pacote no Edge. HTTPS usa Undici com socket TLS ligado ao IP público previamente validado, mantendo SNI e verificação do certificado para o hostname original. Não faz uma segunda resolução DNS nem aceita certificado inválido. O Edge usa pooler transacional, uma conexão por instância, descarte ocioso em 1 s e CA explícita; nenhum cliente de aplicação recebe chave administrativa. Consultas não têm nomes de prepared statements e todo contexto de identidade é local à transação.
+
+O perfil Edge limita conteúdo da conta a 16 MiB e restauração HTTP a 32 MiB para respeitar a memória do runtime; Node local mantém 80/128 MiB. O limite por original continua 8 MiB. Essas cotas são expostas por `account_context`; não são medidas de cobertura intelectual. Os limites de CPU do provedor podem interromper um PDF complexo: o cliente deve conferir o recibo e manter o arquivo original, sem alegar importação concluída.
 
 ## Dados e relações
 

@@ -2,6 +2,8 @@
 
 Entre na sua instância e importe material próprio ou autorizado. O ambiente local permite criar uma identidade exclusiva de teste; o ambiente hospedado deve manter inscrições públicas desativadas e provisionar o titular pelo fluxo legítimo do provedor.
 
+Se recebeu um convite ou link de recuperação, abra-o pessoalmente e use “Definir sua senha”. Escolha uma senha exclusiva de pelo menos 12 caracteres, confirme e guarde-a no seu gerenciador de senhas. Não envie a senha nem o link ao assistente. Para recuperar o acesso, preencha o e-mail no login e escolha “Esqueci minha senha”; a mensagem não revela se a conta existe. Dentro da biblioteca, Configurações oferece “Definir ou alterar minha senha”. O envio de e-mail depende da configuração e das quotas do provedor da instância.
+
 ## Importar e conferir
 
 Em “Importar”, informe título, autoria e edição quando conhecidas, idioma do original e se o material é parcial. Cole o texto, escolha um arquivo ou informe uma página HTML pública HTTPS. O limite é 8 MiB por original. Não invente metadados ausentes. A aplicação conserva o original antes de abrir a representação extraída.
