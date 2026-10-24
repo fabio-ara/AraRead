@@ -11,7 +11,7 @@ const samples=JSON.parse(await readFile('tests/fixtures/editorial.json','utf8'))
 const account=JSON.parse(await readFile('.local/test-accounts.json','utf8'))[0];
 const auth=await fetch(`${config.authUrl}/token?grant_type=password`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(account)});assert.equal(auth.status,200);const identity=await authenticate(`Bearer ${(await auth.json()).access_token}`);
 for(const sample of samples)test(`gêneros: preservação, mediação e segunda leitura — ${sample.name}`,async()=>{
- const source=await execute('source_import',{operation_id:randomUUID(),title:sample.name,genres:sample.genres,format:'structured',blocks:sample.blocks,original_language:'pt',partial:true},identity);
+ const source=await execute('source_import',{operation_id:randomUUID(),title:sample.name,genres:sample.genres,format:'structured',blocks:sample.blocks,original_language:sample.original_language||'pt',partial:true},identity);
  try{
   const index=await execute('source_elements',{reading_id:source.reading_id},identity);assert.deepEqual(index.items.map((x:any)=>x.kind),sample.blocks.map((x:any)=>x.kind));
   const ref=index.items[sample.mediate_index].ref,ctx=await execute('reading_context',{reading_id:source.reading_id,ref,language:'pt-BR'},identity);assert.equal(ctx.original,sample.blocks[sample.mediate_index].text);

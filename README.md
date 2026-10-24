@@ -2,9 +2,9 @@
 
 Uma biblioteca pessoal para ler obras difíceis em períodos curtos, na ordem do original, guardar explicações e retomar em outra sessão. A aplicação conserva o material e o estado; o assistente conectado faz a reescrita e responde às perguntas. O núcleo funciona sem chave de modelo.
 
-Esta versão oferece biblioteca privada, importação, leitor responsivo, idiomas, notas, glossário, histórico, continuidade por intervalos, exportação/restauração e MCP próprio com autenticação real. Original, reescrita e comentários têm identidades e apresentações distintas. Abrir uma passagem não significa tê-la lido ou compreendido.
+A versão 0.2.0 acrescenta perspectivas versionadas, vocabulário contextual, fontes bibliográficas, variantes comparáveis, cadernos privados e continuidade de envios na mesma leitura. Todas as telas mantêm uma coluna de celular, com largura máxima de 480 px inclusive no desktop, seguindo a identidade visual Ara. O original e a reescrita/tradução compartilham a mesma referência; consultar, comparar ou perguntar não marca progresso.
 
-**Estado em 24/10/2026, horário de Brasília:** versão implementada, publicada e validada no ChatGPT, com [interface privada](https://araread-biblioteca.stonyrain65.chatgpt.site) e [MCP OAuth](https://ltzoontstgpbegtakrgk.supabase.co/functions/v1/araread/mcp) no projeto Supabase exclusivo. O ChatGPT importou material sintético, salvou reescrita, pergunta/resposta e glossário, confirmou uma continuidade e recuperou tudo em nova conversa. A interface autenticada conferiu os mesmos registros. Consulte o [estado verificável](STATUS.md) e a [evidência da jornada](docs/evidencias/chatgpt-2026-10-24.json). O [repositório é privado](https://github.com/fabio-ara/AraRead).
+**Estado em 24/10/2026:** evolução em homologação. O destino da interface é [GitHub Pages](https://fabio-ara.github.io/AraRead/); API, autenticação e [MCP OAuth](https://ltzoontstgpbegtakrgk.supabase.co/functions/v1/araread/mcp) permanecem no projeto Supabase exclusivo. A publicação e as provas de cada camada constam no [estado verificável](STATUS.md). O código próprio tem licença MIT e será aberto após auditoria integral do histórico e do artefato. A interface web funciona independentemente do ChatGPT; o painel MCP Apps é opcional e depende de suporte do cliente. Veja a [evolução e matriz F01–F10](docs/evolucao.md).
 
 ## Usar localmente
 

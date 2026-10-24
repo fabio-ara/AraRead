@@ -1,5 +1,14 @@
 # Alterações
 
+## 0.2.0 — evolução em homologação, 24/10/2026
+
+- Interface GitHub Pages independente do ChatGPT; identidade visual Ara e coluna de celular de até 480 px em todas as telas.
+- Original, tradução e reescrita distintos; perspectivas versionadas, variantes históricas, contexto limitado e bibliografia/consulta rastreáveis.
+- Vocabulário contextual e consulta pública opcional; notas selecionáveis, exclusão de derivações, relações entre obras e cadernos seletivos privados.
+- Envios parciais na mesma leitura; preparo offline limitado e fila com recibos, conflitos e recuperação antes de sair.
+- Backup v2 consistente de quinze seções, restauração v1 e migration de dados antigos. Painel opcional MCP Apps e 27 ferramentas no mesmo domínio.
+- Auditoria pública de histórico/artefatos e matriz F01–F10 em [evolução](docs/evolucao.md). O [checkpoint](STATUS.md) distingue código pronto e gates hospedados.
+
 ## 0.1.0 — 23/10/2026
 
 - Biblioteca privada, importação TXT/Markdown/HTML/PDF textual e página HTTPS pública, original imutável e versões vinculadas.

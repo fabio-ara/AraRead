@@ -1,10 +1,11 @@
 // Empacotamento local, sem credenciais ou operações remotas. A CLI recebe
 // explicitamente o ref confirmado somente na etapa posterior de implantação.
-import {mkdir,readFile,readdir,writeFile,copyFile} from 'node:fs/promises';
+import {mkdir,readFile,readdir,writeFile,copyFile,cp} from 'node:fs/promises';
 import {resolve} from 'node:path';
 const root=resolve('.local/edge-release'),fn=resolve(root,'supabase/functions/araread');
 for(const path of [fn,`${fn}/src`,`${fn}/vendor`])await mkdir(path,{recursive:true});
 for(const name of await readdir('src'))if(name.endsWith('.ts'))await copyFile(`src/${name}`,`${fn}/src/${name}`);
+await cp('src/study',`${fn}/src/study`,{recursive:true});
 for(const name of ['pdf.mjs','pdf.worker.mjs'])await copyFile(`node_modules/pdfjs-dist/legacy/build/${name}`,`${fn}/vendor/${name}`);
 await copyFile('node_modules/pdfjs-dist/LICENSE',`${fn}/vendor/PDFJS-LICENSE`);
 const pkg=JSON.parse(await readFile('package.json','utf8')),imports:Record<string,string>={};

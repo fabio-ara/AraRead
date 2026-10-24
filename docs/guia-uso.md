@@ -2,7 +2,7 @@
 
 Entre na sua instância e importe material próprio ou autorizado. O ambiente local permite criar uma identidade exclusiva de teste; o ambiente hospedado deve manter inscrições públicas desativadas e provisionar o titular pelo fluxo legítimo do provedor.
 
-Na instalação privada do Sites, primeiro entre com a conta ChatGPT proprietária. Essa entrada libera a interface; sua identidade de leitura é a conta Supabase da biblioteca. O login do painel administrativo Supabase também é distinto desse leitor.
+Na interface GitHub Pages, entre diretamente com sua conta de leitor Supabase. Não é necessário entrar no ChatGPT para abrir o aplicativo. O login administrativo Supabase, a identidade de leitura e a autorização de um cliente MCP são operações distintas.
 
 Se recebeu um convite ou link de recuperação, abra-o pessoalmente e use “Definir sua senha”. Escolha uma senha exclusiva de pelo menos 12 caracteres, confirme e guarde-a no seu gerenciador de senhas. Não envie a senha nem o link ao assistente. Para recuperar o acesso, preencha o e-mail no login e escolha “Esqueci minha senha”; a mensagem não revela se a conta existe. Dentro da biblioteca, Configurações oferece “Definir ou alterar minha senha”. O envio de e-mail depende da configuração e das quotas do provedor da instância.
 
@@ -10,7 +10,7 @@ Se recebeu um convite ou link de recuperação, abra-o pessoalmente e use “Def
 
 Em “Importar”, informe título, autoria e edição quando conhecidas, idioma do original e se o material é parcial. Cole o texto, escolha um arquivo ou informe uma página HTML pública HTTPS. O limite é 8 MiB por original. Não invente metadados ausentes. A aplicação conserva o original antes de abrir a representação extraída.
 
-No leitor, use “Original”, “Índice” e “Sobre esta fonte” para conferir conteúdo, avisos e versão. A extração de PDF pode perder fórmulas, ordem de colunas, tabelas e imagens. Uma página vazia de texto extraível continua identificada como lacuna. Forneça uma transcrição autorizada e indique no texto página/região. “Fornecer nova versão ou transcrição” vincula a nova versão à anterior e cria uma leitura nova, conservando notas e progresso anteriores. Essa mesma operação permite fornecer a próxima passagem de uma fonte parcial: as versões ficam vinculadas, mas suas leituras não são fundidas nem remapeadas automaticamente.
+No leitor, use “Original”, “Índice” e “Sobre esta fonte” para conferir conteúdo, avisos e versão. A extração de PDF pode perder fórmulas, ordem de colunas, tabelas e imagens. Uma página vazia de texto extraível continua identificada como lacuna. Forneça uma transcrição autorizada e indique no texto página/região. “Fornecer nova versão ou transcrição” vincula a nova versão à anterior e cria uma leitura nova, conservando notas e progresso anteriores. Para a próxima passagem da mesma edição parcial, use “Acrescentar a próxima passagem” no painel de estudo: o envio entra como segmento imutável no fim da mesma leitura, sem marcar conteúdo novo nem alterar referências antigas. Uma transcrição corrigida ou outra edição continua sendo uma versão/leitura distinta.
 
 ## Ler e guardar
 
@@ -26,8 +26,20 @@ Consulte glossário, histórico de explicações e todas as notas nos controles 
 
 O seletor no leitor afeta apenas a consulta atual. “Guardar idioma nesta leitura” torna essa escolha persistente. Configurações guarda o padrão da conta e o tamanho das porções. A prioridade é escolha da operação, preferência da leitura e padrão da conta, inicialmente `pt-BR`. “Outro idioma” aceita identificador BCP 47 válido. Trocar idioma não apaga versões, notas ou progresso; explicações salvas em outro idioma permanecem no histórico.
 
-Depois da primeira abertura online, o dispositivo pode consultar a última biblioteca e as porções carregadas, além de manter um rascunho de anotação. Isso não torna o livro inteiro disponível offline. Sem rede, salvar e avançar ficam desativados; o rascunho não é apresentado como salvo no servidor. Ao reconectar, confira a posição e envie sua intenção. Um rascunho pode precisar de revisão após mudanças em outra sessão.
+Use “Preparar esta porção para uso sem rede” para conservar explicitamente até 12 porções/variantes, no total de 2 MiB por conta neste dispositivo. A última consulta também fica disponível. Sem rede, notas e continuidade entram numa fila local limitada a 40 operações/1 MiB; a interface informa que o servidor ainda não confirmou. Não prepara o livro inteiro nem gera respostas de IA offline.
 
 Se uma resposta se perder, Configurações mostra a operação pendente. Consulte o recibo; se continuar desconhecido, repita a mesma operação pela opção disponível. Não envie uma nova intenção equivalente com uma chave diferente. Em conflito, recarregue a leitura e reavalie a anotação ou avanço.
 
-“Sair” e troca de identidade limpam o cache privado local. Para remover só a cópia deste dispositivo, use Configurações; o servidor permanece intacto. Consulte [recuperação](operacao.md) antes de excluir obras ou restaurar um backup.
+Ao reconectar, a fila confere recibos, identidade, versão e revisão. Uma nota pode ser acrescentada após conferir o mesmo intervalo; conflito de progresso pede decisão explícita, sem escolher automaticamente a página mais alta. “Sair” com pendências oferece recuperação em texto, descarte ou cancelamento. A recuperação não contém tokens. Outra conta não vê a fila anterior; para removê-la, entre na identidade correspondente. Cópias preparadas são revalidadas ao reconectar. Consulte [recuperação](operacao.md) antes de excluir obras ou restaurar backup.
+
+## Apoios, fontes e cadernos
+
+“Apoios, perspectivas e fontes” permite escolher representação, quantidade de apoio e perspectiva sem avançar. Repertório/objetivo são opcionais e editáveis; a aplicação não deduz idade, capacidade ou orientação pessoal. Peça ao assistente um termo, exemplo, premissa, etapa ou pré-requisito e volte à mesma referência. Compare variantes salvas em blocos emparelhados, em uma coluna também no desktop. Uma representação ausente é informada, sem conteúdo inventado.
+
+“Entender e lembrar palavras” recupera primeiro definições e associações já guardadas. A consulta externa opcional ao Wikcionário é uma fonte geral, com data/link; sentido filosófico e etimologia exigem apoio pertinente. Dicas de memória são auxílios identificados, não fatos sobre a origem da palavra.
+
+Em “Gerenciar perspectivas, fontes e cadernos”, cadastre referência bibliográfica (livro pode não ter URL), material realmente disponível e escopo da perspectiva. Fontes sugeridas não equivalem a obras consultadas. As referências APA usam apenas metadados disponíveis. Versões de um comentador podem ter escopos distintos; a seleção não transforma uma hipótese pessoal em verdade.
+
+Notas podem participar ou não do contexto. Desativar conserva o registro; excluir pede confirmação e remove derivações registradas. Cadernos permitem escolher comentários para um pacote com prévia, autoria declarada e condições de uso. Não incluem originais/progresso/outras notas. A importação é privada e inativa; edição/hash/idioma divergentes ficam pendentes de vínculo explícito. Não publica o caderno ou verifica a identidade do autor.
+
+Colegas podem abrir a mesma interface no celular e discutir suas leituras. Esta versão conserva bibliotecas individuais; não oferece sala compartilhada, chat coletivo ou sincronização de progresso entre pessoas.

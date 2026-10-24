@@ -2,7 +2,7 @@ import type { Ref } from './contracts.ts';
 import { ensure } from './errors.ts';
 export type Element = {id:string;source_id:string;ordinal:number;kind:string;text:string;locator:string;meta:Record<string,unknown>};
 export const cp = (s:string) => Array.from(s);
-export const sameRef = (a:Ref|null,b:Ref|null)=>JSON.stringify(a)===JSON.stringify(b);
+export const sameRef = (a:Ref|null,b:Ref|null)=>a===b||!!a&&!!b&&a.source_id===b.source_id&&a.element_id===b.element_id&&a.start===b.start&&a.end===b.end;
 export function validateRef(ref:Ref,element:Element,sourceId:string){
  ensure(ref.source_id===sourceId&&element.source_id===sourceId&&ref.element_id===element.id,'INVALID_REF','Referência de outra fonte ou elemento.');
  ensure(ref.start>=0&&ref.end>ref.start&&ref.end<=cp(element.text).length,'INVALID_REF','Intervalo fora do texto original.');

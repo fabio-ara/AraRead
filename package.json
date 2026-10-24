@@ -1,6 +1,6 @@
 {
   "name": "araread",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Biblioteca pessoal de leitura assistida, na ordem da obra e com memória persistente.",
   "private": true,
   "engines": {
@@ -16,7 +16,8 @@
     "local:accounts": "tsx --env-file-if-exists=.env scripts/accounts.ts",
     "local:setup": "tsx scripts/local-setup.ts",
     "backup": "tsx --env-file-if-exists=.env scripts/backup.ts",
-    "docs:check": "tsx scripts/check-docs.ts"
+    "docs:check": "tsx scripts/check-docs.ts",
+    "audit:public": "tsx scripts/audit-public.ts"
   },
   "keywords": [],
   "author": "",

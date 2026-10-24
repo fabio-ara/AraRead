@@ -1,0 +1,51 @@
+{
+  "version": "0.2.0",
+  "checked_at": "2026-10-24T14:23:16.539Z",
+  "local": {
+    "core": {
+      "passed": 52,
+      "failed": 0
+    },
+    "web": {
+      "passed": 8,
+      "failed": 0
+    },
+    "accessibility": "320 px, 480 px máximo no desktop, texto 200%, teclado/foco; inspeção visual nativa, sem certificação WCAG",
+    "migration": "GoTrue real + dados da versão anterior + 16 tabelas com RLS forçado",
+    "scale": {
+      "elements": 10000,
+      "source_bytes": 2878895,
+      "import_ms": 526,
+      "last_page_ms": 35,
+      "page_response_bytes": 22351,
+      "max_limit": 50,
+      "storage": {
+        "logical_original_bytes": 2878895,
+        "stored_original_bytes": 62590,
+        "extracted_text_bytes": "2468894",
+        "araread_relations_before": 15384576,
+        "araread_relations_after": 19169280,
+        "scope": "Local synthetic fixture; relation sizes include indexes, TOAST and previously allocated space; not a per-user capacity promise."
+      },
+      "measured_at": "2026-10-24T14:16:13.291Z"
+    },
+    "editorial": "9 fixtures sintéticas, 3 erros deliberados; sem revisão acadêmica humana ou estudo com participantes"
+  },
+  "audit": {
+    "commits": 5,
+    "blobs": 133,
+    "bytes": 2276234,
+    "working_files": 119,
+    "secret_alerts": 0,
+    "forbidden_paths": [],
+    "ci_log_bytes": 119561,
+    "ci_log_sha256": "57e12ed48fb2f900abd9d064519cc1d57e7cb55ea1b121f5b238b9ba8b6da6a1",
+    "binary_review": "5 capturas históricas sintéticas inspecionadas; PDF de fixture sintético; imagens novas de QA sintética",
+    "commit_metadata": "Autoria histórica conferida com e-mail já publicado voluntariamente no perfil GitHub e no repositório público do titular; nenhum histórico reescrito",
+    "rights": "Código próprio MIT; avisos de dependências preservados; tokens Ara adaptados sob MIT"
+  },
+  "remote": {
+    "status": "pending",
+    "note": "As provas históricas 0.1.0 não comprovam a evolução; atualizar após gates hospedados e cliente real."
+  }
+}

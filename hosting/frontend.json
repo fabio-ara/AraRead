@@ -1,5 +1,7 @@
 {
-  "project_id": "appgprj_6adc31ed31d88191bd345c2ab4837e83",
-  "origin": "https://araread-biblioteca.stonyrain65.chatgpt.site",
+  "provider": "github-pages",
+  "url": "https://fabio-ara.github.io/AraRead/",
+  "origin": "https://fabio-ara.github.io",
+  "base_path": "/AraRead/",
   "api_base": "https://ltzoontstgpbegtakrgk.supabase.co/functions/v1/araread"
 }

@@ -1,0 +1,51 @@
+name: GitHub Pages
+on:
+  workflow_run:
+    workflows: [verificação local]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: ${{ !github.event.repository.private && (github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == github.repository)) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - name: Conferir gate da revisão exata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          revision=$(git rev-parse HEAD)
+          gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$revision&status=success" --jq '.workflow_runs | any(.head_branch == "main" and .conclusion == "success")' | grep -qx true
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24.14.0
+          cache: npm
+      - run: npm ci
+      - uses: actions/configure-pages@v6.0.0
+      - run: npm run build
+        env:
+          ARAREAD_BASE_PATH: /AraRead/
+          VITE_API_BASE: ${{ vars.ARAREAD_API_BASE }}
+      - run: npm run audit:public -- --artifact dist
+      - uses: actions/upload-pages-artifact@v5.0.0
+        with:
+          path: dist
+          retention-days: 1
+      - name: Publicar interface estática
+        id: deployment
+        uses: actions/deploy-pages@v5.0.1

@@ -1,5 +1,7 @@
 # Conectar o assistente
 
+A interface web no GitHub Pages é independente do ChatGPT. O mesmo endpoint MCP pode ser configurado em clientes compatíveis com Streamable HTTP/OAuth; o painel visual MCP Apps é opcional. O núcleo não exige chave ou assinatura de um modelo específico. A orientação atual é 1.1.0 e há 27 ferramentas. Provas 1.0.0/0.1.0 abaixo são históricas; a revisão atual está no [checkpoint](../STATUS.md).
+
 O assistente precisa receber a orientação e usar o MCP para que as explicações sobrevivam à conversa. Um arquivo local no repositório não é carregado automaticamente pelo ChatGPT. A instalação expõe a orientação por três caminhos: instruções do servidor, ferramenta `assistant_guidance` e recurso `araread://assistant/guidance`; o prompt `retomar-leitura` também inclui o texto versionado.
 
 **Estado em 24/10/2026:** conexão pessoal e jornada de leitura/escrita/retomada aprovadas no ChatGPT, com conferência na [interface privada](https://araread-biblioteca.stonyrain65.chatgpt.site). O ChatGPT carregou orientação 1.0.0 e recuperou os registros em nova conversa; veja a [evidência](evidencias/chatgpt-2026-10-24.json). Separadamente, o SDK oficial comprovou OAuth/PKCE, 16 ferramentas, revogação e reconexão no HTTPS hospedado. O [endpoint MCP](https://ltzoontstgpbegtakrgk.supabase.co/functions/v1/araread/mcp) exige OAuth; não cole chave administrativa no cliente.

@@ -2,6 +2,10 @@
 
 O gate usa material sintético e identidades do Supabase Auth local real, em PostgreSQL isolado. Não exige chave de modelo. O teste de navegador interage com a interface servida e relê dados pela API; o teste MCP usa o cliente oficial e o provedor OAuth real. Simulação complementar de perda da resposta ocorre depois que a requisição real chegou ao servidor, sem substituir a persistência.
 
+A evolução 0.2.0 tem [matriz F01–F10 própria](evolucao.md), incluindo limites das provas editoriais e do painel. Resultados atuais devem ser lidos no [checkpoint](../STATUS.md), sem atribuir as provas históricas à revisão nova.
+
+Gate local 0.2.0: 52 testes do núcleo e oito jornadas web aprovados, tipos/build, links documentais e auditoria de dependências sem vulnerabilidades conhecidas. A prova de 10 mil elementos distingue tamanho lógico, compressão e tamanho físico das relações, sem prometer escala ilimitada. O [relatório sanitizado](evidencias/evolucao-2026-10-24.json) registra números e limites. Capturas nativas da [coluna no desktop](assets/evolution-phone-desktop.png) e das [configurações em 320 px](assets/evolution-settings-320.png) usam somente fixtures sintéticas. O teste também amplia texto a 200%, opera por teclado e confere foco/ausência de overflow; não é certificação assistiva completa.
+
 ## Reproduzir
 
 Execute a [instalação local](instalacao.md), mantenha o servidor em produção local ativo e rode:
@@ -27,7 +31,7 @@ npx tsx scripts/verify-public-url.ts
 
 Ela obtém somente `example.com` e usa o redirecionamento público do httpbin para comprovar rejeição de destino loopback. Uma tentativa inicial com httpbingo recebeu recusa do próprio serviço, sem provar o redirecionamento; foi substituída pelo endpoint httpbin, que permitiu exercitar o fluxo. Isso não envolve dados pessoais. Resultado em `.local/evidence/public-url.json`.
 
-## Matriz de aceitação local
+## Matriz da base 0.1.0 (histórica)
 
 | Nº | Requisito → implementação | Teste e evidência |
 |---|---|---|

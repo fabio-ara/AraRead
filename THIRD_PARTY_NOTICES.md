@@ -2,7 +2,7 @@
 
 Inventário gerado dos pacotes instalados a partir do lockfile. As dependências transitivas e opcionais variam por plataforma; conserve também as licenças distribuídas dentro de cada pacote. Os textos encontrados estão em [THIRD_PARTY_LICENSES.txt](THIRD_PARTY_LICENSES.txt). Para outra plataforma, execute novamente `npx tsx scripts/licenses.ts` após `npm ci`.
 
-Nenhum código foi copiado dos repositórios AraLearn/AraHub: foram consultados arquitetura e fluxos documentados, adaptando apenas conceitos. As amostras editoriais e o PDF de teste são criações sintéticas deste projeto. KaTeX inclui fontes; PDF.js e sua distribuição conservam os avisos Apache. PostgreSQL, GoTrue e Node são imagens oficiais separadas; suas licenças permanecem nas distribuições correspondentes.
+A identidade visual adapta tokens de CSS da família AraLearn/AraHub, consultados em modo somente leitura e licenciados sob MIT. Copyright (c) 2026 Fabio Eidi Ara (AraLearn) e Fabio Ara (AraHub); licença MIT preservada em [LICENSE](LICENSE), do mesmo titular. Não foram transplantados dados, segredos ou identificadores de instalação. Amostras editoriais, inclusive verso grego não atribuído a autor histórico e sem pretensão métrica, e PDF de teste são criações sintéticas do AraRead. KaTeX inclui fontes; PDF.js conserva avisos Apache. Imagens oficiais PostgreSQL/GoTrue/Node mantêm suas próprias licenças.
 
 | Pacote | Versão | Licença declarada |
 |---|---|---|

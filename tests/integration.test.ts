@@ -2,7 +2,7 @@ import { test,after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { randomUUID,createHash } from 'node:crypto';
-import { execute } from '../src/service.ts';
+import { execute,sections as backupSections } from '../src/service.ts';
 import { pool,transaction,type Identity } from '../src/db.ts';
 import { authenticate } from '../src/auth.ts';
 import { config } from '../src/config.ts';
@@ -89,10 +89,10 @@ test('percurso durável e isolamento com PostgreSQL e duas identidades reais',as
   const second=await call('reading_context',{reading_id:created.reading_id},newIdentity);assert.deepEqual(second.reading.resume,context.reading.resume);assert.equal(second.effective_language,'pt-BR');assert.ok(second.mediation);assert.ok((await call('reading_history',{reading_id:created.reading_id,kind:'notes'},newIdentity)).items.length>=3);
  });
  await t.test('exportação e restauração preservam relações, bytes, cobertura e histórico com IDs novos',async()=>{
-  const sections:Record<string,any[]>={};for(const section of ['works','sources','elements','readings','mediations','notes','terms','events','preferences','receipts']){
-   let offset:number|null=0;sections[section]=[];while(offset!==null){const page=await call('data_export',{section,offset,limit:50,include_original:true});sections[section].push(...page.items);offset=page.pagination.next_offset;}
+  let snapshot:string|undefined;const sections:Record<string,any[]>={};for(const section of backupSections){
+   let offset:number|null=0;sections[section]=[];while(offset!==null){const page=await call('data_export',{section,offset,limit:50,include_original:true,snapshot});snapshot=page.snapshot;sections[section].push(...page.items);offset=page.pagination.next_offset;}
   }
-  const bundle={format:'araread/1',sections};const restored=await call('data_restore',{operation_id:op(),bundle},bob);assert.ok(restored.id_map[created.reading_id]);
+  const bundle={format:'araread/2',snapshot,sections};const restored=await call('data_restore',{operation_id:op(),bundle},bob);assert.ok(restored.id_map[created.reading_id]);
   const restoredContext=await call('reading_context',{reading_id:restored.id_map[created.reading_id]},bob);assert.equal(restoredContext.original,context.original);assert.equal(restoredContext.mediation.rewrite,context.mediation.rewrite);assert.equal(restoredContext.reading.covered.length,context.reading.covered.length);assert.notEqual(restoredContext.source.id,context.source.id);
   const tampered=structuredClone(bundle);tampered.sections.readings[0].resume.end=999999;await assert.rejects(()=>call('data_restore',{operation_id:op(),bundle:tampered},bob),{code:'INVALID_REF'});
   for(const work of sections.works)await call('work_delete',{operation_id:op(),work_id:restored.id_map[work.id],confirm_title:work.title},bob);

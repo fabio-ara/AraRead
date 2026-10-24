@@ -20,8 +20,19 @@ O endpoint `/mcp` usa Streamable HTTP pelo SDK oficial. A implementação foi ex
 | `data_restore` | Restaura bundle íntegro em novos IDs, sem sobrescrever leituras existentes |
 | `work_delete` | Exclusão destrutiva própria, exigindo `confirm_title` exato |
 | `assistant_guidance` | Carrega orientação operacional versionada |
+| `source_append` | Acrescenta segmento imutável à mesma leitura parcial, sem avançar |
+| `reference_save` | Bibliografia e trecho, inclusive livro sem URL; consulta exige material/localizador |
+| `perspective_save` | Versão imutável de comentador/tradição/abordagem/caderno e escopo |
+| `context_prepare` | Escrita com revisão/recibo: registra contexto disponibilizado limitado, sem avançar |
+| `note_manage` | Ativa/desativa, vincula pendente ou exclui memória e derivações registradas |
+| `connection_save` | Relação entre duas passagens próprias, com problema, natureza, evidência e limites |
+| `study_catalog` | Catálogo privado paginado de fontes, perspectivas, contextos, notas ou relações |
+| `notebook_export` | Pacote seletivo com prévia, sem originais/progresso/credenciais |
+| `notebook_import` | Cópia privada inativa; alinhamento exato ou vínculo pendente |
+| `correction_save` | Sinaliza erro e dependentes; correção efetiva é nova variante com `supersedes` |
+| `lexicon_lookup` | Vocabulário salvo primeiro; consulta externa opcional atribuída |
 
-Leituras têm `readOnlyHint:true`; escritas têm `false`; só exclusão declara destruição. Repetição de escrita é idempotente com identidade de operação. Importação declara mundo aberto pois pode obter uma URL pública. Anotações são dicas ao cliente, sem substituir autenticação e permissões reais. Não há SQL arbitrário, terminal ou execução de conteúdo.
+Leituras têm `readOnlyHint:true`; escritas têm `false`; exclusão de obra e gestão de notas declaram potencial destrutivo. Repetição de escrita é idempotente com identidade de operação. Importação e consulta de léxico declaram mundo aberto pois podem obter material público. Anotações são dicas ao cliente, sem substituir autenticação e permissões reais. Não há SQL arbitrário, terminal ou execução de conteúdo.
 
 ## Referência, revisão e idioma
 
@@ -48,6 +59,14 @@ await mcp.callTool({name:'mediation_save',arguments:{
 
 ## Limites e erros
 
-Paginação usa `offset`, `limit` de 1 a 50 e `next_offset:null` no fim. Fontes com bytes na exportação limitam a página a uma fonte. Contexto inclui no máximo 25 termos, 25 notas da passagem e 15 perguntas abertas; use histórico para percorrer o restante. Originais: 8 MiB; texto colado no contrato: 2 milhões de unidades de string; até 20 mil elementos de 100 mil caracteres; reescrita: 20 mil caracteres; até 20 acréscimos; anotação: 10 mil; biblioteca: cota de conteúdo de 80 MiB. MCP e operações HTTP comuns limitam JSON a 16 MiB. A rota web/CLI autenticada `POST /api/data_restore` aceita até 128 MiB para o backup com originais; verifica sessão antes de ler o corpo maior e aplica a cota ao conteúdo restaurado. Para recuperar backups acima de 16 MiB, use essa rota; não há restauração multipart.
+Paginação usa `offset`, `limit` de 1 a 50 e `next_offset:null` no fim. Fontes com bytes na exportação limitam a página a uma fonte. Contexto inclui no máximo 25 termos, 25 notas da passagem e 15 perguntas abertas; use histórico para percorrer o restante. Originais: 8 MiB; texto colado no contrato: 2 milhões de unidades de string; até 20 mil elementos de 100 mil caracteres; reescrita: 20 mil caracteres; até 20 acréscimos; anotação: 10 mil; biblioteca: cota lógica de 80 MiB local ou 16 MiB no Edge. MCP e operações HTTP comuns limitam JSON a 16 MiB. A rota web/CLI autenticada `POST /api/data_restore` aceita até 128 MiB local ou 32 MiB no Edge para o backup com originais; verifica sessão antes de ler o corpo maior e aplica a cota ao conteúdo restaurado. Para recuperar backups acima de 16 MiB, use essa rota; não há restauração multipart.
 
-Erros principais: `VALIDATION`, `INVALID_REF`, `NOT_FOUND`, `CONFLICT`, `NOT_AT_RESUME`, `EXISTS`, `IDEMPOTENCY_MISMATCH`, `UNAUTHENTICATED`, `SESSION_REVOKED`, `FORBIDDEN`, `QUOTA`, `TOO_LARGE`, `UNSAFE_URL`, `ROBOTS_DENIED`, `SOURCE_UNAVAILABLE`, `INVALID_BACKUP`. `INTERNAL` pede consultar recibo antes de repetir. Mensagens não retornam SQL ou credenciais. `operation_get` não recebe IDs de outra conta nem distingue existência alheia.
+Erros principais: `VALIDATION`, `INVALID_REF`, `NOT_FOUND`, `CONFLICT`, `NOT_AT_RESUME`, `EXISTS`, `IDEMPOTENCY_MISMATCH`, `UNAUTHENTICATED`, `SESSION_REVOKED`, `FORBIDDEN`, `QUOTA`, `TOO_LARGE`, `UNSAFE_URL`, `ROBOTS_DENIED`, `SOURCE_UNAVAILABLE`, `INVALID_BACKUP`, `EXPORT_CHANGED`, `INVALID_CONTEXT`, `MISSING_EVIDENCE`. `INTERNAL` pede consultar recibo antes de repetir. Mensagens não retornam SQL ou credenciais. `operation_get` não recebe IDs de outra conta nem distingue existência alheia.
+
+## Seleção, contexto, histórico e painel
+
+Os contratos adicionais ficam em [study/contracts.ts](../src/study/contracts.ts); há 27 ferramentas. `selection` separa representação, apoio, perspectiva, inclusão/IDs de notas e repertório/objetivo opcionais. `context_prepare` retorna `context_id`, assinatura, material disponibilizado e lacunas; incrementa revisão e gera recibo sem mudar posição. `mediation_save` pode referenciar esse contexto, alinhamento real, referências usadas, dependências e versão substituída. Campos provider/model só são enviados quando conhecidos. A assinatura não garante determinismo do modelo.
+
+`reading_context` pode selecionar `variant_id` histórica na mesma porção/idioma; retorna um corpo e metadados limitados das demais variantes, com sinalização de desatualização. `data_export` v2 exige o mesmo `snapshot` nas quinze seções; conflito invalida o conjunto. `data_restore` aceita v1/v2 com IDs novos. `operation_get` pode retornar recibo de contexto com `privacy_redacted:true` após exclusão, sem recriar dados removidos.
+
+`reading_context` anuncia opcionalmente o recurso `ui://araread/reader-v2.html`, MIME `text/html;profile=mcp-app`. O painel usa MCP Apps `ui/initialize`, `ui/notifications/tool-result`, `tools/call` e `ui/message` por JSON-RPC ao host. Botões pedem explicação/pergunta sem avanço; continuidade usa revisão, chave e recibo. Não exige `window.openai`; clientes sem suporte continuam usando ferramentas textuais. O harness local testa a ponte; a prova em host externo é registrada separadamente. Consulte a [especificação MCP Apps](https://apps.extensions.modelcontextprotocol.io/api/documents/Overview.html).

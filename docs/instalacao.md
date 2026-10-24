@@ -25,7 +25,7 @@ Para parar somente esta instância: encerre seu processo Node e execute `docker 
 
 ## Configuração hospedada necessária
 
-A instalação hospedada usa Supabase Edge para API/MCP e o Site privado para a interface estática. O Node/container continua disponível para execução local. A adaptação mantém o mesmo domínio, PDF textual e proteção de URL; veja [decisões](decisoes.md). O projeto exclusivo Free já passou por gates HTTP, OAuth/MCP e interface reais. Nenhum serviço pago foi contratado. Os endereços vigentes estão no [checkpoint](../STATUS.md).
+A instalação hospedada usa Supabase Edge para API/MCP e GitHub Pages para a interface estática. O Node/container continua disponível para execução local. A adaptação mantém o mesmo domínio, PDF textual e proteção de URL; veja [decisões](decisoes.md). O projeto exclusivo Free já passou por gates HTTP, OAuth/MCP e interface reais. Nenhum serviço pago foi contratado. Os endereços vigentes estão no [checkpoint](../STATUS.md).
 
 Antes de qualquer escrita remota, confira conta, organização, projeto novo/exclusivo, plano e políticas atuais. Não ative faturamento ou inscrições públicas, não migre para o projeto dos irmãos e não abra um diretório público de plugins. A [página de preços do Supabase](https://supabase.com/pricing), consultada em 23/10/2026, informa limites e pausa por inatividade no plano gratuito; eles podem mudar. Confirme novamente no provisionamento. Uma conta nova não autoriza contornar limites ou os [termos de uso aceitável](https://supabase.com/aup).
 
@@ -65,12 +65,18 @@ Após conferir identidade/organização/projeto exclusivos e configurar os segre
 
 O adaptador verifica JWT ES256/RS256, emissor, audiência, sessão, cliente e permissão antes dos dados. `verify_jwt=false` desativa somente o verificador legado do gateway, necessário para descoberta OAuth pública e para os tokens assimétricos destinados ao recurso próprio; não habilita dados anônimos. Os gates comprovam 401 sem token, rejeição de audiência incorreta e revogação imediata. Veja [segurança](seguranca.md).
 
-Para atualizar a interface existente, rode `npx tsx scripts/prepare-site.ts` e faça o build no checkout `.local/sites-araread` com o Vite do lockfile. `hosting/frontend.json` conserva a identidade e as URLs; não crie outro Site. A credencial de escrita vem do conector Sites e entra somente por stdin no helper oficial `site-workflow.mjs`. Ele sincroniza fonte e empacota o build; publique a revisão exata com a operação privada do conector. O Site conserva acesso do titular e o aplicativo continua exigindo sua sessão Supabase. A credencial de serviço usada na QA não é incluída no código ou no bundle.
+Para publicar a interface, configure a variável do repositório `ARAREAD_API_BASE` com a URL pública da função exclusiva. O workflow `.github/workflows/pages.yml` compila com `ARAREAD_BASE_PATH=/AraRead/` e `VITE_API_BASE`, publica somente `dist` e exige CI aprovada para a revisão exata de `main`. Ative Pages com origem GitHub Actions depois da auditoria/autorização pública. Uma execução privada não torna a biblioteca pública nem é prova de publicação. Para forks, ajuste o caminho do projeto no workflow e as URLs Auth/CORS; não copie destinos do titular. O antigo `prepare-site.ts` foi retirado.
 
 ## Artefato e gates externos
 
 ```powershell
-docker build -t araread:local-0.1.0 .
+docker build -t araread:local-0.2.0 .
 ```
 
 A imagem contém app/build/dependências e roda como usuário `node`, sem `.env`, dados ou chaves locais. Um build bem-sucedido não demonstra implantação. Confira saúde, interface, migrações novas, originais privados, OAuth/PKCE pelo gateway, revogação, duas contas e escrita/retomada reais. Só depois execute a [prova no cliente externo](conectar-assistente.md). Na reversão, retorne o artefato compatível sem apagar banco; migrations com dados não são desfeitas automaticamente. Use backup e uma migration corretiva revisada quando necessário.
+
+## Caminho Pages e evolução
+
+`hosting/frontend.json` identifica URL completa, origem (sem caminho), base path e API. `APP_ORIGIN` recebe só a origem CORS; o Auth recebe a URL da interface e redirect exato no caminho do projeto. A página de consentimento usa o mesmo aplicativo com `authorization_id` na query, sem depender de rota SPA inexistente. Confira o redirecionamento real pelo SDK após qualquer alteração do Auth. Conserve consentimentos existentes; mudar frontend não exige apagar contas/concessões.
+
+A terceira migration acrescenta seis tabelas com RLS forçado e preenche o segmento raiz de leituras existentes. Não reescreva os checksums anteriores. O gate cria banco temporário com dados anteriores à evolução e verifica posição, histórico e vínculos após as três migrations. Faça backup consistente antes de aplicar no destino confirmado. O empacotador Edge copia recursivamente `src/study`; publicar só os arquivos da raiz é incompleto.

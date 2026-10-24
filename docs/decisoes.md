@@ -1,25 +1,25 @@
 # Decisões, capacidades e referências
 
-Registro da versão 0.1.0, iniciado em 23/10/2026 e finalizado conforme o [checkpoint](../STATUS.md). Decisões são derivadas do uso pessoal e das provas realizadas, sem atribuir sucesso hospedado a testes locais.
+Registro consolidado da evolução 0.2.0. As provas históricas 0.1.0 permanecem em [testes](testes.md); o [checkpoint](../STATUS.md) identifica quais gates da revisão atual foram concluídos.
 
 | Decisão | Motivo e consequência |
 |---|---|
 | Frontend TypeScript sem framework visual | Biblioteca/leitor/configurações cabem em DOM simples; reaproveita contratos sem acrescentar infraestrutura curricular |
 | Um domínio, adaptadores Node e Web padrão | Node reproduz o ambiente local; Edge serve a instalação hospedada. Ambos chamam o mesmo serviço, autorização e persistência |
 | PostgreSQL/Auth Supabase; originais em `bytea` | Importação, referência e original entram no mesmo commit; suficiente para arquivos de 8 MiB e biblioteca pessoal; consome a cota de banco, sem depender de bucket público |
-| Supabase Edge e interface estática privada no Sites | A incompatibilidade de `https.request.lookup` foi resolvida com Undici 7.30.1 e socket TLS para IP já validado, sem segunda resolução. O PDF foi reduzido de um pacote de 33 MB recusado para os módulos necessários; o pacote final de 3 MB passou no Edge real. Render foi retirado conforme a escolha do titular |
+| Supabase Edge e interface estática pública no GitHub Pages | A incompatibilidade de `https.request.lookup` foi resolvida com Undici 7.30.1 e socket TLS para IP já validado, sem segunda resolução. O PDF foi reduzido de um pacote de 33 MB recusado para os módulos necessários; o pacote final de 3 MB passou no Edge real. Render foi retirado conforme a escolha do titular |
 | Perfil de memória para Edge | Conta com 16 MiB de conteúdo e restauração HTTP de 32 MiB, mantendo original de até 8 MiB. Backup real de 17.085.827 bytes foi restaurado, com IDs novos e hashes iguais. Node local mantém 80/128 MiB |
 | Pooler transacional no Edge | A repetição do gate atingiu `EMAXCONNSESSION`: instâncias efêmeras ocuparam as 15 conexões do modo de sessão. Porta 6543, pool de uma conexão e descarte ocioso em 1 s evitam prender uma sessão PostgreSQL por instância. Identidade/RLS continuam locais à transação, sem prepared statements nomeados |
 | GoTrue/OAuth do provedor | Identidade, consentimento, PKCE, DCR e concessões reais; não criar servidor OAuth artesanal |
 | Revogação por consulta de sessão/concessão | Bloqueio imediato em operações, ao custo de consultar banco e depender dele para autorizar |
 | Intervalos em pontos de código e fontes imutáveis | Mudança de porção/idioma não altera identidade; versão nova não desloca notas antigas |
-| Versão adicional para material parcial | Cadeia vinculada e leituras separadas conservam o histórico; não existe alinhamento/fusão automática de progresso entre versões |
+| Manifesto de segmentos para envios parciais | A próxima passagem da mesma edição entra no fim da mesma leitura. Outra edição/transcrição continua em versão/leitura distinta, sem remapear progresso |
 | Revisão e recibo na transação | Conflito explícito e repetição segura após resposta perdida, sem um sistema distribuído de eventos |
-| Cache privado limitado | Consulta da última porção e rascunho offline, sem simular sincronização nem criptografia contra o dono do perfil |
+| Cache e fila limitados | Última porção e preparo explícito, fila de notas/progresso com recibos e conflitos; sem download do livro inteiro nem criptografia contra o dono do perfil |
 
 ## Aproveitamento dos irmãos
 
-Foram consultados seletivamente README, mapas, arquitetura, persistência, autoria/conexão MCP, identidade, instalação, recuperação e documentação visual/de testes dos repositórios AraLearn/AraHub disponíveis como irmãos locais. Suas licenças MIT foram conferidas. Foram adaptados conceitos de documentação por objetivo, estado canônico, prova de recibo, jornada de conexão e explicitação dos níveis de teste. Nenhum código, segredo, project ref, OAuth client ID ou dado pessoal foi transplantado. Complexidade de cursos, integrações institucionais, serviços e sistemas visuais completos foi rejeitada por não servir ao leitor pessoal. Os repositórios e serviços permaneceram em leitura.
+Foram consultados seletivamente mapas, arquitetura, persistência, conexão, recuperação e documentação dos irmãos em modo somente leitura. Tokens visuais de cor, tipografia, espaçamento e controles foram adaptados da família Ara, sob MIT e autorização do titular; os avisos constam em [terceiros](../THIRD_PARTY_NOTICES.md). Nenhum segredo, identificador de instalação ou dado pessoal foi transplantado. A coluna de até 480 px vale em todas as telas por determinação posterior do titular, para leitura pelo celular e discussão com colegas.
 
 ## Capacidades e limites
 
@@ -27,13 +27,13 @@ Implementado: importadores declarados, fonte versionada, leitura por porção, r
 
 Validado localmente: persistência e Auth reais, duas contas e RLS, revisões concorrentes, falhas antes/depois do commit, revogação, PKCE e nova autorização, protocolos moderno/legado do SDK, reinício real, migração vazia/evolução, PDF imperfeito, seis gêneros sintéticos, mobile/desktop/offline e fonte de 10 mil elementos. Os resultados consolidados estão em [testes](testes.md).
 
-Validado com infraestrutura remota: conta independente e projeto exclusivo Free confirmados, migrations aplicadas com checksum, dez tabelas com RLS forçado, papel mínimo e conexão PostgreSQL com TLS verificado, Auth ES256 e inscrições públicas desativadas. Sete verificações exercitaram duas identidades sintéticas, fontes, recibos, retomada, isolamento e revogação; ambas foram removidas ao final. O domínio rodou em Node local: isso não prova gateway ou interface hospedados.
+A infraestrutura remota 0.1.0 foi comprovada com identidades sintéticas e cliente externo; as evidências originais estão em [testes](testes.md). Elas não comprovam automaticamente as funções 0.2.0. O estado corrente de migrations, runtime, Pages e cliente real deve ser consultado no [checkpoint](../STATUS.md), sem confundir publicação de código com publicação do serviço.
 
 Validado no destino completo: nove verificações pelo gateway HTTPS, incluindo 24 chamadas concorrentes com identidades alternadas, seis verificações MCP com OAuth/PKCE e cliente oficial fora do servidor, interface publicada desktop/mobile e restauração acima de 16 MiB. A interface conferiu a mediação gravada pelo MCP e suas escritas foram relidas por nova sessão MCP. Não confundir esse cliente compatível com o ChatGPT.
 
 Validado no ChatGPT após os atos pessoais do titular: orientação 1.0.0, importação sintética, reescrita, pergunta/resposta vinculada, glossário, recibos, continuidade explícita e recuperação em nova conversa. A interface autenticada confirmou os registros e a retomada. A revisão passou de 4 a 5 somente no avanço solicitado; a nova conversa manteve a revisão 5. A [evidência específica](evidencias/chatgpt-2026-10-24.json) separa essa jornada das provas anteriores do SDK. Revogação/reconexão permanecem comprovadas pelo SDK oficial no provedor real; a concessão pessoal do ChatGPT foi preservada. Nenhum cartão, upgrade, plugin público ou recurso Render foi criado.
 
-Fora desta versão: OCR automático, EPUB/DOCX, imagem interpretada automaticamente, extração perfeita de layout/PDF, alinhamento de edições, busca vetorial, geração interna, fila, sincronização de escrita offline, restauração multipart e classificação automática de verdade. Nenhuma dessas ausências autoriza descartar material original ou esconder uma lacuna.
+Fora desta versão: OCR automático, EPUB/DOCX, interpretação automática de imagem, extração perfeita de layout/PDF, alinhamento de edições distintas, busca vetorial, geração interna, restauração multipart, salas coletivas e classificação automática de verdade. Fila offline, perspectivas e cadernos seletivos agora estão implementados; suas garantias e limites estão na [evolução](evolucao.md).
 
 ## Fontes técnicas primárias
 
@@ -52,3 +52,5 @@ Matriz de bibliotecas fixadas: MCP server/client 2.4.0, adaptador Node 2.1.2, su
 Consultas adicionais em 24/10/2026: [limites Edge](https://supabase.com/docs/guides/functions/limits), [autenticação Edge](https://supabase.com/docs/guides/functions/auth), [API oficial de gerenciamento](https://api.supabase.com/api/v1-json) e [conectores TLS Undici](https://github.com/nodejs/undici/blob/v7.30.0/docs/docs/api/Connector.md). O Edge documenta 256 MB e 2 s de CPU por requisição; PDF complexo pode ser interrompido. Undici 7.30.1 foi fixado após a auditoria identificar correções de segurança ausentes em 7.30.0. Não usar tráfego artificial para impedir pausas do plano gratuito.
 
 A configuração final de conexões segue [conexão PostgreSQL para funções](https://supabase.com/docs/guides/database/connecting-to-postgres): pooler transacional, pool de uma conexão, ausência de prepared statements nomeados e contexto local à transação. A investigação de `EMAXCONNSESSION` consultou os [logs por SQL](https://supabase.com/docs/guides/observability/advanced-log-filtering), somente no projeto exclusivo e em janela delimitada, sem registrar tokens ou corpos de requisição.
+
+Consultas primárias da evolução: [GitHub Pages por workflow](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages), [MCP Apps](https://apps.extensions.modelcontextprotocol.io/api/documents/Overview.html), [Supabase OAuth Server](https://supabase.com/docs/guides/auth/oauth-server/getting-started) e [armazenamento TOAST](https://www.postgresql.org/docs/current/storage-toast.html). A interface estática não hospeda um backend. Compressão e contexto limitado economizam recursos; não tornam o Free adequado a um número ilimitado de usuários/obras.
