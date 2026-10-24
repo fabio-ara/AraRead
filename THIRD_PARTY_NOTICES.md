@@ -176,3 +176,11 @@ A identidade visual adapta tokens de CSS da família AraLearn/AraHub, consultado
 | zod | 4.6.7 | MIT |
 
 Pacotes sem arquivo de licença identificado na raiz: nenhum. O inventário não substitui a licença específica de arquivos internos.
+
+## Adaptador OCR opcional
+
+`Dockerfile.ocr` usa a distribuição Debian bookworm e seus pacotes Python 3, Poppler (`pdfinfo`, `pdftotext`, `pdftoppm`) e Tesseract com dados de idioma inglês/português. Não fazem parte do bundle JavaScript/Edge. A imagem conserva avisos e licenças em `/usr/share/doc/<pacote>/copyright` e licenças comuns em `/usr/share/common-licenses`.
+
+O pacote Poppler instalado declara GPL-2 ou GPL-3 para seus arquivos principais, com avisos específicos por arquivo; Tesseract declara Apache-2.0. Consulte os arquivos da distribuição para todo o inventário transitivo e os [fontes Poppler](https://poppler.freedesktop.org/) e [Tesseract](https://github.com/tesseract-ocr/tesseract). A licença MIT do AraRead cobre seu adaptador próprio, sem relicenciar esses executáveis. O gate local utilizou Tesseract 5.3.0; a versão efetiva acompanha cada suplemento produzido.
+
+As fixtures PDF da 0.3 são inteiramente sintéticas e geradas por `scripts/pdf-v3-fixtures.py`. ReportLab, Pillow e PyMuPDF/MuPDF são ferramentas de desenvolvimento opcionais; não são embarcadas no servidor nem no Edge. Nenhuma página da Stanford Encyclopedia foi copiada para as fixtures ou para o repositório.

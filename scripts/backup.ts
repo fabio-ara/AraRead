@@ -8,11 +8,12 @@ if(!token)throw new Error('Configure ARAREAD_ACCESS_TOKEN apenas no ambiente do 
 async function call(tool:string,args:unknown){const r=await fetch(`${origin}/api/${tool}`,{method:'POST',headers:{authorization:`Bearer ${token}`,'content-type':'application/json'},body:JSON.stringify(args)});const out=await r.json();if(!r.ok||!out.ok)throw new Error(out.error?.message||`HTTP ${r.status}`);return out.data;}
 if(mode==='export'){
  const sections:Record<string,unknown[]>={};let snapshot:string|undefined;
- for(const section of ['works','sources','elements','readings','mediations','notes','terms','events','preferences','receipts','reading_segments','references','perspectives','contexts','connections']){
+ const manifest=await call('data_export',{section:'works',limit:1});snapshot=manifest.snapshot;
+ for(const section of manifest.sections){
   sections[section]=[];let offset:number|null=0;
   while(offset!==null){const page=await call('data_export',{section,offset,limit:50,include_original:true,snapshot});snapshot=page.snapshot;sections[section].push(...page.items);offset=page.pagination.next_offset;}
  }
- await writeFile(file,JSON.stringify({format:'araread/2',snapshot,exported_at:new Date().toISOString(),sections}),{mode:0o600,flag:'wx'});console.log('Backup privado consistente criado e originais incluídos. Proteja o arquivo.');
+ await writeFile(file,JSON.stringify({format:manifest.format,snapshot,exported_at:new Date().toISOString(),sections}),{mode:0o600,flag:'wx'});console.log('Backup privado consistente criado, incluindo os bytes originais quando disponíveis. Proteja o arquivo.');
 }else{
  const bytes=await readFile(file,'utf8'),bundle=JSON.parse(bytes),requestFile=`${file}.restore-request.json`,sha256=createHash('sha256').update(bytes).digest('hex');
  let intent:{operation_id:string,sha256:string};

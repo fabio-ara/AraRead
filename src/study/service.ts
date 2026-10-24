@@ -8,9 +8,11 @@ import {exportNotebook,importNotebook} from './notebooks.ts';
 import {lookupVocabulary} from './vocabulary.ts';
 import {deleteMemory} from './memory.ts';
 import {studySchemas} from './contracts.ts';
+import type {Identity} from '../db.ts';
+import {resolvePreferences} from './preferences.ts';
 
 const str=JSON.stringify;
-export async function dispatchStudy(name:string,a:any,uid:string,c:PoolClient,r:any,quota:(n:number)=>Promise<unknown>){
+export async function dispatchStudy(name:string,a:any,uid:string,c:PoolClient,r:any,quota:(n:number)=>Promise<unknown>,identity?:Identity){
  if(!Object.hasOwn(studySchemas,name))return undefined;
  r??=await one(c,'select * from araread.readings where id=$1',[a.reading_id]);ensure(r,'NOT_FOUND','Leitura não encontrada.',404);
  if(a.ref)await memberElement(c,r.id,a.ref);
@@ -37,7 +39,7 @@ export async function dispatchStudy(name:string,a:any,uid:string,c:PoolClient,r:
   result={entity_id:id,perspective_id:id,version:(previous?.version||0)+1};
  }
  if(name==='context_prepare'){
-  const pref=await one(c,'select language from araread.preferences');const prepared=await prepareStudy(c,r,a.ref,a.language||r.language||pref?.language||'pt-BR',a.selection);
+  const pref=await resolvePreferences(c,r,identity);const prepared=await prepareStudy(c,r,a.ref,a.language||String(pref.values.language),a.selection,identity);
   const id=randomUUID();await c.query('insert into araread.contexts(id,owner_id,reading_id,source_id,ref,selection,signature,materials,gaps,language,guidance_version) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)',[id,uid,r.id,a.ref.source_id,str(a.ref),str(prepared.selection),prepared.signature,str(prepared.material_keys),str(prepared.gaps),prepared.effective_language,guidanceVersion]);
   const {material_keys,...publicPrepared}=prepared;result={context_id:id,...publicPrepared,guidance_version:guidanceVersion,availability_is_not_causation:true};
  }

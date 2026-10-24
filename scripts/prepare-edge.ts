@@ -6,6 +6,7 @@ const root=resolve('.local/edge-release'),fn=resolve(root,'supabase/functions/ar
 for(const path of [fn,`${fn}/src`,`${fn}/vendor`])await mkdir(path,{recursive:true});
 for(const name of await readdir('src'))if(name.endsWith('.ts'))await copyFile(`src/${name}`,`${fn}/src/${name}`);
 await cp('src/study',`${fn}/src/study`,{recursive:true});
+await cp('src/ingestion',`${fn}/src/ingestion`,{recursive:true});
 for(const name of ['pdf.mjs','pdf.worker.mjs'])await copyFile(`node_modules/pdfjs-dist/legacy/build/${name}`,`${fn}/vendor/${name}`);
 await copyFile('node_modules/pdfjs-dist/LICENSE',`${fn}/vendor/PDFJS-LICENSE`);
 const pkg=JSON.parse(await readFile('package.json','utf8')),imports:Record<string,string>={};

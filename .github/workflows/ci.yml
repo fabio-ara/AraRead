@@ -20,6 +20,13 @@ jobs:
       - run: npm run local:setup
       - run: docker compose up -d --wait
       - run: npm run db:migrate && npm run local:accounts
+      - name: OCR aberto local com recursos limitados
+        run: |
+          docker build -f Dockerfile.ocr -t araread-ocr:ci .
+          mkdir -p .local/ocr
+          chmod 777 .local/ocr
+          docker run --rm --network none --memory 512m --cpus 1 --pids-limit 64 --read-only --tmpfs /tmp:rw,noexec,nosuid,size=128m -v "$PWD/tests/fixtures:/input:ro" -v "$PWD/.local/ocr:/output" araread-ocr:ci /input/synthetic-scanned.pdf /output/scanned-import.json --language eng
+          node --import tsx --env-file-if-exists=.env scripts/verify-ingestion-v3.ts .local/ocr/scanned-import.json
       - run: npx playwright install --with-deps chromium
       - name: servidor e testes reais
         run: |

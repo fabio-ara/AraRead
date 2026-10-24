@@ -4,6 +4,9 @@ import {ensure} from '../errors.ts';
 import {validateRef,type Element} from '../anchors.ts';
 import type {Ref} from '../contracts.ts';
 import {guidanceVersion} from '../guidance.ts';
+import type {Identity} from '../db.ts';
+import {resolvePreferences} from './preferences.ts';
+import {editorialPreparation} from './editorial.ts';
 
 const canonical=(v:any):any=>v instanceof Date?v.toISOString():Array.isArray(v)?v.map(canonical):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,canonical(v[k])])):v;
 export const digest=(v:unknown)=>createHash('sha256').update(typeof v==='string'||Buffer.isBuffer(v)?v:JSON.stringify(canonical(v))).digest('hex');
@@ -25,13 +28,17 @@ export async function dependentMediations(c:PoolClient,readingId:string,seeds:st
  while(frontier.length){const next=(await c.query('select id from araread.mediations where reading_id=$1 and dependencies ?| $2::text[] and not(id=any($3::uuid[]))',[readingId,frontier,affected])).rows.map(x=>x.id);affected.push(...next);frontier=next;ensure(affected.length<=500,'TOO_MANY_DEPENDENCIES','Dependências excedem o limite de revisão.');}
  return affected;
 }
-export async function prepareStudy(c:PoolClient,r:any,ref:Ref,language:string,explicit:any={}){
+export async function prepareStudy(c:PoolClient,r:any,ref:Ref,language:string,explicit:any={},identity?:Identity){
  const pref=await one(c,'select study from araread.preferences')||{study:{}};
- const selection={representation:'rewrite',support_mode:'standard',perspective_id:null,include_notes:true,...pref.study,...r.study,...explicit};
+ const resolved=await resolvePreferences(c,r,identity,explicit);
+ const selection={representation:'rewrite',...pref.study,...r.study,...resolved.values,...explicit};delete selection.language;delete selection.portion_size;
+ if(selection.representation==='translation'){selection.perspective_id=null;selection.active_profile=null;selection.include_notes=false;selection.support_mode='standard';delete selection.note_ids;delete selection.repertoire;delete selection.goal;}
+ const profile=selection.representation==='translation'?null:resolved.profile;
  const perspective=await ownPerspective(c,selection.perspective_id,r.id);
  const gaps:string[]=[];let remaining=64*1024-256,omitted=0;
  const bounded=(rows:any[])=>rows.filter(row=>{const bytes=Buffer.byteLength(JSON.stringify(row));if(bytes>remaining){omitted++;return false;}remaining-=bytes;return true;});
  if(perspective)remaining-=Buffer.byteLength(JSON.stringify(perspective));
+ if(profile)remaining-=Buffer.byteLength(JSON.stringify(profile));
  const notes=bounded(selection.include_notes?(await c.query(`select * from araread.notes where reading_id=$1 and element_id=$2 and not pending_link and status<>'disabled' and (selected or notebook_id=$3) and ($4::uuid[] is null or id=any($4)) order by created_at,id limit 40`,[r.id,ref.element_id,perspective?.kind==='notebook'?perspective.id:null,selection.note_ids||null])).rows:[]);
  const terms=bounded((await c.query('select * from araread.terms where reading_id=$1 and element_id=$2 and language=$3 order by created_at desc,id limit 25',[r.id,ref.element_id,language])).rows);
  const evidenceIds=[...new Set<string>([...(perspective?.evidence_ids||[]),...notes.flatMap(n=>n.evidence_ids||[]),...terms.flatMap(t=>t.details?.evidence_ids||[])])];
@@ -41,11 +48,11 @@ export async function prepareStudy(c:PoolClient,r:any,ref:Ref,language:string,ex
  const references=bounded(available);
  if(omitted)gaps.push(`${omitted} material(is) não foram disponibilizados por excederem o orçamento de 64 KiB de apoios; reduza a seleção para consultá-los. O original não foi cortado por esse orçamento.`);
  const e=await memberElement(c,r.id,ref),source=await one(c,'select sha256 from araread.sources where id=$1',[ref.source_id]);
- const materialKeys={source:{id:ref.source_id,sha256:source.sha256,ref},notes:notes.map(n=>({id:n.id,hash:digest([n.text,n.kind,n.attribution,n.evidence_ids])})),terms:terms.map(t=>({id:t.id,hash:digest([t.definition,t.sense,t.details])})),references:references.map(v=>({id:v.id,sha256:v.sha256,access:v.access,consulted_at:v.consulted_at})),perspective:perspective?{id:perspective.id,version:perspective.version}:null};
+ const materialKeys={source:{id:ref.source_id,sha256:source.sha256,ref},notes:notes.map(n=>({id:n.id,hash:digest([n.text,n.kind,n.attribution,n.evidence_ids])})),terms:terms.map(t=>({id:t.id,hash:digest([t.definition,t.sense,t.details])})),references:references.map(v=>({id:v.id,sha256:v.sha256,access:v.access,consulted_at:v.consulted_at})),perspective:perspective?{id:perspective.id,version:perspective.version}:null,profile:profile?{id:profile.id,version:profile.version}:null};
  const signature=digest({ref,language,selection,materials:materialKeys,guidance_version:guidanceVersion});
  if(perspective&&!references.some(v=>v.access==='available'&&v.excerpt))gaps.push('Esta perspectiva não tem material de referência disponível; não atribua posições ao comentador sem consultar fonte pertinente.');
  if(references.some(v=>v.access!=='available'||!v.consulted_at))gaps.push('Há referências sugeridas ou sem consulta declarada. Não apresentá-las como consultadas.');
- return {selection,signature,materials:{notes,terms,references,perspective},material_keys:materialKeys,gaps,ref,original:Array.from(e.text).slice(ref.start,ref.end).join(''),effective_language:language};
+ return {pedagogy:editorialPreparation,selection,signature,materials:{notes,terms,references,perspective,profile},material_keys:materialKeys,gaps,ref,original:Array.from(e.text).slice(ref.start,ref.end).join(''),effective_language:language};
 }
 export function apa(v:any){
  const author=v.author||'Autoria não informada',year=v.year||'s.d.';
