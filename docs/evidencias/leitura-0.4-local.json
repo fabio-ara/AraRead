@@ -4,7 +4,7 @@
   "base_commit": "28dc609e841fdbb012dec2646dfa2cf3462cab43",
   "scope": "Implementação e prova local; sem publicação hospedada",
   "core": {
-    "passed": 97,
+    "passed": 102,
     "failed": 0,
     "skipped": 0,
     "database": "PostgreSQL e Auth reais isolados; duas contas comuns"
@@ -52,7 +52,8 @@
     "personal_data_changed": false
   },
   "review": {
-    "independent": "pendente: HTTP 429; CLI sem parecer",
+    "independent": "concluída em duas sessões CLI isoladas, somente leitura; nove achados reproduzidos e corrigidos",
+    "verified_findings": 9,
     "static_security_findings": 0,
     "human_review": false
   },

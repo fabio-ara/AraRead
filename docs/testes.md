@@ -2,7 +2,7 @@
 
 ## Validação local 0.4
 
-O gate do núcleo passou em 97/97 testes locais com Auth/PostgreSQL reais, incluindo instalação/evolução, compatibilidade de recibos/backup, RLS entre contas, parágrafos legados, seleção por representação, versões órfãs, datas civis e entradas matemáticas hostis. O cliente MCP oficial conferiu também o JSON Schema real de saída; o campo de contexto da seleção foi acrescentado ao contrato após essa verificação.
+O gate do núcleo passou em 102/102 testes locais com Auth/PostgreSQL reais, incluindo instalação/evolução, compatibilidade de recibos/backup, RLS entre contas, parágrafos legados, seleção por representação, versões órfãs, datas civis e entradas matemáticas hostis. As regressões da revisão independente incluem citações literais de UUID, espaços em fronteiras legadas, oração parentética e pontuação CJK. O cliente MCP oficial conferiu também o JSON Schema real de saída; o campo de contexto da seleção foi acrescentado ao contrato após essa verificação.
 
 Os testes de navegador exercitam seleção/persistência, três abas, outra sessão, fila offline e remoção; apoios incluem consulta real, nota de cálculo, queda de conexão e pergunta preservada. O host MCP sintético negocia capacidades e simula perda antes/depois do commit, relendo recibo e dados reais. Isso não homologa o host externo. `tests/lexicon-live.ts` é prova de rede explícita, separada da suíte determinística, para palavra comum, conceito e locução. Resultados de Chromium/WebKit, revisão independente e publicação em [STATUS](../STATUS.md). Os bloqueios e correções estão na [revisão 0.4](evidencias/revisao-0.4.md).
 

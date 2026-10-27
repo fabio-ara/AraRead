@@ -36,3 +36,15 @@ test('posição legada tem continuidade explícita e algoritmo histórico perman
  const remainder=portion(e,old.end);assert.equal(remainder.start,old.end);assert.equal(passageInfo(e,remainder).starts_mid_unit,true);
  assert.throws(()=>portion(e,cp(e.text).length));
 });
+
+test('fim legado antes do espaço continua sendo fronteira completa',()=>{
+ const e=element('Uma sentença completa. '.repeat(100)),old=legacyPortion(e);assert.equal(cp(e.text)[old.end-1],'.');assert.equal(cp(e.text)[old.end],' ');
+ assert.equal(passageInfo(e,old).ends_mid_unit,false);assert.equal(passageInfo(e,portion(e,old.end)).starts_mid_unit,false);
+});
+test('pontuação interna ao parêntese não encerra a oração principal',()=>{
+ const first='A proposta '+'muito '.repeat(75)+'(por quê?) depende de '+'outra condição '.repeat(40)+'. ',e=element(first+'Outra sentença.');
+ assert.equal(portion(e,0,'short').end,cp(first).length);assert.equal(sentenceBoundaries(e.text).boundaries.includes(cp(e.text.slice(0,e.text.indexOf('depende'))).length),false);
+});
+test('sequência de pontuação CJK permanece na mesma sentença',()=>{
+ const e=element('这'.repeat(549)+'？！'+'下一句。'.repeat(200));assert.equal(portion(e,0,'short').end,551);assert.equal(sentenceBoundaries(e.text).boundaries.includes(550),false);
+});

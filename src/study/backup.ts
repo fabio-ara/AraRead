@@ -52,7 +52,16 @@ export async function restoreBackup(c:PoolClient,uid:string,input:any,quota:(n:n
  const sourceMap=new Map(data.sources.map(v=>[v.id,v])),elementMap=new Map(data.elements.map(v=>[v.id,v])),readingMap=new Map(data.readings.map(v=>[v.id,v])),noteMap=new Map(data.notes.map(v=>[v.id,v]));
  const allowed=(readingId:string,sourceId:string)=>data.reading_segments.some(g=>g.reading_id===readingId&&g.source_id===sourceId);
  const ref=(v:any,readingId?:string)=>{ensure(refSchema.safeParse(v).success,'INVALID_BACKUP','Referência inválida.');const e=elementMap.get(v.element_id);ensure(e&&e.source_id===v.source_id&&(!readingId||allowed(readingId,v.source_id)),'INVALID_BACKUP','Referência fora dos segmentos da leitura.');validateRef(v,e,v.source_id);return {...v,source_id:known(v.source_id),element_id:known(v.element_id)};};
- const remap=(v:any):any=>typeof v==='string'?(map[v]||missingEvidence[v]||v):Array.isArray(v)?v.map(remap):v&&typeof v==='object'?Object.fromEntries(Object.entries(v).map(([k,x])=>[k,remap(x)])):v;
+ const remap=(v:any):any=>{
+  if(typeof v==='string')return map[v]||missingEvidence[v]||v;
+  if(Array.isArray(v))return v.map(remap);
+  if(v&&typeof v==='object'){
+   // A text selector contains literal quotes/context, even when they look like IDs.
+   if(typeof v.exact==='string'&&typeof v.start==='number'&&typeof v.end==='number'&&v.representation)return {...v,...(v.mediation_id?{mediation_id:remap(v.mediation_id)}:{})};
+   return Object.fromEntries(Object.entries(v).map(([k,x])=>[k,remap(x)]));
+  }
+  return v;
+ };
  for(const g of data.reading_segments){const r=readingMap.get(g.reading_id),s=sourceMap.get(g.source_id);ensure(r&&s&&sourceMap.get(r.source_id)?.work_id===s.work_id,'INVALID_BACKUP','Segmento de outra obra.');}
  for(const old of data.elements)ensure(blockSchema.safeParse({kind:old.kind,text:old.text,locator:old.locator,meta:old.meta}).success&&Number.isInteger(old.ordinal)&&old.ordinal>=0,'INVALID_BACKUP','Elemento inválido.');
  for(const [section,cols]of Object.entries(columns))for(const old of data[section]){

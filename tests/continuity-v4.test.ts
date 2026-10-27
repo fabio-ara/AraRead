@@ -7,6 +7,7 @@ import {authenticate} from '../src/auth.ts';
 import {config} from '../src/config.ts';
 import {pool,transaction} from '../src/db.ts';
 import {outputs} from '../src/outputs.ts';
+import {legacyPortion} from '../src/anchors.ts';
 if(!config.local||new URL(config.database).hostname!=='127.0.0.1')throw Error('Somente ambiente local isolado.');
 const accounts=JSON.parse(await readFile('.local/test-accounts.json','utf8'));
 async function login(n=0){const response=await fetch(`${config.authUrl}/token?grant_type=password`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(accounts[n])});assert.equal(response.status,200);return authenticate(`Bearer ${(await response.json()).access_token}`);}
@@ -52,5 +53,12 @@ test('confronto semântico não oculta fragmento; três abas e índice expõem o
  await assert.rejects(()=>save(whole.full_ref,true,old.entity_id),{code:'INVALID_RELATION'});
  await save(whole.full_ref);const full=await call('reading_display',{reading_id:w.reading_id,ref:whole.full_ref});assert.equal(full.passage.is_fragment,false);assert.equal(full.original,text);assert.equal(full.representations.translation.text,text);assert.deepEqual(full.reading.covered,[]);
  assert.equal((await call('reading_history',{reading_id:w.reading_id,kind:'mediations'})).items.length,3);
+});
+test('painel reaproveita fim de sentença legado sem exigir reconhecimento de interrupção inexistente',async()=>{
+ const title=`Sentença legada ${op()}`,w=await call('source_import',{operation_id:op(),title,text:'Uma sentença completa. '.repeat(100),original_language:'pt-BR'});works.push({...w,title});
+ const c=await call('reading_context',{reading_id:w.reading_id}),old=legacyPortion({...c.element,text:c.original,source_id:c.source.id});
+ await transaction(alice,db=>db.query('update araread.readings set opened=$2,resume=$2 where id=$1',[w.reading_id,JSON.stringify(old)]));
+ const prepared=await call('context_prepare',{operation_id:op(),reading_id:w.reading_id,expected_revision:c.reading.revision,ref:old});await call('mediation_save',{operation_id:op(),reading_id:w.reading_id,expected_revision:prepared.revision,ref:old,context_id:prepared.context_id,rewrite:'A passagem contém sentenças completas repetidas para um teste de compatibilidade.',editorial_review:review,provenance:{agent:'Fixture legada',guidance_version:'1.2.0'}});
+ const display=await call('reading_display',{reading_id:w.reading_id,ref:old});assert.equal(display.ready,true);assert.equal(display.passage.ends_mid_unit,false);assert.deepEqual(display.ref,old);assert.deepEqual(display.reading.covered,[]);
 });
 after(async()=>{for(const w of works)await call('work_delete',{operation_id:op(),work_id:w.work_id,confirm_title:w.title});await pool.end();});

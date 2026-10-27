@@ -26,6 +26,7 @@ const splittable=new Set(['paragraph','quote','note']);
 const word=(c:string)=>!!c&&/[\p{L}\p{N}\p{M}]/u.test(c);
 const opening:Record<string,string>={'(':')','[':']','{':'}','“':'”','‘':'’','«':'»','‹':'›','「':'」','『':'』','（':'）','【':'】'};
 const closing=new Set(Object.values(opening));
+const parenthetical=new Set([')',']','}','）','】']);
 // Conservative, explicit multilingual policy. Unrecognized language is not a semantic guarantee.
 const abbreviations=new Set(['sr','sra','srta','dr','dra','prof','profa','mr','mrs','ms','st','saint','jr','sr','etc','ex','p','pp','vol','cap','fig','cf','vs','approx','ca','jan','fev','mar','abr','jun','jul','ago','set','out','nov','dez','feb','apr','aug','sep','oct','dec','mme','mlle','m','bce','ce','bc','ad']);
 export function sentenceBoundaries(text:string){
@@ -48,11 +49,11 @@ export function sentenceBoundaries(text:string){
     const token=chars.slice(Math.max(0,i-24),i).join('').match(/([\p{L}]+)$/u)?.[1]||'';
     terminal=!(prev==='.'||next==='.'||/\d/u.test(prev)&&/\d/u.test(next)||abbreviations.has(token.toLowerCase())||/^\p{L}$/u.test(token)||word(next));
    }
-   pending=terminal;
+   pending=terminal&&!stack.some(mark=>parenthetical.has(mark));
   }else if(!closes&&!/\s/u.test(char))pending=false;
   if(pending&&!stack.length&&!unbalanced){
    // A sentence includes its closing marks and following spaces, never the next word.
-   if(!next||/\s/u.test(next)||/[。！？]/u.test(char)&&!closing.has(next)&&next!=='"'&&next!=="'"){
+   if(!/[.!?。！？]/u.test(next)&&(!next||/\s/u.test(next)||/[。！？]/u.test(char)&&!closing.has(next)&&next!=='"'&&next!=="'")){
     let end=i+1;while(end<chars.length&&/\s/u.test(chars[end]))end++;
     if(graph.has(end)&&boundaries.at(-1)!==end)boundaries.push(end);
     pending=false;
@@ -75,10 +76,11 @@ export function portion(element:Element,start=0,size='medium'):Ref {
 }
 export function passageInfo(element:Element,ref:Ref,size='medium'){
  validateRef(ref,element,element.source_id);
- const length=cp(element.text).length,atomic=!splittable.has(element.kind),structure=sentenceBoundaries(element.text),parts:Ref[]=[];
+ const chars=cp(element.text),length=chars.length,atomic=!splittable.has(element.kind),structure=sentenceBoundaries(element.text),parts:Ref[]=[];
  let start=0;while(start<length){const end=chooseEnd(length,structure.boundaries,start,size,atomic);parts.push({source_id:element.source_id,element_id:element.id,start,end});start=end;}
  const index=parts.findIndex(p=>sameRef(p,ref)),fragment=ref.start!==0||ref.end!==length;
- const starts=ref.start>0&&(atomic||!structure.boundaries.includes(ref.start)),ends=ref.end<length&&(atomic||!structure.boundaries.includes(ref.end));
+ const atBoundary=(offset:number)=>{while(offset<length&&/\s/u.test(chars[offset]))offset++;return structure.boundaries.includes(offset);};
+ const starts=ref.start>0&&(atomic||!atBoundary(ref.start)),ends=ref.end<length&&(atomic||!atBoundary(ref.end));
  const label=element.locator||`Elemento ${element.ordinal+1}`;
  const reason=!fragment?(length>6000?'protected_or_unsplittable_unit':'whole_element'):index<0?'existing_or_explicit_interval':size==='short'?'short_reading':'long_element';
  return {policy:segmentationPolicy,full_ref:{source_id:element.source_id,element_id:element.id,start:0,end:length},is_fragment:fragment,starts_mid_unit:starts,ends_mid_unit:ends,continues_before:ref.start>0,continues_after:ref.end<length,part:index<0?null:index+1,parts:index<0?null:parts.length,reason,unclosed_source_structure:structure.unclosed_structure,

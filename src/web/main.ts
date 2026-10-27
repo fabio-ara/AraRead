@@ -5,7 +5,7 @@ import './style.css';
 import {cacheGet,cacheSet,clearOwner,clearLegacyContexts} from './private-cache.ts';
 import {el,field} from './ui.ts';
 import {queue,enqueue,syncQueue,discardQueue,removeQueued,recoverQueue,restoreQueue,invalidateReading,revalidatePrepared,preparePassage,cachedPassages,removePassage,type Queued} from './offline.ts';
-import {readingPanel,disposeReadingPanel} from './study-panel.ts';
+import {readingPanel,disposeReadingPanel,refreshReadingPanel} from './study-panel.ts';
 
 const button=(text:string,action:()=>unknown,attrs:Record<string,any>={})=>el('button',{type:'button',onclick:()=>busy?notice('Aguarde a confirmação da gravação em andamento.'):void guard(action),...attrs},text);
 const tag=(text:string)=>el('span',{class:'tag'},text);
@@ -164,7 +164,16 @@ async function logout(force=false){const uid=owner();queued=await queue(uid);pen
 let reconnecting:Promise<void>|undefined;
 function reconnect(){
  if(reconnecting)return reconnecting;
- reconnecting=(async()=>{if(!owner())return;queued=await syncQueue(owner(),call);if(screen!=='reader')await load();else prepared=await revalidatePrepared(owner(),call);notice(queued.length?'Conexão restabelecida. Confira as pendências em Configurações.':'Conexão restabelecida; alterações locais confirmadas quando havia pendências.');})().finally(()=>{reconnecting=undefined;});
+ reconnecting=(async()=>{
+  const uid=owner();if(!uid)return;const ownedCall=(tool:string,args:any)=>call(tool,args,uid);const synced=await syncQueue(uid,ownedCall);if(owner()!==uid)return;queued=synced;
+  if(screen!=='reader')await load();else{
+   const opened=ctx,revision=opened?.reading.revision;prepared=await revalidatePrepared(uid,ownedCall);
+   if(opened?.display){const fresh=await ownedCall('reading_context',{reading_id:opened.reading.id,ref:opened.ref,language:opened.effective_language}),highlights=await ownedCall('highlight_list',{reading_id:opened.reading.id,ref:opened.ref});
+    if(owner()===uid&&ctx===opened&&opened.reading.revision===revision&&!busy){Object.assign(opened.reading,fresh.reading);Object.assign(opened.display.reading,fresh.reading);opened.display.highlights=highlights;opened.display.terms=fresh.terms;refreshReadingPanel(opened.display);await cacheSet(uid,'last-context',opened);const entries=await preparePassage(uid,opened);if(owner()===uid&&ctx===opened)prepared=entries;}
+   }
+  }
+  if(owner()===uid)notice(queued.length?'Conexão restabelecida. Confira as pendências em Configurações.':'Conexão restabelecida; alterações locais confirmadas quando havia pendências.');
+ })().finally(()=>{reconnecting=undefined;});
  return reconnecting;
 }
 window.addEventListener('offline',()=>{if(screen==='reader')notice('Sem conexão. A seleção e a pergunta foram preservadas; gravações locais aguardam sincronização.');else render();});

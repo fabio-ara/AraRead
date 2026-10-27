@@ -11,13 +11,22 @@ async function call(name:string,args:any){
 const pendingMemory=new Map<string,string>();
 const pendingStore={getItem(key:string){try{return sessionStorage.getItem(key)||pendingMemory.get(key)||null;}catch{return pendingMemory.get(key)||null;}},setItem(key:string,value:string){pendingMemory.set(key,value);try{sessionStorage.setItem(key,value);}catch{}},removeItem(key:string){pendingMemory.delete(key);try{sessionStorage.removeItem(key);}catch{}}};
 const pendingKey=()=>`araread-pending:${current.reading.owner_id}:${current.reading.id}`;
+const clearPending=(key:string,operation:string)=>{const saved=pendingStore.getItem(key);if(saved&&JSON.parse(saved).args.operation_id===operation)pendingStore.removeItem(key);};
 const recovery=document.createElement('div');status.after(recovery);
 function refreshRecovery(){
  recovery.replaceChildren();if(!current||!connected||!app.getHostCapabilities()?.serverTools)return;
  const key=pendingKey(),reading=current,pending=pendingStore.getItem(key);if(!pending)return;
- const button=document.createElement('button');button.textContent='Recuperar gravação';button.onclick=()=>void view!.run(async()=>{
-  const request=JSON.parse(pending),known=await call('operation_get',{operation_id:request.args.operation_id}),result=known.status==='confirmed'?known:await call(request.name,request.args);
-  if(result.status!=='confirmed')throw Error('Sem confirmação.');pendingStore.removeItem(key);
+ const request=JSON.parse(pending),button=document.createElement('button');button.textContent=request.conflict?'Conferir e reaplicar gravação':'Recuperar gravação';
+ if(request.conflict){const description=document.createElement('p');description.textContent=`Outra sessão alterou a leitura. Confira antes de reaplicar: ${request.args.target?.exact||request.args.text||request.args.term||'remover o destaque selecionado'}.`;recovery.append(description);}
+ button.onclick=()=>void view!.run(async()=>{
+  const known=await call('operation_get',{operation_id:request.args.operation_id});let result=known;
+  if(known.status!=='confirmed')try{result=await call(request.name,request.args);}catch(e:any){
+   if(e.code!=='CONFLICT')throw e;
+   const latest=await call('reading_context',{reading_id:reading.reading.id,ref:reading.ref}),saved=pendingStore.getItem(key);
+   if(saved&&JSON.parse(saved).args.operation_id===request.args.operation_id)pendingStore.setItem(key,JSON.stringify({...request,conflict:true,args:{...request.args,expected_revision:latest.reading.revision}}));
+   if(current===reading){reading.reading.revision=latest.reading.revision;refreshRecovery();view!.announce('A gravação não foi aplicada. Confira a intenção pendente antes de confirmar novamente.');}return;
+  }
+  if(result.status!=='confirmed')throw Error('Sem confirmação.');clearPending(key,request.args.operation_id);
   const latest=await call('reading_context',{reading_id:reading.reading.id,ref:reading.ref});reading.reading.revision=latest.reading.revision;
   reading.highlights=await call('highlight_list',{reading_id:reading.reading.id,ref:reading.ref});if(current===reading){render();view!.announce('Gravação anterior confirmada pelo recibo.');}
  });recovery.append(button);
@@ -26,8 +35,8 @@ async function write(name:string,args:any){
  const key=pendingKey();let saved=pendingStore.getItem(key),request=saved?JSON.parse(saved):null;
  if(request){refreshRecovery();throw Error('Há gravação incerta. Use “Recuperar gravação” antes de criar outra intenção.');}
  request={name,args:{...args,operation_id:crypto.randomUUID()}};pendingStore.setItem(key,JSON.stringify(request));
- try{const result=await call(name,request.args);if(result.status!=='confirmed')throw Error('Gravação não confirmada.');pendingStore.removeItem(key);return result;}
- catch(e:any){if(typeof e.code==='string'&&!['INTERNAL','HOST_ERROR','ERROR'].includes(e.code))pendingStore.removeItem(key);refreshRecovery();throw e;}
+ try{const result=await call(name,request.args);if(result.status!=='confirmed')throw Error('Gravação não confirmada.');clearPending(key,request.args.operation_id);return result;}
+ catch(e:any){if(typeof e.code==='string'&&!['INTERNAL','HOST_ERROR','ERROR'].includes(e.code))clearPending(key,request.args.operation_id);refreshRecovery();throw e;}
 }
 function render(){
  if(!current)return;view?.dispose();const supported=connected&&!!app.getHostCapabilities()?.serverTools;

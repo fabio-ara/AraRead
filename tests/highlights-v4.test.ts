@@ -34,6 +34,14 @@ test('grifos persistem nas três representações e acréscimos com versões e �
  await write(w,'highlight_remove',{highlight_id:saved[0].highlight_id});assert.equal((await call('highlight_list',{reading_id:w.reading_id})).items.length,3);
  assert.ok((await call('reading_history',{reading_id:w.reading_id,kind:'notes'})).items.some((v:any)=>v.id===note.entity_id));assert.deepEqual((await call('reading_context',{reading_id:w.reading_id})).reading.covered,[]);
 });
+test('backup preserva UUID literal da citação e remapeia somente referências da âncora',async()=>{
+ const linked=await fixture(),title=`Citação literal ${op()}`,w=await call('source_import',{operation_id:op(),title,text:`${linked.work_id} é uma identificação citada no original.`,original_language:'pt-BR'});works.push({...w,title});
+ const c=await call('reading_context',{reading_id:w.reading_id}),target={representation:'original',segment:'main',...quoteSelector(c.original,0,36)};await write(w,'highlight_save',{ref:w.ref,target});
+ const sections:Record<string,any[]>={};let snapshot:string|undefined;for(const section of backupSections){sections[section]=[];let offset:number|null=0;while(offset!==null){const page=await call('data_export',{section,offset,limit:50,include_original:true,snapshot});snapshot=page.snapshot;sections[section].push(...page.items);offset=page.pagination.next_offset;}}
+ const restored=await call('data_restore',{operation_id:op(),bundle:{format:'araread/3',snapshot,sections}},bob);for(const item of sections.works)works.push({work_id:restored.id_map[item.id],title:item.title,who:bob});
+ const copy=await call('highlight_list',{reading_id:restored.id_map[w.reading_id]},bob);assert.notEqual(restored.id_map[linked.work_id],linked.work_id);assert.equal(copy.items[0].target.exact,linked.work_id);assert.equal(copy.items[0].state,'anchored');assert.equal((await call('reading_context',{reading_id:restored.id_map[w.reading_id]},bob)).original,c.original);
+});
+
 test('seleção repetida, quote/contexto, grafema, sessão, leitura e conta são conferidos',async()=>{
  const w=await fixture(),other=await fixture(bob),m=await mediate(other);
  const ctx=await call('reading_context',{reading_id:w.reading_id}),target={representation:'original',segment:'main',...quoteSelector(ctx.original,15,23)};

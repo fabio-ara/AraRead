@@ -33,6 +33,25 @@ try{
  const concurrent=await Promise.all(Array.from({length:24},(_,i)=>json('/api/account_context',{},clients[i%2].token)));
  for(const [i,result]of concurrent.entries()){assert.equal(result.status,200,JSON.stringify(result.body));assert.equal(result.body.data.account.id,users[i%2]);}
  pass('24 chamadas concorrentes preservam identidades pelo pooler transacional');
+ // Novos contratos da 0.4, exercitados somente por identidades comuns pelo Edge.
+ const invoke=async(name:string,args:any,token=alice)=>{const r=await json('/api/'+name,args,token);assert.equal(r.status,200,JSON.stringify(r.body.error));assert.equal(r.body.ok,true);return r.body.data;};
+ let current=await invoke('reading_context',{reading_id:source.reading_id});assert.equal(current.original,text.trim());assert.deepEqual(current.ref,current.passage.full_ref);assert.equal(current.passage.is_fragment,false);
+ const target={representation:'original',segment:'main',start:0,end:3,exact:'Uma',prefix:'',suffix:[...text].slice(3,35).join('')};
+ const highlightArgs={operation_id:randomUUID(),reading_id:source.reading_id,expected_revision:current.reading.revision,ref:current.ref,target};
+ const highlight=await invoke('highlight_save',highlightArgs);assert.equal(highlight.status,'confirmed');assert.deepEqual(await invoke('highlight_save',highlightArgs),highlight);
+ assert.equal((await invoke('highlight_list',{reading_id:source.reading_id})).items[0].target.exact,'Uma');assert.equal((await json('/api/highlight_list',{reading_id:source.reading_id},bob)).status,404);assert.equal((await invoke('operation_get',{operation_id:highlightArgs.operation_id},bob)).status,'unknown');
+ pass('0.4: paragrafo inteiro, grifo Unicode, recibo e isolamento no Edge');
+ current=await invoke('reading_context',{reading_id:source.reading_id});await invoke('term_save',{operation_id:randomUUID(),reading_id:source.reading_id,expected_revision:current.reading.revision,ref:current.ref,term:'Uma',language:'pt-BR',definition:'Artigo indefinido na passagem sintética.',origin:'user',details:{selection:target,definition_kind:'contextual'}});
+ const beforeQueries=await invoke('reading_context',{reading_id:source.reading_id});const lexical=await invoke('lexicon_lookup',{reading_id:source.reading_id,ref:current.ref,selection:target,term:'Uma',language:'pt-BR'});assert.equal(lexical.saved[0].context_match,'same_selection');assert.equal(lexical.external,null);
+ for(const [input,value]of [['429?–347 B.C.E.',82],['1 BCE–1 CE',1],['sin(30)',0.5]] as const)assert.equal((await invoke('contextual_calculate',{reading_id:source.reading_id,ref:current.ref,input})).value,value);
+ assert.equal((await json('/api/contextual_calculate',{reading_id:source.reading_id,ref:current.ref,input:'1/0'},alice)).body.error.code,'CALCULATION_INPUT');
+ const afterQueries=await invoke('reading_context',{reading_id:source.reading_id});assert.equal(afterQueries.reading.revision,beforeQueries.reading.revision);assert.deepEqual(afterQueries.reading.covered,[]);assert.deepEqual(afterQueries.reading.resume,beforeQueries.reading.resume);
+ pass('0.4: vocabulario com selecao e calculos puros nao mudam progresso');
+ const sections:Record<string,any[]>={};let snapshot:string|undefined;const manifest=await invoke('data_export',{section:'works',limit:1});
+ for(const section of manifest.sections){sections[section]=[];let offset:number|null=0;while(offset!==null){const page=await invoke('data_export',{section,offset,limit:50,include_original:true,snapshot});snapshot=page.snapshot;sections[section].push(...page.items);offset=page.pagination.next_offset;}}
+ const restored=await invoke('data_restore',{operation_id:randomUUID(),bundle:{format:'araread/3',snapshot,sections}},bob);const copied=await invoke('highlight_list',{reading_id:restored.id_map[source.reading_id]},bob);assert.equal(copied.items[0].state,'anchored');assert.equal(copied.items[0].target.exact,'Uma');assert.notEqual(copied.items[0].id,highlight.highlight_id);
+ const copiedContext=await invoke('reading_context',{reading_id:restored.id_map[source.reading_id]},bob);assert.equal(copiedContext.original,current.original);assert.deepEqual(copiedContext.reading.covered,[]);
+ pass('0.4: backup v3 restaura grifo em outra conta com novos IDs');
  const signed=await clients[0].client.auth.signOut({scope:'local'});if(signed.error)throw signed.error;const revoked=await json('/api/account_context',{},alice);assert.equal(revoked.status,401,JSON.stringify(revoked.body));assert.equal(revoked.body.error.code,'SESSION_REVOKED');pass('sessao revogada perde acesso imediatamente no gateway');
 }finally{
  for(const id of users){const deleted=await admin.auth.admin.deleteUser(id);if(deleted.error)throw deleted.error;}

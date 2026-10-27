@@ -70,5 +70,5 @@ export function mountReader(root:HTMLElement,display:any,adapter:ReaderAdapter={
  },{signal:abort.signal});
  document.addEventListener('pointerdown',e=>{if(!sheet.hidden&&!sheet.contains(e.target as Node)&&!menu.contains(e.target as Node))sheet.hidden=true;},{signal:abort.signal});
  article.append(tablist,...panels,status,details,menu,sheet);root.replaceChildren(article);select(0);paint();
- const view={dispose(){abort.abort();(globalThis.CSS as any)?.highlights?.delete('araread-saved');},show,announce,getSelection:()=>selection,menu,run,display,adapter};attachReaderSupports(view);return view;
+ const view={dispose(){abort.abort();(globalThis.CSS as any)?.highlights?.delete('araread-saved');},refresh:paint,show,announce,getSelection:()=>selection,menu,run,display,adapter};attachReaderSupports(view);return view;
 }

@@ -24,7 +24,21 @@ O executor matemático foi revisto quanto a operações permitidas, tamanho/prof
 
 A análise estática focada de segurança/autenticação/soberania não retornou achados no conjunto enviado. Seu alcance é limitado às regras executadas; não cobre toda a semântica do mandato.
 
-Os revisores automatizados independentes não concluíram: o serviço retornou HTTP 429 após as tentativas. Uma tentativa separada pela CLI também não produziu revisão, com erros de inicialização/transporte; foi encerrada. Nenhum parecer inexistente é contado como aprovação. **A revisão independente de integridade, seleção, isolamento, cálculos, vocabulário e capacidades do host permanece pendente e impede a entrega integral/publicação.**
+O serviço de subagentes retornou HTTP 429. A revisão foi concluída por duas sessões independentes da CLI, em cópia limpa de `33fc7c4`, somente leitura e sem extensões desnecessárias nessa execução. A configuração global não foi alterada. Uma sessão cobriu seleção, isolamento, backup, cálculos, vocabulário e capacidades MCP; a outra, segmentação e continuidade. Os pareceres apontaram nove falhas, reproduzidas pelo agente principal antes das correções:
+
+| Achado independente | Correção e regressão |
+|---|---|
+| Resposta atrasada apagava uma nova pendência da **mesma** leitura | Limpeza confere também a identidade da operação. Ponte SDK com API real retém a resposta A, recupera seu recibo, cria B e libera A. |
+| Recuperação repetia indefinidamente uma revisão recusada | Conflito preserva a intenção e exige “Conferir e reaplicar gravação”, com revisão atual e mesma identidade. A jornada altera a leitura por outro cliente entre falha e recuperação. |
+| Restauração remapeava UUID citado literalmente | Seletores remapeiam a referência da mediação, preservando citação e contexto. Backup entre duas contas restaura um UUID literal sem trocar o texto. |
+| Campo editado associava definição ao termo errado | Resultado guarda o termo consultado; editar invalida o resultado, inclusive respostas atrasadas. Jornada consulta, edita e exige nova consulta antes de guardar. |
+| Grifo sincronizado permanecia ausente no leitor aberto | Reconexão atualiza revisão e destaques sem recriar a passagem ou a pergunta. Jornada confirma o grifo e faz outra escrita sem recarregar. |
+| Pontos de anos fracionários eram removidos | Normalização restrita às abreviações das eras; anos fracionários são recusados. Casos com ponto e vírgula decimal foram acrescentados. |
+| Espaço após ponto invalidava fim de sentença legado | Classificação aceita fronteiras equivalentes no espaço, sem mudar os offsets persistidos. Teste real reaproveita o painel sem exigir reconhecimento de interrupção inexistente. |
+| Pontuação interna ao parêntese encerrava oração externa | Pontuação parentética não é promovida a fim da oração principal. Fixture mantém o predicado junto à proposta. |
+| Sinais CJK consecutivos eram separados | A fronteira aguarda o fim da sequência de pontuação. Fixture conserva `？！` na mesma passagem. |
+
+As reproduções do revisor foram locais, em memória, algumas com dependências simuladas; as correções foram conferidas por 22 testes focados de núcleo com PostgreSQL/Auth reais onde pertinente e duas jornadas de interface com API real. Os gates consolidados da revisão corrente são registrados no PR. A revisão é automatizada, não acadêmica humana.
 
 ## Motores de navegador
 

@@ -67,4 +67,6 @@ Aplique somente `20261027142447_representation_highlights_v4.sql`, sem editar mi
 
 Atualize o catálogo do conector quando o cliente oferecer essa função: orientação 1.3.0, 47 ferramentas e recurso `ui://araread/reader-v4.html`. Não refaça consentimentos nem amplie permissões para contornar capacidade ausente. O SDK precisa de `serverTools` para chamadas e `message.text` para perguntar ao chat. A recuperação de escrita incerta consulta recibo e conserva a mesma chave.
 
+Se a recuperação encontrar alteração concorrente, o painel conserva a intenção e oferece **Conferir e reaplicar gravação**. Confira o texto antes de confirmar; uma nova confirmação usa a revisão atual e a mesma identidade da operação. Respostas atrasadas não removem pendências posteriores. Na web, a sincronização atualiza os grifos da passagem aberta e conserva a seleção e a pergunta em edição.
+
 Para a apresentação fragmentada de uma leitura antiga, use a [prévia e o reparo](leitura-0.4.md#reparo-de-apresentação) sob a conta proprietária. Não reimporte a fonte, não remapeie cobertura e não substitua uma mediação de intervalo diferente. Uma biblioteca pessoal só é alterada com autorização e acesso legítimo; prova sintética não comprova reparo pessoal.

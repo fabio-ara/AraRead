@@ -5,9 +5,10 @@ export type CalculationInput={input:string;mode?:'auto'|'scientific'|'historical
 const fail=(message:string):never=>{throw Object.assign(Error(message),{code:'CALCULATION_INPUT'});};
 function civil(v:CivilYear){if(!Number.isSafeInteger(v.year)||v.year<1||v.year>100000||!['BCE','CE'].includes(v.era))fail('Use anos civis inteiros de 1 a 100.000 e uma era explícita. Não existe ano zero.');return v.era==='BCE'?1-v.year:v.year;}
 const label=(v:CivilYear)=>`${v.approximate?'cerca de ':''}${v.year} ${v.era==='BCE'?'a.C.':'d.C.'}`;
+const normalizeEras=(input:string)=>input.normalize('NFC').replace(/\b(?:B\.?C\.?E\.?|B\.?C\.?|A\.?E\.?C\.?|A\.?C\.?|C\.?E\.?|A\.?D\.?|E\.?C\.?|D\.?C\.?)(?=\s|$|[–—-])/gi,era=>era.replace(/\./g,''));
 export function parseHistorical(input:string){
  const uncertainty=/\?|~|≈|cerca|circa|aprox|\bca\.?\s/i,halves=input.split(/[–—-]|\s+(?:até|a|to)\s+/i);
- const clean=input.normalize('NFC').replace(/\./g,'').replace(/(?:cerca de|circa|aproximadamente|aprox|\bca\b|[?~≈])/gi,'').trim();
+ const clean=normalizeEras(input).replace(/(?:cerca de|circa|aproximadamente|aprox\.?|\bca\b\.?|[?~≈])/gi,'').trim();
  const era='(BCE|BC|AEC|AC|CE|AD|EC|DC)',match=new RegExp(`^(\\d{1,6})\\s*${era}?\\s*(?:[–—-]|até|a|to)\\s*(\\d{1,6})\\s*${era}?$`,'i').exec(clean);
  if(!match||!match[2]&&!match[4])fail('Informe dois anos e suas eras, por exemplo 429 a.C. – 347 a.C. Confira os operandos antes de interpretar o intervalo.');
  const decode=(v:string)=>['BCE','BC','AEC','AC'].includes(v.toUpperCase())?'BCE':'CE';
@@ -17,7 +18,7 @@ export function parseHistorical(input:string){
 export function calculate(a:CalculationInput){
  if(typeof a.input!=='string'||a.input.length>512)fail('Limite de 512 caracteres por cálculo.');
  const input=a.input.trim();if(!input&&!a.dates)fail('Digite uma expressão ou intervalo de anos.');
- const historical=!!a.dates||a.mode==='historical'||a.mode!=='scientific'&&/\b(?:BCE|BC|AEC|AC|CE|AD|EC|DC)\b/i.test(input.replace(/\./g,''));
+ const historical=!!a.dates||a.mode==='historical'||a.mode!=='scientific'&&/\b(?:BCE|BC|AEC|AC|CE|AD|EC|DC)\b/i.test(normalizeEras(input));
  if(historical){
   const dates=a.dates?{...a.dates,era_shared:false}:parseHistorical(input),from=civil(dates.from),to=civil(dates.to);
   if(to<from)fail('O segundo ano é anterior ao primeiro. Corrija a ordem dos operandos.');
