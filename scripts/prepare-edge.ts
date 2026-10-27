@@ -1,14 +1,16 @@
 import './build-widget.ts';
 // Empacotamento local, sem credenciais ou operações remotas. A CLI recebe
 // explicitamente o ref confirmado somente na etapa posterior de implantação.
-import {mkdir,readFile,readdir,writeFile,copyFile,cp} from 'node:fs/promises';
+import {mkdir,readFile,readdir,writeFile,copyFile,cp,stat} from 'node:fs/promises';
 import {resolve} from 'node:path';
 const root=resolve('.local/edge-release'),fn=resolve(root,'supabase/functions/araread');
 for(const path of [fn,`${fn}/src`,`${fn}/vendor`])await mkdir(path,{recursive:true});
 for(const name of await readdir('src'))if(name.endsWith('.ts'))await copyFile(`src/${name}`,`${fn}/src/${name}`);
 await cp('src/study',`${fn}/src/study`,{recursive:true});
 await cp('src/ingestion',`${fn}/src/ingestion`,{recursive:true});
-for(const name of ['pdf.mjs','pdf.worker.mjs'])await copyFile(`node_modules/pdfjs-dist/legacy/build/${name}`,`${fn}/vendor/${name}`);
+// Distribuição oficial da mesma versão, incluindo os avisos de licença.
+// Evita exceder o limite de 5 MB de código-fonte da API de deploy.
+for(const name of ['pdf','pdf.worker'])await copyFile(`node_modules/pdfjs-dist/legacy/build/${name}.min.mjs`,`${fn}/vendor/${name}.mjs`);
 await copyFile('node_modules/pdfjs-dist/LICENSE',`${fn}/vendor/PDFJS-LICENSE`);
 const pkg=JSON.parse(await readFile('package.json','utf8')),imports:Record<string,string>={};
 for(const [name,version]of Object.entries(pkg.dependencies))imports[name]=`npm:${name}@${version}`;
@@ -25,4 +27,6 @@ await writeFile(`${fn}/index.ts`,[
 // ES256 e descoberta OAuth são verificados pelo aplicativo. O verificador
 // legado do gateway não aceita o JWT assimétrico do projeto nem rotas públicas.
 await writeFile(`${root}/supabase/config.toml`,'project_id = "araread-edge"\n[functions.araread]\nverify_jwt = false\n');
-console.log(`Pacote preparado em ${root}; nenhum recurso remoto alterado.`);
+async function bytes(dir:string):Promise<number>{let total=0;for(const item of await readdir(dir,{withFileTypes:true})){const path=`${dir}/${item.name}`;total+=item.isDirectory()?await bytes(path):(await stat(path)).size;}return total;}
+const size=await bytes(fn);if(size>4_500_000)throw Error(`Pacote Edge com ${size} bytes excede a margem local para deploy. Revise dependências e artefatos.`);
+console.log(`Pacote preparado em ${root}: ${size} bytes; nenhum recurso remoto alterado.`);

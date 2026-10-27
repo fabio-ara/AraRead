@@ -30,7 +30,7 @@
     "hosted": "não implantado/verificado nesta revisão",
     "chatgpt_host": "não homologado nesta revisão"
   },
-  "migration": "20261027142447_representation_highlights_v4.sql aplicada somente no banco local isolado",
+  "migration": "20261027142447_representation_highlights_v4.sql verificada no banco local isolado e aplicada no destino existente; seis anteriores intactas",
   "lexicon": {
     "real_queries": [
       "casa (pt)",
