@@ -63,7 +63,7 @@ try{
  const bundle=(await invoke('profile_export',{profile_id:profile.profile_id,lens_ids:[lens],declared_author:'Gate sintético',usage_terms:'MIT',reviewed_for_sharing:true})).bundle;
  const copy=await accountWrite('profile_import',{bundle,explicit_request:true});assert.equal(copy.active,false);await accountWrite('profile_manage',{profile_id:profile.profile_id,action:'delete'});await accountWrite('profile_manage',{profile_id:copy.profile_id,action:'delete'});
  pass('mapa, progresso, navegação fora de sequência, preferências e pacote privado de perfil no MCP hospedado');
- const widget=await client.readResource({uri:'ui://araread/reader-v3.html'});assert.equal((widget.contents[0] as any).mimeType,'text/html;profile=mcp-app');assert.match((widget.contents[0] as any).text,/ui\/initialize/);
+ const widget=await client.readResource({uri:'ui://araread/reader-v4.html'});assert.equal((widget.contents[0] as any).mimeType,'text/html;profile=mcp-app');assert.match((widget.contents[0] as any).text,/ui\/initialize/);
  pass('perspectiva, livro sem URL, contexto/variante, vocabulário salvo, envio na mesma leitura e recurso MCP Apps no runtime hospedado');
  const guidanceResource=await client.readResource({uri:'araread://assistant/guidance'});assert.match((guidanceResource.contents[0] as any).text,/AraRead/);assert.ok((await client.getPrompt({name:'retomar-leitura',arguments:{reading_id:source.reading_id}})).messages.length);
  const denied=await fetch(resource,{method:'POST',headers:{authorization:`Bearer ${webToken}`,'content-type':'application/json',accept:'application/json, text/event-stream'},body:JSON.stringify({jsonrpc:'2.0',id:1,method:'tools/list',params:{}})});assert.equal(denied.status,401);pass('token web nao substitui audiencia e permissao MCP');

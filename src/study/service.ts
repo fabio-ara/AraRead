@@ -1,4 +1,5 @@
 import {randomUUID} from 'node:crypto';
+import {calculate} from '../calculator.ts';
 import type {PoolClient} from 'pg';
 import {ensure} from '../errors.ts';
 import {guidanceVersion} from '../guidance.ts';
@@ -26,6 +27,7 @@ export async function dispatchStudy(name:string,a:any,uid:string,c:PoolClient,r:
   return {reading_id:r.id,revision:r.revision,items:a.kind==='references'?items.map(v=>({...v,apa:apa(v),verification:'Consulta declarada e hash do trecho; apoio intelectual não certificado'})):items,pagination:{offset:a.offset,limit:a.limit,total,next_offset:a.offset+a.limit<total?a.offset+a.limit:null}};
  }
  if(name==='lexicon_lookup')return lookupVocabulary(c,a);
+ if(name==='contextual_calculate'){try{return {reading_id:r.id,ref:a.ref,...calculate(a)};}catch(e:any){ensure(false,'CALCULATION_INPUT',e.message);}}
  if(name==='notebook_export')return exportNotebook(c,a);
  let result:any;
  if(name==='reference_save'){

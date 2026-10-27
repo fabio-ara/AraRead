@@ -4,6 +4,7 @@ COPY package.json package-lock.json ./
 RUN npm ci
 COPY index.html vite.config.ts tsconfig.json ./
 COPY src ./src
+COPY scripts/build-widget.ts ./scripts/build-widget.ts
 COPY public ./public
 COPY LICENSE THIRD_PARTY_NOTICES.md THIRD_PARTY_LICENSES.txt ./
 RUN npm run build

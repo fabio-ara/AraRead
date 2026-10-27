@@ -1,3 +1,4 @@
+import './build-widget.ts';
 // Empacotamento local, sem credenciais ou operações remotas. A CLI recebe
 // explicitamente o ref confirmado somente na etapa posterior de implantação.
 import {mkdir,readFile,readdir,writeFile,copyFile,cp} from 'node:fs/promises';
@@ -12,7 +13,7 @@ await copyFile('node_modules/pdfjs-dist/LICENSE',`${fn}/vendor/PDFJS-LICENSE`);
 const pkg=JSON.parse(await readFile('package.json','utf8')),imports:Record<string,string>={};
 for(const [name,version]of Object.entries(pkg.dependencies))imports[name]=`npm:${name}@${version}`;
 imports['pdfjs-dist/legacy/build/pdf.mjs']='./vendor/pdf.mjs';
-await writeFile(`${fn}/deno.json`,JSON.stringify({imports},null,2));
+await writeFile(`${fn}/deno.json`,JSON.stringify({imports,compilerOptions:{lib:['deno.ns','dom','dom.iterable','es2023'],types:[`npm:@types/pg@${pkg.devDependencies['@types/pg']}`]}},null,2));
 await writeFile(`${fn}/index.ts`,[
  "import {Buffer} from 'node:buffer';",
  "import {WorkerMessageHandler} from './vendor/pdf.worker.mjs';",

@@ -1,8 +1,8 @@
 import {cacheGet,cacheSet,cacheRemove} from './private-cache.ts';
-export type Queued={tool:'note_save'|'reading_move',args:any,owner:string,reading:string,version:string,created:string,state:'local'|'syncing'|'conflict'|'failed',error?:string};
+export type Queued={tool:'note_save'|'reading_move'|'highlight_save',args:any,owner:string,reading:string,version:string,created:string,state:'local'|'syncing'|'conflict'|'failed',error?:string};
 export async function queue(owner:string):Promise<Queued[]>{return await cacheGet(owner,'queue')||[];}
 export async function enqueue(owner:string,tool:string,args:any,ctx:any){
- if(!['note_save','reading_move'].includes(tool))throw Error('Esta alteração exige conexão.');
+ if(!['note_save','reading_move','highlight_save'].includes(tool))throw Error('Esta alteração exige conexão.');
  const items=await queue(owner),item:Queued={owner,tool:tool as Queued['tool'],args:{...args,operation_id:crypto.randomUUID()},reading:args.reading_id,version:ctx.source.sha256,created:new Date().toISOString(),state:'local'};
  if(tool==='reading_move'&&items.some(x=>x.tool===tool&&x.reading===args.reading_id))throw Error('Já há uma continuidade local para esta leitura. Sincronize ou confira essa intenção antes de registrar outra.');
  if(items.length>=40||new Blob([JSON.stringify([...items,item])]).size>1024*1024)throw Error('Limite local: 40 operações ou 1 MiB. Sincronize ou recupere as pendências.');
@@ -17,7 +17,7 @@ export async function syncQueue(owner:string,call:(tool:string,args:any)=>Promis
    const current=await call('reading_context',{reading_id:item.reading,ref:item.args.ref});
    if(current.source.sha256!==item.version)throw Object.assign(Error('A versão da fonte mudou.'),{code:'CONFLICT'});
    if(current.reading.revision!==item.args.expected_revision){
-    if(item.tool==='note_save')item.args.expected_revision=current.reading.revision;
+    if(item.tool==='note_save'||item.tool==='highlight_save')item.args.expected_revision=current.reading.revision;
     else throw Object.assign(Error('Outra sessão alterou o percurso. Confira antes de reaplicar.'),{code:'CONFLICT'});
    }
    item.state='syncing';await cacheSet(owner,'queue',items);
@@ -34,7 +34,7 @@ export async function restoreQueue(owner:string,text:string){
  if(v.format!=='araread-pending/1'||!Array.isArray(v.operations)||v.operations.length>40)throw Error('Formato de recuperação inválido.');
  if(v.unconfirmed?.length)throw Error('A recuperação tem uma operação online incerta. Consulte seu operation_id no assistente antes de reaplicá-la; ela não foi importada automaticamente.');
  const items=await queue(owner);
- for(const item of v.operations){if(item.owner!==owner||!['note_save','reading_move'].includes(item.tool)||typeof item.reading!=='string'||item.args?.reading_id!==item.reading||typeof item.args?.operation_id!=='string'||!item.args?.ref||typeof item.version!=='string')throw Error('Operação inválida ou pertencente a outra conta.');if(!items.some(x=>x.args.operation_id===item.args.operation_id))items.push({...item,state:'local'});}
+ for(const item of v.operations){if(item.owner!==owner||!['note_save','reading_move','highlight_save'].includes(item.tool)||typeof item.reading!=='string'||item.args?.reading_id!==item.reading||typeof item.args?.operation_id!=='string'||!item.args?.ref||typeof item.version!=='string')throw Error('Operação inválida ou pertencente a outra conta.');if(!items.some(x=>x.args.operation_id===item.args.operation_id))items.push({...item,state:'local'});}
  if(items.length>40||new Blob([JSON.stringify(items)]).size>1024*1024)throw Error('A recuperação excederia o limite da fila.');await cacheSet(owner,'queue',items);return items;
 }
 export async function cachedPassages(owner:string):Promise<any[]>{return await cacheGet(owner,'passages')||[];}

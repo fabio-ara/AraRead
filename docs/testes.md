@@ -1,5 +1,15 @@
 # Testes e evidências
 
+## Validação local 0.4
+
+O gate do núcleo passou em 97/97 testes locais com Auth/PostgreSQL reais, incluindo instalação/evolução, compatibilidade de recibos/backup, RLS entre contas, parágrafos legados, seleção por representação, versões órfãs, datas civis e entradas matemáticas hostis. O cliente MCP oficial conferiu também o JSON Schema real de saída; o campo de contexto da seleção foi acrescentado ao contrato após essa verificação.
+
+Os testes de navegador exercitam seleção/persistência, três abas, outra sessão, fila offline e remoção; apoios incluem consulta real, nota de cálculo, queda de conexão e pergunta preservada. O host MCP sintético negocia capacidades e simula perda antes/depois do commit, relendo recibo e dados reais. Isso não homologa o host externo. `tests/lexicon-live.ts` é prova de rede explícita, separada da suíte determinística, para palavra comum, conceito e locução. Resultados de Chromium/WebKit, revisão independente e publicação em [STATUS](../STATUS.md). Os bloqueios e correções estão na [revisão 0.4](evidencias/revisao-0.4.md).
+
+Chromium e WebKit passaram em **10/10 jornadas cada**, sem testes pulados, com Playwright 1.64.1. O primeiro detectou uma corrida na reconexão que recriava o leitor durante uma consulta; a reconexão agora sincroniza/revalida o cache sem recriar a passagem aberta. A prova lexical real adicional consultou casa, ontology e free will. O pacote Edge passou em `deno check`, com tipos de PostgreSQL e DOM declarados, e uma prova local do executor no Deno conferiu quatro casos. Isso não equivale à execução no Supabase hospedado.
+
+[Evidência estruturada](evidencias/leitura-0.4-local.json). Capturas nativas inspecionadas: [320 px](assets/reader-v4-highlights-320.png), [1440 px com coluna de até 480 px](assets/reader-v4-highlights-1440.png), [escuro](assets/reader-v4-highlights-dark.png), [zoom 200%](assets/reader-v4-highlights-zoom200.png) e [cálculo na passagem](assets/reader-v4-calculator.png). Somente material sintético. A captura registra a interface, não comprova sozinha persistência.
+
 ## Validação 0.3 concluída
 
 Em 24/10/2026, o núcleo atual passou em 78/78 testes com PostgreSQL/Auth reais e duas identidades. A suíte inclui instalação vazia, evolução de dados, RLS direto, recibos, concorrência, OAuth/PKCE e SDK MCP oficial preparando e apresentando as três representações, restauração acima de 16 MiB e 10 mil elementos. Os 13 testes de ingestão cobrem HTML contaminado, preâmbulo/bibliografia, prosa, colunas, notas, tabelas, fórmulas, lacunas e OCR não revisado. Casos editoriais sintéticos incluem filosofia, ciência, matemática, poesia, distinção marxiano/marxista e problema ontológico; não são citações autênticas.
@@ -177,7 +187,7 @@ As reescritas curtas cobrem as proposições fornecidas, mantêm sua sequência 
 
 Local usa aplicação completa, banco/Auth reais e cliente SDK. Hospedado exige identidade/destino exclusivo, migrations/configuração, interface, gateway e OAuth/duas contas no destino. Cliente externo real exige leitura/escrita e retomada no ChatGPT ou cliente autorizado, com conferência na interface. Os três níveis passaram, incluindo a jornada específica no ChatGPT descrita acima. Descoberta de metadados, `/health`, 401 e token administrativo não foram usados como substitutos dessa jornada.
 
-A [CI](../.github/workflows/ci.yml) fixa Ubuntu 24.04, configura Node, instalação pelo lockfile, tipos/docs/build, Compose real, identidades, testes e Chromium, sem segredos pessoais. O runner é fixado porque Playwright 1.56.1 não suporta Ubuntu 26.04, atualmente selecionado por `ubuntu-latest`. O comando opcional de rede pública não roda na CI. Não faça upload de `.local`, traces, tokens ou backups como artifacts. O estado da execução remota, quando disponível, deve ser registrado separadamente da evidência local.
+A [CI](../.github/workflows/ci.yml) fixa Ubuntu 24.04, configura Node, instalação pelo lockfile, tipos/docs/build, Compose real, identidades, testes e Chromium, sem segredos pessoais. O runner permanece em Ubuntu 24.04; Playwright foi atualizado para 1.64.1 para corrigir recarga offline no WebKit. A CI atual instala e executa também WebKit. O script lexical ampliado de rede pública é opcional; a jornada de apoios usa uma consulta real ao Wikcionário e pode apontar indisponibilidade externa. Não faça upload de `.local`, traces, tokens ou backups como artifacts. O estado da execução remota, quando disponível, deve ser registrado separadamente da evidência local.
 
 ## Capturas locais 0.3
 

@@ -10,6 +10,12 @@ O endpoint `/mcp` usa Streamable HTTP pelo SDK oficial. A implementação foi ex
 | `source_import` | Cria fonte textual canônica após validação; retenção excepcional e deduplicação privada; `work_id`/`derives_from` vinculam correção versionada |
 | `reading_context` | Consulta porção, idioma, revisão, fonte, explicação e contexto limitado; não altera posição |
 | `reading_display` | Apresenta explicação/tradução conferidas da mesma referência; único recurso MCP Apps |
+| `reading_repair_preview` | Prévia de abertura do elemento inteiro, sem escrita, com revisão e token do estado |
+| `reading_repair` | Aplica prévia vigente, alterando somente aberto/revisão; conserva retomada, cobertura e versões |
+| `highlight_list` | Grifos por elemento e representação, versões substituídas/órfãs e paginação |
+| `highlight_save` | Grava seleção por versão/segmento/pontos de código com citação e contexto conferidos |
+| `highlight_remove` | Remove só o grifo escolhido, preservando notas e variantes |
+| `contextual_calculate` | Cálculo científico ou datas civis determinísticos, sem persistir nem avançar |
 | `reading_progress` | Cobertura de unidades válidas, parágrafos restantes, aberto/retomada e limites de fonte parcial |
 | `reading_outline` | Hierarquia original e mapa interpretativo salvo, com referências reais |
 | `reading_seek` | Abre referência ou busca inequívoca, preservando retomada principal e cobertura |

@@ -78,7 +78,7 @@ export async function extractPdf(bytes:Buffer){
   for(let i=1;i<=pdf.numPages;i++){
    const p=await pdf.getPage(i),viewport=p.getViewport({scale:1}),content=await p.getTextContent(),ops=await p.getOperatorList();
    const tokens:Token[]=content.items.filter((v:any)=>'str'in v&&v.str.trim()).map((v:any)=>({text:v.str,x:v.transform[4],y:v.transform[5],width:v.width,height:Math.max(v.height,Math.abs(v.transform[3]),1),rotated:Math.abs(v.transform[1])>.1||Math.abs(v.transform[2])>.1}));
-   const visual=ops.fnArray.some(n=>[OPS.paintImageXObject,OPS.paintInlineImageXObject,OPS.constructPath].includes(n))||tokens.some(t=>t.rotated);
+   const visual=ops.fnArray.some((n:number)=>[OPS.paintImageXObject,OPS.paintInlineImageXObject,OPS.constructPath].includes(n))||tokens.some(t=>t.rotated);
    pages.push({page:i,width:viewport.width,height:viewport.height,tokens,visual});p.cleanup();
   }return reconstructPdf(pages);
  })(),new Promise<never>((_,reject)=>{timeout=setTimeout(()=>{void task.destroy();reject(new AppError('PDF_TIMEOUT','Extração excedeu o limite. Preserve o arquivo e use preparação local.'));},15000);})]);

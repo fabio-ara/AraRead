@@ -1,5 +1,5 @@
 export const config = {
- name:process.env.APP_NAME || 'AraRead', version:'0.3.0',
+ name:process.env.APP_NAME || 'AraRead', version:'0.4.0',
  port:Number(process.env.PORT || 4317), origin:process.env.APP_ORIGIN || 'http://127.0.0.1:4317',
  authUrl:process.env.AUTH_URL || 'http://127.0.0.1:4318',
  issuer:process.env.AUTH_ISSUER || 'http://127.0.0.1:4317/auth/v1',

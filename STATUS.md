@@ -1,5 +1,15 @@
 # Estado verificável
 
+**AraRead 0.4.0 implementado, ainda não publicado (27/10/2026).** Branch `feat/reading-integrity-context`, base `28dc609`. Continuidade estrutural compatível, reparo explícito da apresentação, grifos por representação e apoios de vocabulário/cálculo estão implementados. [Comportamento e recuperação](docs/leitura-0.4.md).
+
+**Prova local:** 97/97 testes de núcleo, PostgreSQL/Auth reais, duas contas e backup v1/v2/v3. Chromium e WebKit passaram em 10/10 jornadas cada, sem testes pulados. Elas verificam seleção, persistência, outra sessão, capacidades MCP, resposta perdida e reconexão. Tipos, build e pacote Edge/Deno verificados; migration aditiva aplicada somente no banco isolado. Resultados e alcance estão em [testes](docs/testes.md) e na [revisão 0.4](docs/evidencias/revisao-0.4.md). CI remota deve ser conferida nos checks da branch/PR, sem presumir aprovação pelo resultado local.
+
+**Gate pendente:** a revisão independente exigida pelo mandato não concluiu por indisponibilidade do serviço revisor (HTTP 429); a tentativa separada por CLI não retornou parecer. A análise estática realizada não a substitui. Não houve merge, migration remota ou publicação da 0.4, nem homologação das novas ações no host ChatGPT real. A leitura pessoal e todos os seus dados permaneceram intactos; o reparo foi comprovado somente em fixtures.
+
+A instalação existente continua na **0.3.0**. Emulação de toque não comprova gestos nativos em aparelhos físicos. As provas históricas abaixo não homologam a 0.4.
+
+## Entrega 0.3.0 — histórica
+
 **AraRead 0.3.0 entregue em 24/10/2026**, publicado no [GitHub Pages](https://fabio-ara.github.io/AraRead/) e no [MCP OAuth](https://ltzoontstgpbegtakrgk.supabase.co/functions/v1/araread/mcp) do projeto Supabase exclusivo Free. O [PR #1](https://github.com/fabio-ara/AraRead/pull/1) foi integrado após os gates: implementação inicial em `6f0fcd5`, correções verificadas em `18e9855b2865cf61bd6ccc37f0fb3f6c63b16d40` e merge `237f228f56e2c637863787251051d6eddeb769e1`. A [descrição da 0.3](docs/leitura-0.3.md) explica o comportamento e seus limites.
 
 O leitor reúne **Leitura facilitada | Tradução | Original**, com preparação e comparação editorial antes de apresentar o painel. Chat controla termos, perguntas, fontes, mapa, navegação, progresso, preferências e perfis privados. A ingestão HTML/PDF separa conteúdo editorial de navegação, conserva estrutura e lacunas e aceita OCR local aberto com proveniência. O armazenamento privilegia texto canônico, mantendo bytes quando necessários ou solicitados. A geração continua no assistente externo, sem chave de modelo no backend; Node/Compose permanece reproduzível.

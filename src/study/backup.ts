@@ -1,3 +1,4 @@
+import {highlightTarget,checkSelector} from './highlights.ts';
 import {randomUUID} from 'node:crypto';
 import type {PoolClient} from 'pg';
 import {z} from 'zod';
@@ -12,7 +13,7 @@ import {profileDefinition,parameterSchemas} from './preference-contracts.ts';
 import {validateProfileDefinition} from './preferences.ts';
 
 export const backupSections=['works','sources','elements','readings','mediations','notes','terms','events','preferences','receipts','reading_segments','references','perspectives','contexts','connections','reading_maps','profiles','preference_records'] as const;
-const jsonFields=new Set(['genres','warnings','meta','opened','resume','covered','additions','provenance','ref','target_ref','study','study_selection','alignment','evidence_ids','dependencies','details','attribution','selection','materials','gaps','extraction','editorial','items','definition','value']);
+const jsonFields=new Set(['genres','warnings','meta','opened','resume','covered','additions','provenance','ref','target_ref','study','study_selection','alignment','evidence_ids','dependencies','details','attribution','selection','materials','gaps','extraction','editorial','items','definition','value','anchor']);
 const columns:Record<string,string[]>={
  works:['id','owner_id','title','author','created_at'],sources:['id','owner_id','work_id','edition','original_language','partial','genres','origin','captured_at','sha256','original','mime','filename','warnings','derives_from','original_available','canonical_sha256','extraction','storage_policy'],
  elements:['id','owner_id','source_id','ordinal','kind','text','locator','meta'],readings:['id','owner_id','source_id','revision','language','portion_size','opened','resume','covered','available_end','created_at','study'],
@@ -21,7 +22,7 @@ const columns:Record<string,string[]>={
  perspectives:['id','owner_id','reading_id','name','kind','scope','description','version','previous_id','evidence_ids','declared_author','usage_terms','created_at'],
  contexts:['id','owner_id','reading_id','source_id','ref','selection','signature','materials','gaps','language','guidance_version','created_at'],
  mediations:['id','owner_id','reading_id','source_id','element_id','start_offset','end_offset','language','rewrite','additions','provenance','created_at','context_id','context_signature','representation','study_selection','alignment','evidence_ids','dependencies','supersedes','status','editorial'],
- notes:['id','owner_id','reading_id','source_id','element_id','start_offset','end_offset','kind','text','origin','reply_to','resolved','created_at','selected','notebook_id','declared_author','related_mediation_id','evidence_ids','supersedes','attribution','pending_link','status'],
+ notes:['id','owner_id','reading_id','source_id','element_id','start_offset','end_offset','kind','text','origin','reply_to','resolved','created_at','selected','notebook_id','declared_author','related_mediation_id','evidence_ids','supersedes','attribution','pending_link','status','anchor'],
  terms:['id','owner_id','reading_id','source_id','element_id','start_offset','end_offset','language','term','definition','sense','origin','created_at','details','status'],
  events:['id','owner_id','reading_id','kind','ref','revision','created_at'],
  connections:['id','owner_id','reading_id','target_reading_id','ref','target_ref','kind','origin','problem','limits','evidence_ids','created_at'],
@@ -29,7 +30,7 @@ const columns:Record<string,string[]>={
  profiles:['id','owner_id','name','version','previous_id','definition','provenance','active','created_at'],
  preference_records:['id','owner_id','scope','reading_id','session_id','key','value','state','provenance','created_at'],
 };
-const defaults:Record<string,any>={study:{},context_id:null,context_signature:null,representation:'rewrite',study_selection:{},alignment:[],evidence_ids:[],dependencies:[],supersedes:null,status:'unreviewed',selected:false,notebook_id:null,declared_author:'',related_mediation_id:null,attribution:{},pending_link:false,details:{},original_available:true,canonical_sha256:null,extraction:{},storage_policy:'retained',editorial:{}};
+const defaults:Record<string,any>={anchor:null,study:{},context_id:null,context_signature:null,representation:'rewrite',study_selection:{},alignment:[],evidence_ids:[],dependencies:[],supersedes:null,status:'unreviewed',selected:false,notebook_id:null,declared_author:'',related_mediation_id:null,attribution:{},pending_link:false,details:{},original_available:true,canonical_sha256:null,extraction:{},storage_policy:'retained',editorial:{}};
 const row=z.record(z.string(),z.unknown());
 const bundleSchema=z.object({format:z.enum(['araread/1','araread/2','araread/3']),snapshot:z.string().optional(),exported_at:z.iso.datetime().optional(),sections:z.object(Object.fromEntries(backupSections.map((s,i)=>[s,i<10?z.array(row).max(100000):z.array(row).max(100000).default([])])) as z.ZodRawShape)}).strict();
 
@@ -40,7 +41,7 @@ export async function restoreBackup(c:PoolClient,uid:string,input:any,quota:(n:n
  const data=parsed.data.sections as Record<string,any[]>;
  await c.query('set constraints all deferred');
  if(!data.reading_segments.length&&parsed.data.format==='araread/1')data.reading_segments=data.readings.map(r=>({id:randomUUID(),owner_id:uid,reading_id:r.id,source_id:r.source_id,ordinal:0,created_at:r.created_at}));
- let bytes=0;for(const s of data.sources)bytes+=Buffer.byteLength(String(s.original_base64||''),'base64');for(const s of data.elements)bytes+=Buffer.byteLength(String(s.text||''));for(const s of data.mediations)bytes+=Buffer.byteLength(String(s.rewrite||''))+Buffer.byteLength(JSON.stringify(s.additions||[]));for(const s of data.notes)bytes+=Buffer.byteLength(String(s.text||''));for(const s of data.terms)bytes+=Buffer.byteLength(String(s.definition||''));for(const section of ['references','perspectives','contexts','connections','reading_maps','profiles','preference_records'])for(const row of data[section])bytes+=Buffer.byteLength(JSON.stringify(row));await quota(bytes);
+ let bytes=0;for(const s of data.sources)bytes+=Buffer.byteLength(String(s.original_base64||''),'base64');for(const s of data.elements)bytes+=Buffer.byteLength(String(s.text||''));for(const s of data.mediations)bytes+=Buffer.byteLength(String(s.rewrite||''))+Buffer.byteLength(JSON.stringify(s.additions||[]));for(const s of data.notes)bytes+=Buffer.byteLength(String(s.text||''))+Buffer.byteLength(JSON.stringify(s.anchor||{}));for(const s of data.terms)bytes+=Buffer.byteLength(String(s.definition||''));for(const section of ['references','perspectives','contexts','connections','reading_maps','profiles','preference_records'])for(const row of data[section])bytes+=Buffer.byteLength(JSON.stringify(row));await quota(bytes);
  const map:Record<string,string>={};for(const section of Object.keys(columns))for(const r of data[section]){ensure(z.uuid().safeParse(r.id).success&&!map[r.id],'INVALID_BACKUP','ID inválido ou duplicado.');map[r.id]=randomUUID();}
  const referenceIds=new Set(data.references.map(r=>r.id)),missingEvidence:Record<string,string>={};
  const evidence=(id:any)=>{ensure(z.uuid().safeParse(id).success,'INVALID_BACKUP','Identificador bibliográfico inválido.');if(referenceIds.has(id))return map[id];ensure(!map[id],'INVALID_BACKUP','Referência aponta para entidade de outra natureza.');return missingEvidence[id]??=randomUUID();};
@@ -69,6 +70,15 @@ export async function restoreBackup(c:PoolClient,uid:string,input:any,quota:(n:n
   if(section==='readings'){ensure(allowed(old.id,old.source_id),'INVALID_BACKUP','Manifesto da leitura incompleto.');r.opened=ref(old.opened,old.id);r.resume=ref(old.resume,old.id);ensure(Array.isArray(old.covered),'INVALID_BACKUP','Cobertura inválida.');r.covered=old.covered.map((v:any)=>ref(v,old.id));}
   if(['mediations','notes','terms'].includes(section)){
    ref({source_id:old.source_id,element_id:old.element_id,start:old.start_offset,end:old.end_offset},old.reading_id);
+   if(section==='notes'&&old.kind==='highlight'){
+    const {unavailable_version,...target}=old.anchor||{};ensure(highlightTarget.safeParse(target).success,'INVALID_BACKUP','Âncora de grifo inválida.');
+    let body:string|undefined;
+    if(target.representation==='original'){ensure(!target.mediation_id&&target.segment==='main'&&target.start>=old.start_offset&&target.end<=old.end_offset,'INVALID_BACKUP','Grifo original fora da passagem.');body=elementMap.get(old.element_id)?.text;}
+    else {const m=data.mediations.find(v=>v.id===target.mediation_id);if(m){ensure(m.reading_id===old.reading_id&&m.source_id===old.source_id&&m.element_id===old.element_id&&m.start_offset===old.start_offset&&m.end_offset===old.end_offset&&m.representation===target.representation,'INVALID_BACKUP','Grifo ligado a outra passagem/representação.');body=target.segment==='main'?m.rewrite:m.additions[Number(target.segment.split(':')[1])]?.text;}
+     else {ensure(unavailable_version===true&&!map[target.mediation_id],'INVALID_BACKUP','Versão de grifo ausente sem declaração de indisponibilidade.');target.mediation_id=randomUUID();}}
+    if(body!==undefined)checkSelector(body,target);else ensure(unavailable_version===true,'INVALID_BACKUP','Segmento ausente no backup.');
+    r.anchor={...target,...(unavailable_version?{unavailable_version:true}:{})};
+   }
    if(section==='notes'){ensure(!old.reply_to||(noteMap.get(old.reply_to)?.reading_id===old.reading_id&&noteMap.get(old.reply_to)?.kind==='question'),'INVALID_BACKUP','Resposta sem pergunta da mesma leitura.');ensure(old.kind!=='answer'||old.reply_to,'INVALID_BACKUP','Resposta sem pergunta.');ensure(!['understood','favorite','review','doubt'].includes(old.kind)||old.origin==='user','INVALID_BACKUP','Marca pessoal com origem inválida.');}
    if(section==='mediations')r.alignment=r.alignment.map((v:any)=>ref(v,old.reading_id));
   }
@@ -78,7 +88,7 @@ export async function restoreBackup(c:PoolClient,uid:string,input:any,quota:(n:n
   if(section==='reading_maps'){ensure(Array.isArray(old.items)&&old.items.length<=300,'INVALID_BACKUP','Mapa inválido.');r.items=old.items.map((i:any)=>({...i,ref:ref(i.ref,old.reading_id)}));}
   if(section==='profiles'){ensure(profileDefinition.safeParse(old.definition).success,'INVALID_BACKUP','Definição de perfil inválida.');validateProfileDefinition(old.definition);}
   if(section==='preference_records'){ensure(['account','reading'].includes(old.scope)&&old.session_id==null&&Object.hasOwn(parameterSchemas,old.key)&&['active','disabled','default'].includes(old.state),'INVALID_BACKUP','Preferência persistente inválida; sessões não são restauradas.');if(old.state!=='default')ensure(parameterSchemas[old.key as keyof typeof parameterSchemas].safeParse(old.value).success,'INVALID_BACKUP','Valor de preferência inválido.');if(old.key==='active_profile'&&old.value)ensure(data.profiles.some(p=>p.id===old.value),'INVALID_BACKUP','Perfil ausente no backup.');if(old.key==='perspective_id'&&old.value)ensure(data.perspectives.some(p=>p.id===old.value&&p.reading_id===old.reading_id),'INVALID_BACKUP','Perspectiva fora da leitura.');r.value=remap(old.value);}
-  for(const field of ['study','study_selection','selection','materials','details','attribution','definition','editorial'])if(r[field])r[field]=remap(r[field]);
+  for(const field of ['study','study_selection','selection','materials','details','attribution','definition','editorial','anchor'])if(r[field])r[field]=remap(r[field]);
   await c.query(`insert into araread."${section}"(${cols.join(',')}) values(${cols.map((_,i)=>`$${i+1}`).join(',')})`,cols.map(k=>r[k]==null?null:jsonFields.has(k)?JSON.stringify(r[k]):r[k]));
  }
  const pref=data.preferences[0];if(pref){ensure(schemas.preferences_set.safeParse({operation_id:randomUUID(),expected_revision:0,language:pref.language,portion_size:pref.portion_size}).success,'INVALID_BACKUP','Preferências inválidas.');await c.query('insert into araread.preferences(owner_id,language,portion_size,study) values($1,$2,$3,$4) on conflict do nothing',[uid,pref.language,pref.portion_size,JSON.stringify(remap(pref.study||{}))]);}

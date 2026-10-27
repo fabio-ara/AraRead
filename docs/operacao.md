@@ -46,7 +46,7 @@ Para código defeituoso, volte ao artefato anterior compatível com o schema; n�
 
 ## Fila e cópias no dispositivo
 
-Filas anteriores de notas/progresso offline conservam proprietário, leitura, fonte, intervalo, revisão e identidade da intenção. O serviço é consultado antes de repetir. Só o acréscimo seguro de nota admite revisão atualizada automaticamente; progresso conflitante pede conferir/reaplicar. Não altere uma chave para tentar contornar um resultado desconhecido. A recuperação de pendências é JSON privado, sem credenciais, importável apenas na mesma conta.
+Filas anteriores de notas/progresso offline conservam proprietário, leitura, fonte, intervalo, revisão e identidade da intenção. O serviço é consultado antes de repetir. O acréscimo seguro de nota ou grifo admite revisão atualizada automaticamente; progresso conflitante pede conferir/reaplicar. Não altere uma chave para tentar contornar um resultado desconhecido. A recuperação de pendências é JSON privado, sem credenciais, importável apenas na mesma conta.
 
 Uma escrita conhecida invalida as cópias preparadas dessa leitura; na entrada/reconexão, revisões remotas são conferidas. Uma cópia totalmente offline não pode ser apagada à distância. Backups e cadernos já entregues a outra pessoa também não podem ser revogados pelo aplicativo. Limpar cache ou sair não apaga o servidor.
 
@@ -59,3 +59,12 @@ Aplique as três migrations novas em ordem, sem editar as anteriores. A primeira
 Conexões existentes no ChatGPT podem conservar o catálogo anterior. Na interface verificada em 24/10/2026, use **Plugins → AraRead → Gerenciar → Atualizar ferramentas** e abra uma nova conversa. A orientação deve informar 1.2.0 e o catálogo, 41 ferramentas, incluindo `source_preview` e `reading_display`; `editorial_review` é um campo de `mediation_save`, não uma ferramenta separada. Preserve a concessão OAuth e a política de permissões existentes. A prova no cliente usou aprovações pontuais para as operações sintéticas autorizadas; nenhuma autorização permanente foi ampliada.
 
 Uma representação preparada com escolhas temporárias precisa ser recuperada com seleção compatível. Para retomar pelas preferências persistidas, prepare novamente usando os valores efetivos da leitura; variantes anteriores permanecem no histórico. A troca de perfil afeta a explicação, mantendo a tradução independente. A aceitação entre conversas verificou a mesma revisão, variantes, notas, termos e referência antes e depois da recuperação.
+
+
+## Atualizar para 0.4
+
+Aplique somente `20261027142447_representation_highlights_v4.sql`, sem editar migrations aplicadas. A coluna `notes.anchor` é opcional para notas antigas; o trigger confere fonte, versão, representação, segmento, citação e contexto sob RLS. Instalação vazia e evolução fazem parte do gate. Atualize Edge/Node e frontend pelo destino existente após os gates; `npm run build` gera também o painel MCP autocontido. `scripts/prepare-edge.ts` inclui todos os módulos atuais e dependências fixadas. O cache público muda para v4; dados privados ficam separados por conta.
+
+Atualize o catálogo do conector quando o cliente oferecer essa função: orientação 1.3.0, 47 ferramentas e recurso `ui://araread/reader-v4.html`. Não refaça consentimentos nem amplie permissões para contornar capacidade ausente. O SDK precisa de `serverTools` para chamadas e `message.text` para perguntar ao chat. A recuperação de escrita incerta consulta recibo e conserva a mesma chave.
+
+Para a apresentação fragmentada de uma leitura antiga, use a [prévia e o reparo](leitura-0.4.md#reparo-de-apresentação) sob a conta proprietária. Não reimporte a fonte, não remapeie cobertura e não substitua uma mediação de intervalo diferente. Uma biblioteca pessoal só é alterada com autorização e acesso legítimo; prova sintética não comprova reparo pessoal.

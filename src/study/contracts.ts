@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import {highlightTarget} from './selection-schema.ts';
 
 // Shared study selectors contain configuration, never inferred personal traits.
 export const studySelection=z.object({
@@ -14,7 +15,7 @@ const ref=z.object({source_id:z.uuid(),element_id:z.uuid(),start:z.number().int(
 const ids=z.array(z.uuid()).max(40).default([]);
 export const citationUrl=z.url().max(2000).refine(s=>{try{const u=new URL(s);return ['http:','https:'].includes(u.protocol)&&!u.username&&!u.password;}catch{return false;}},'Referências aceitam apenas links HTTP/HTTPS sem credenciais.');
 export const citationSchema=z.object({title:z.string().min(1).max(500),author:z.string().max(500).default(''),year:z.string().max(40).default(''),edition:z.string().max(200).default(''),translation:z.string().max(200).default(''),url:citationUrl.optional(),doi:z.string().max(200).optional(),kind:z.enum(['book','article','dictionary','web','local','commentary']).default('book'),locator:z.string().max(500).default(''),excerpt:z.string().max(16000).default(''),consulted_at:z.iso.date().nullable().default(null),access:z.enum(['available','suggested','unavailable']).default('suggested'),license:z.string().max(300).default('')}).strict();
-export const termDetails=z.object({original_term:z.string().max(200).optional(),equivalent:z.string().max(200).optional(),alternatives:z.array(z.string().max(400)).max(8).default([]),etymology:z.string().max(2000).optional(),memory_aid:z.string().max(2000).optional(),construction:z.string().max(2000).optional(),evidence_ids:ids,derived_from:z.uuid().optional()}).strict();
+export const termDetails=z.object({original_term:z.string().max(200).optional(),equivalent:z.string().max(200).optional(),alternatives:z.array(z.string().max(400)).max(8).default([]),etymology:z.string().max(2000).optional(),memory_aid:z.string().max(2000).optional(),construction:z.string().max(2000).optional(),evidence_ids:ids,derived_from:z.uuid().optional(),selection:highlightTarget.optional(),definition_kind:z.enum(['contextual','general']).optional(),source:z.object({title:z.string().min(1).max(500),url:citationUrl,captured_at:z.iso.datetime(),attribution:z.string().max(500),license:z.string().max(500),sha256:z.string().regex(/^[a-f0-9]{64}$/)}).strict().optional()}).strict();
 export const studySchemas={
  source_append:z.object({...revision,text:z.string().min(1).max(2000000).optional(),format:z.enum(['text','markdown','structured']).default('text'),blocks:z.array(z.object({kind:z.string().min(1).max(60),text:z.string().min(1).max(100000),locator:z.string().max(200).optional(),meta:z.record(z.string(),z.unknown()).default({})})).min(1).max(20000).optional(),origin:z.string().min(1).max(2000).default('user_provided'),partial:z.boolean().default(true)}).strict(),
  reference_save:z.object({...revision,...citationSchema.shape}).strict(),
@@ -26,9 +27,10 @@ export const studySchemas={
  notebook_export:z.object({reading_id:z.uuid(),notebook_id:z.uuid(),note_ids:z.array(z.uuid()).min(1).max(50)}).strict(),
  notebook_import:z.object({...revision,bundle:z.unknown()}).strict(),
  correction_save:z.object({...revision,ref,mediation_id:z.uuid(),problem:z.string().min(1).max(4000),evidence_ids:ids}).strict(),
- lexicon_lookup:z.object({reading_id:z.uuid(),term:z.string().trim().min(1).max(120),language:z.enum(['pt','en','fr','es','de','el','la']).default('pt'),consult_external:z.boolean().default(false)}).strict(),
+ lexicon_lookup:z.object({reading_id:z.uuid(),ref:ref.optional(),selection:highlightTarget.optional(),term:z.string().trim().min(1).max(120),language:z.string().min(2).max(80).refine(s=>{try{return !!Intl.getCanonicalLocales(s)[0];}catch{return false;}},'Use idioma BCP 47.').default('pt'),consult_external:z.boolean().default(false)}).strict(),
+ contextual_calculate:z.object({reading_id:z.uuid(),ref,input:z.string().max(512),mode:z.enum(['auto','scientific','historical']).default('auto'),angle_unit:z.enum(['degrees','radians']).default('degrees'),decimal:z.enum([',','.']).default(','),dates:z.object({from:z.object({year:z.number().int().min(1).max(100000),era:z.enum(['BCE','CE']),approximate:z.boolean().default(false)}).strict(),to:z.object({year:z.number().int().min(1).max(100000),era:z.enum(['BCE','CE']),approximate:z.boolean().default(false)}).strict()}).strict().optional()}).strict(),
 } as const;
-export const studyReadTools=['study_catalog','notebook_export','lexicon_lookup'];
+export const studyReadTools=['study_catalog','notebook_export','lexicon_lookup','contextual_calculate'];
 export const studyDescriptions:Record<keyof typeof studySchemas,string>={
  source_append:'Acrescenta material autorizado ao fim da MESMA leitura como segmento imutável, sem mover referências antigas nem marcar novas porções. Revisão e recibo obrigatórios.',
  reference_save:'Guarda referência bibliográfica e trecho disponível, inclusive livro sem URL. consulted_at exige trecho e localizador; é declaração de consulta, não certificação de verdade.',
@@ -40,5 +42,6 @@ export const studyDescriptions:Record<keyof typeof studySchemas,string>={
  notebook_export:'Prepara pacote seletivo de comentários escolhidos de um caderno, com prévia. Não exporta biblioteca, originais, progresso ou notas não selecionadas. Sem download automático.',
  notebook_import:'Importa caderno como cópia atribuída privada e inativa. Só alinha automaticamente por hash exato da edição/elemento e intervalos válidos; demais comentários ficam pendentes.',
  correction_save:'Registra problema em mediação e sinaliza dependentes para reexame; preserva original e histórico. Correção efetiva é nova mediation_save com supersedes.',
- lexicon_lookup:'Recupera primeiro termos já salvos da leitura. Opcionalmente consulta Wikcionário público com atribuição; retorna texto não confiável, data, revisão e links de pesquisa filosófica. Não inventa etimologia nem grava automaticamente.',
+ lexicon_lookup:'Consulta sentidos salvos no idioma e sinaliza contexto da passagem. Opcionalmente consulta Wikcionário com excertos breves, fonte e data. Links de pesquisa não são verbetes lidos. Não atribua inferência contextual à fonte; nada é gravado ou avançado.',
+ contextual_calculate:'Calcula apoio à passagem sem gravar nem avançar. Datas civis não têm ano zero: 429?–347 BCE ≈82 anos, sem inferir idade exata. Exibe operandos corrigíveis. Científica escalar, graus/radianos, vírgula ou ponto decimal; funções restritas, sem código arbitrário. Salvar nota exige ação explícita.',
 };

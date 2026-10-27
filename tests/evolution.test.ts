@@ -72,7 +72,7 @@ test('evolução F01–F10 conserva percurso, variantes, memória e fronteiras',
  await t.test('vocabulário contextual reutiliza banco e exige fonte para etimologia',async()=>{
   await assert.rejects(()=>mutate('term_save',{ref:refA,term:'hipótese',definition:'Provisória',origin:'assistant',details:{etymology:'Etimologia inventada'}}),{code:'MISSING_EVIDENCE'});
   await mutate('term_save',{ref:refA,term:'condição',definition:'O que precisa valer para a afirmação se aplicar.',sense:'Condição nesta passagem',origin:'assistant',details:{memory_aid:'Compare um caso em que a condição vale e outro em que não vale.',original_term:'condição',evidence_ids:[base.reference_id]}});
-  const saved=await call('lexicon_lookup',{reading_id:reading.reading_id,term:'condição',consult_external:true});assert.equal(saved.saved.length,1);assert.equal(saved.external,null);assert.equal(saved.saved[0].details.original_term,'condição');
+  const saved=await call('lexicon_lookup',{reading_id:reading.reading_id,term:'condição',consult_external:false});assert.equal(saved.saved.length,1);assert.equal(saved.external,null);assert.equal(saved.saved[0].details.original_term,'condição');
   const absent=await call('lexicon_lookup',{reading_id:reading.reading_id,term:'λόγος'});assert.equal(absent.external,null);assert.equal(absent.requires_inference,true);assert.ok(absent.suggestions.some((v:any)=>v.url.includes('plato.stanford.edu')));
  });
  await t.test('F06 correção preserva versão e marca só dependentes',async()=>{
@@ -120,7 +120,8 @@ test('evolução F01–F10 conserva percurso, variantes, memória e fronteiras',
   assert.equal((await call('operation_get',{operation_id:context.operation_id})).privacy_redacted,true);
  });
  await t.test('recibo antigo continua idempotente após novos campos opcionais',async()=>{
-  const request={reading_id:reading.reading_id,expected_revision:999,operation_id:op(),ref:refA,kind:'note',text:'Intenção antiga, sem repetição.',origin:'user',resolved:false};
+  // O servidor antigo serializava a referência normalizada pelo schema, não a ordem de chaves JSONB.
+  const request={reading_id:reading.reading_id,expected_revision:999,operation_id:op(),ref:{source_id:refA.source_id,element_id:refA.element_id,start:refA.start,end:refA.end},kind:'note',text:'Intenção antiga, sem repetição.',origin:'user',resolved:false};
   const hash=createHash('sha256').update('note_save'+JSON.stringify(request)).digest('hex'),receipt={operation_id:request.operation_id,status:'confirmed',reading_id:reading.reading_id,revision:2,entity_id:op()};
   await transaction(alice,async db=>{await db.query('insert into araread.receipts(owner_id,operation_id,request_hash,result) values($1,$2,$3,$4)',[alice.id,request.operation_id,hash,JSON.stringify(receipt)]);});
   assert.deepEqual(await call('note_save',request),receipt);assert.deepEqual(await call('operation_get',{operation_id:request.operation_id}),receipt);

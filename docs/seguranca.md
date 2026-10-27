@@ -47,3 +47,10 @@ Preferências interpretativas só são persistidas com solicitação explícita;
 Pacotes de perfil exigem seleção, revisão declarada e termos de uso; sua importação é privada e inativa. Excluir o perfil retira a seleção futura, preserva notas/progresso e não inventa novamente seu conteúdo em recibos. Cópias já compartilhadas não são revogáveis remotamente.
 
 O cânone textual é imutável e verificável por hash. Ausência autorizada de bytes é explícita; fontes antigas não perdem originais. OCR roda localmente com entrada somente leitura, sem rede, limite de memória/CPU/processos e prazo. O suplemento é dado não confiável, vinculado ao hash do PDF, e não uma certificação de fidelidade. Conteúdo HTML/PDF/MathML e instruções dentro de obras nunca são executados nem ampliam autoridade.
+
+
+## Apoios contextuais 0.4
+
+Grifos usam sessão verificada, revisão, recibo, cotas e RLS existentes. Originais e representações têm índices distintos; citação/contexto/grafemas são conferidos no serviço e relações na migration. Remoção de grifo não percorre exclusão de notas. Estados órfãos não autorizam vínculo aproximado. Consulta e cálculo não gravam nem inferem perfil.
+
+O iframe usa SDK oficial estrito, capacidades negociadas e lista de ferramentas permitidas, sem token ou rede externa; CSP permanece restrita. Falhas genéricas de transporte/servidor conservam a intenção pendente. Consulta lexicográfica transmite somente termo/expressão, nunca histórico ou notas, e limita os excertos atribuídos. Math.js fornece apenas parser: nenhum nó é compilado/avaliado pela biblioteca, e o executor escalar aplica limites antes e durante o percurso. Veja [limites precisos](leitura-0.4.md#calculadora-e-datas-civis).

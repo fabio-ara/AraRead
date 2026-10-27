@@ -6,6 +6,7 @@ export const editorialReviewSchema=z.object({
  rationale:z.string().min(20).max(5000),
  claims:z.array(z.object({kind:z.enum(['explanation','context','interpretation','example','evidence','critical_note']),text:z.string().min(1).max(1500),source_quote:z.string().max(500).optional(),evidence_ids:z.array(z.uuid()).max(12).default([]),status:z.enum(['source_supported','documented','illustrative','hypothesis','uncertain'])}).strict()).max(40),
  limits:z.string().min(1).max(3000),
+ continuity_acknowledged:z.boolean().optional(),
 }).strict();
 export type EditorialReview=z.infer<typeof editorialReviewSchema>;
 export function editorialAssessment(original:string,rewrite:string,representation:string,review?:EditorialReview,sourceLanguage='und',targetLanguage='pt-BR'){

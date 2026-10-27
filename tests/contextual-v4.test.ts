@@ -1,0 +1,41 @@
+import {test,after} from 'node:test';
+import assert from 'node:assert/strict';
+import {randomUUID} from 'node:crypto';
+import {readFile} from 'node:fs/promises';
+import {execute} from '../src/service.ts';
+import {authenticate} from '../src/auth.ts';
+import {config} from '../src/config.ts';
+import {pool,transaction} from '../src/db.ts';
+import {outputs} from '../src/outputs.ts';
+import {quoteSelector} from '../src/study/highlights.ts';
+import {dictionaryExcerpt,lookupVocabulary} from '../src/study/vocabulary.ts';
+import {calculate} from '../src/calculator.ts';
+if(!config.local||new URL(config.database).hostname!=='127.0.0.1')throw Error('Somente ambiente local isolado.');
+const accounts=JSON.parse(await readFile('.local/test-accounts.json','utf8'));
+async function login(n=0){const response=await fetch(`${config.authUrl}/token?grant_type=password`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(accounts[n])});assert.equal(response.status,200);return authenticate(`Bearer ${(await response.json()).access_token}`);}
+const alice=await login(),bob=await login(1),works:any[]=[];
+const call=async(name:any,args:any={},who=alice)=>{const value=await execute(name,args,who);outputs[name as keyof typeof outputs].parse(value);return value;};
+const op=()=>randomUUID();
+test('vocabulário respeita idioma, polissemia, seleção e conta; consultas não avançam',async()=>{
+ const title=`Vocabulário sintético ${op()}`,w=await call('source_import',{operation_id:op(),title,text:'banco perto da casa.\n\nbanco na praça.',original_language:'pt-BR'});works.push({...w,title});
+ let c=await call('reading_context',{reading_id:w.reading_id,language:'pt-BR'});const target={representation:'original',segment:'main',...quoteSelector(c.original,0,5)};
+ const save=async(ref:any,language:string,definition:string)=>{const current=await call('reading_context',{reading_id:w.reading_id});return call('term_save',{operation_id:op(),reading_id:w.reading_id,expected_revision:current.reading.revision,ref,term:'banco',language,definition,origin:'user',details:ref===w.ref?{selection:target,definition_kind:'contextual'}:{}});};
+ await save(w.ref,'pt-BR','Instituição, sentido escolhido pelo leitor na primeira passagem.');await save(c.next_ref,'pt-BR','Assento, sentido escolhido na segunda passagem.');await save(w.ref,'es','Banco, definición en otro idioma.');
+ c=await call('reading_context',{reading_id:w.reading_id});const revision=c.reading.revision;
+ const result=await call('lexicon_lookup',{reading_id:w.reading_id,ref:w.ref,selection:target,term:'banco',language:'pt-BR'}, {...alice,permissions:'read'});
+ assert.equal(result.saved.length,2);assert.equal(result.saved[0].context_match,'same_selection');assert.equal(result.saved[1].context_match,'other_passage');assert.equal(result.external,null);assert.equal(result.requires_inference,true);
+ await assert.rejects(()=>call('lexicon_lookup',{reading_id:w.reading_id,ref:w.ref,term:'banco'},bob),{code:'NOT_FOUND'});
+ await assert.rejects(()=>call('lexicon_lookup',{reading_id:w.reading_id,ref:w.ref,selection:{...target,exact:'wrong'},term:'banco'}),{code:'ANCHOR_MISMATCH'});
+ const calc=await call('contextual_calculate',{reading_id:w.reading_id,ref:w.ref,input:'429?–347 B.C.E.'},{...alice,permissions:'read'});assert.equal(calc.value,calculate({input:'429?–347 B.C.E.'}).value);
+ await assert.rejects(()=>call('contextual_calculate',{reading_id:w.reading_id,ref:w.ref,input:'1/0'}),{code:'CALCULATION_INPUT'});
+ const after=await call('reading_context',{reading_id:w.reading_id});assert.equal(after.reading.revision,revision);assert.deepEqual(after.reading.covered,[]);assert.deepEqual(after.reading.opened,c.reading.opened);
+ const empty=await call('lexicon_lookup',{reading_id:w.reading_id,term:'expressão ausente',language:'pt'});assert.equal(empty.saved.length,0);assert.equal(empty.external,null);
+ const failed=await transaction(alice,db=>lookupVocabulary(db,{reading_id:w.reading_id,term:'casa',language:'pt',consult_external:true},async()=>{throw Error('Rede indisponível sintética');}));assert.equal(failed.external,null);assert.match(failed.notice,/indisponível/);
+ let received='';const html='<div class="mw-parser-output"><h1 id="Português">Português</h1><h2>Substantivo</h2><ol><li>Definição sintética.<dl><dd>Exemplo que não deve virar definição.</dd></dl></li></ol><h1>Italiano</h1><h2>Substantivo</h2><ol><li>Outro idioma.</li></ol></div>';
+ const external=await transaction(alice,db=>lookupVocabulary(db,{reading_id:w.reading_id,term:'livre arbítrio',language:'pt',consult_external:true},async url=>{received=url;return Buffer.from(html);}));assert.equal(external.external?.brief,'Definição sintética.');assert.equal(received,'https://pt.wiktionary.org/wiki/livre_arb%C3%ADtrio');assert.ok(!received.includes(w.reading_id));
+});
+test('extração lexicográfica limitada não mistura idioma, citações e etimologia',()=>{
+ const html='<div class="mw-parser-output"><h2 id="English">English</h2><h3>Etymology</h3><ol><li>Origem, não definição.</li></ol><h3>Noun</h3><ol><li>Primeiro sentido.<ul><li>Citação extensa.</li></ul></li><li>Segundo sentido.</li></ol><h2>French</h2><h3>Noun</h3><ol><li>Não inglês.</li></ol></div>';
+ assert.deepEqual(dictionaryExcerpt(html,'en'),['Primeiro sentido.','Segundo sentido.']);assert.deepEqual(dictionaryExcerpt(html,'pt'),[]);assert.deepEqual(dictionaryExcerpt('<main>Sem estrutura.</main>','en'),[]);
+});
+after(async()=>{for(const w of works)await call('work_delete',{operation_id:op(),work_id:w.work_id,confirm_title:w.title});await pool.end();});

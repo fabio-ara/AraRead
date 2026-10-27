@@ -1,3 +1,4 @@
+import {highlightOutputs} from './study/highlights.ts';
 import {z} from 'zod';
 import {refSchema,language,type ToolName} from './contracts.ts';
 import {navigationOutputs} from './study/navigation.ts';
@@ -8,9 +9,10 @@ const receipt=z.object({operation_id:id,status:z.literal('confirmed')});
 const saved=receipt.extend({reading_id:id,source_id:id.optional(),revision:rev,ref:refSchema.optional(),entity_id:id.optional(),effective_language:language.optional()}).passthrough();
 export const outputs:Record<ToolName,z.ZodType>={
  ...preferenceOutputs,
- ...navigationOutputs as Record<'reading_progress'|'reading_outline'|'reading_seek'|'reading_map_save',z.ZodType>,
+ ...highlightOutputs,
+ ...navigationOutputs,
  source_preview:z.object({quality:row,metadata:row,canonical_hash:z.string(),preview:z.array(row),total_elements:rev,original_bytes:rev}),
- reading_display:z.object({ready:z.literal(true),work:row,source:row,reading:row,ref:refSchema,element:row,original:z.string(),effective_language:language,representations:z.object({facilitated:row,translation:row,original:row}),location:row,fallback_text:z.string()}),
+ reading_display:z.object({ready:z.literal(true),terms:z.array(row),passage:row,permissions:row,highlights:row,work:row,source:row,reading:row,ref:refSchema,element:row,original:z.string(),effective_language:language,representations:z.object({facilitated:row,translation:row,original:row}),location:row,fallback_text:z.string()}),
  source_append:saved.extend({segment_id:id,manifest_version:rev,first_new_ref:refSchema,resume:refSchema,previous_references_preserved:z.boolean(),warnings:z.array(z.string())}),
  reference_save:saved.extend({reference_id:id,apa:z.string(),consultation:z.literal('declared'),structural_hash:z.string()}),
  perspective_save:saved.extend({perspective_id:id,version:rev}),
@@ -22,12 +24,13 @@ export const outputs:Record<ToolName,z.ZodType>={
  notebook_import:saved.extend({notebook_id:id,aligned:rev,pending:rev,influence_enabled:z.literal(false),attribution_verified:z.literal(false)}),
  correction_save:saved.extend({affected_mediation_ids:z.array(id),original_changed:z.literal(false),human_review_inferred:z.literal(false)}),
  lexicon_lookup:z.object({saved:z.array(row),suggestions:z.array(z.object({title:z.string(),url:z.url()})),external:row.nullable(),requires_inference:z.boolean().optional(),notice:z.string()}),
+ contextual_calculate:z.object({reading_id:id,ref:refSchema,kind:z.enum(['scientific','historical']),input:z.string(),value:z.number().finite(),formatted:z.string(),calculation:z.string(),notice:z.string(),engine:z.string()}).passthrough(),
  account_context:z.object({account:z.object({id}),preferences:z.object({language,portion_size:z.string(),revision:rev}).passthrough(),capabilities:row,guidance_version:z.string()}),
  assistant_guidance:z.object({version:z.string(),instructions:z.string()}),
  library_list:z.object({items:z.array(z.object({reading_id:id,source_id:id,work_id:id,title:z.string(),author:z.string(),edition:z.string(),original_language:language,language,revision:rev,resume:refSchema,opened:refSchema,partial:z.boolean(),available_end:z.boolean()})),pagination:page}),
  source_import:receipt.extend({work_id:id,source_id:id,reading_id:id,revision:rev,ref:refSchema,warnings:z.array(z.string()),deduplicated:z.boolean().optional(),quality:row.optional(),original_available:z.boolean().optional()}),
- reading_context:z.object({work:z.object({id,title:z.string(),author:z.string()}),source:z.object({id,work_id:id,edition:z.string(),original_language:language,partial:z.boolean(),warnings:z.array(z.string()),mime:z.string(),filename:z.string(),sha256:z.string(),genres:z.array(z.string())}).passthrough(),reading:z.object({id,source_id:id,revision:rev,language:language.nullable(),portion_size:z.string().nullable(),opened:refSchema,resume:refSchema,covered:z.array(refSchema),available_end:z.boolean()}).passthrough(),ref:refSchema,element:z.object({id,kind:z.string(),locator:z.string(),meta:row,ordinal:rev}),original:z.string(),mediation:z.object({id,language,rewrite:z.string(),additions:z.array(row),provenance:row,created_at:z.unknown()}).passthrough().nullable(),other_languages:z.array(language),effective_language:language,next_ref:refSchema.nullable(),previous_ref:refSchema.nullable(),terms:z.array(row),notes:z.array(row),pending_questions:z.array(row),end_message:z.string().optional(),study:z.object({selection:row,signature:z.string(),materials:row,gaps:z.array(z.string()),variants:z.array(row),stale:z.boolean(),legacy_context_unknown:z.boolean()})}),
- source_elements:z.object({reading_id:id,source_id:id,revision:rev,items:z.array(z.object({id,kind:z.string(),locator:z.string(),ordinal:rev,segment_ordinal:rev,preview:z.string(),ref:refSchema})),pagination:page}),
+ reading_context:z.object({selection_context:z.object({prefix:z.string(),suffix:z.string()}),passage:row,work:z.object({id,title:z.string(),author:z.string()}),source:z.object({id,work_id:id,edition:z.string(),original_language:language,partial:z.boolean(),warnings:z.array(z.string()),mime:z.string(),filename:z.string(),sha256:z.string(),genres:z.array(z.string())}).passthrough(),reading:z.object({id,source_id:id,revision:rev,language:language.nullable(),portion_size:z.string().nullable(),opened:refSchema,resume:refSchema,covered:z.array(refSchema),available_end:z.boolean()}).passthrough(),ref:refSchema,element:z.object({id,kind:z.string(),locator:z.string(),meta:row,ordinal:rev}),original:z.string(),mediation:z.object({id,language,rewrite:z.string(),additions:z.array(row),provenance:row,created_at:z.unknown()}).passthrough().nullable(),other_languages:z.array(language),effective_language:language,next_ref:refSchema.nullable(),previous_ref:refSchema.nullable(),terms:z.array(row),notes:z.array(row),pending_questions:z.array(row),end_message:z.string().optional(),study:z.object({selection:row,signature:z.string(),materials:row,gaps:z.array(z.string()),variants:z.array(row),stale:z.boolean(),legacy_context_unknown:z.boolean()})}),
+ source_elements:z.object({reading_id:id,source_id:id,revision:rev,items:z.array(z.object({id,kind:z.string(),locator:z.string(),ordinal:rev,segment_ordinal:rev,preview:z.string(),ref:refSchema,full_ref:refSchema,passage:row})),pagination:page}),
  reading_history:z.object({reading_id:id,source_id:id,revision:rev,items:z.array(row),pagination:page}),
  mediation_save:saved,term_save:saved,note_save:saved,reading_move:saved,
  operation_get:z.union([receipt.passthrough(),z.object({operation_id:id,status:z.literal('unknown'),message:z.string()})]),

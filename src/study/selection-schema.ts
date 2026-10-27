@@ -1,0 +1,2 @@
+import {z} from 'zod';
+export const highlightTarget=z.object({representation:z.enum(['original','rewrite','translation']),mediation_id:z.uuid().optional(),segment:z.string().regex(/^(main|addition:(?:[0-9]|1[0-9]))$/).default('main'),start:z.number().int().nonnegative(),end:z.number().int().positive(),exact:z.string().min(1).max(8000),prefix:z.string().max(128).default(''),suffix:z.string().max(128).default('')}).strict();
