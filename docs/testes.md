@@ -10,6 +10,12 @@ Chromium e WebKit passaram em **10/10 jornadas cada**, sem testes pulados, com P
 
 [Evidência estruturada](evidencias/leitura-0.4-local.json). Capturas nativas inspecionadas: [320 px](assets/reader-v4-highlights-320.png), [1440 px com coluna de até 480 px](assets/reader-v4-highlights-1440.png), [escuro](assets/reader-v4-highlights-dark.png), [zoom 200%](assets/reader-v4-highlights-zoom200.png) e [cálculo na passagem](assets/reader-v4-calculator.png). Somente material sintético. A captura registra a interface, não comprova sozinha persistência.
 
+## Instalação e cliente 0.4
+
+Após o merge e a publicação, `tests/hosted-http.ts` aprovou 12 verificações; `tests/hosted-mcp.ts` com `HOSTED_UI=true`, oito; `tests/hosted-restore.ts`, quatro. Auth/PostgreSQL e Edge são os serviços reais existentes, acessados por contas sintéticas comuns; administração limitada à criação/remoção dessas identidades. O Pages confirmou grifo salvo e relido por nova sessão MCP, cálculo, teclado, largura máxima e recarga offline. [Relatório hospedado](evidencias/hospedado-0.4.json), [desktop](assets/hosted-v4-desktop.png), [móvel](assets/hosted-v4-mobile.png) e [calculadora](assets/hosted-v4-calculator.png).
+
+O [ChatGPT real](evidencias/chatgpt-0.4.json) confirmou catálogo, painel, dois grifos e [cálculo contextual](assets/chatgpt-v4-calculator.png). A homologação nesse cliente é parcial: controle de navegador interrompido por segurança, sem teste final de vocabulário, mensagem ao chat ou outra conversa. A leitura pessoal não foi reparada. Esses limites não anulam as provas automatizadas, mas impedem declarar concluído todo o mandato.
+
 ## Validação 0.3 concluída
 
 Em 24/10/2026, o núcleo atual passou em 78/78 testes com PostgreSQL/Auth reais e duas identidades. A suíte inclui instalação vazia, evolução de dados, RLS direto, recibos, concorrência, OAuth/PKCE e SDK MCP oficial preparando e apresentando as três representações, restauração acima de 16 MiB e 10 mil elementos. Os 13 testes de ingestão cobrem HTML contaminado, preâmbulo/bibliografia, prosa, colunas, notas, tabelas, fórmulas, lacunas e OCR não revisado. Casos editoriais sintéticos incluem filosofia, ciência, matemática, poesia, distinção marxiano/marxista e problema ontológico; não são citações autênticas.

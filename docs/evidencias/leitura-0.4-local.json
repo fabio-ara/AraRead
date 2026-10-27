@@ -2,7 +2,7 @@
   "version": "0.4.0",
   "date": "2026-10-27",
   "base_commit": "28dc609e841fdbb012dec2646dfa2cf3462cab43",
-  "scope": "Implementação e prova local; sem publicação hospedada",
+  "scope": "Prova local consolidada; publicação e cliente têm evidências próprias",
   "core": {
     "passed": 102,
     "failed": 0,
@@ -27,8 +27,8 @@
   "integration": {
     "mcp_sdk": "cliente oficial com OAuth/Auth local real",
     "mcp_apps": "SDK oficial em host sintético; capacidades presentes/ausentes, perda antes/depois de commit e resposta atrasada após troca de leitura",
-    "hosted": "não implantado/verificado nesta revisão",
-    "chatgpt_host": "não homologado nesta revisão"
+    "hosted": "ver hospedado-0.4.json",
+    "chatgpt_host": "prova parcial em chatgpt-0.4.json"
   },
   "migration": "20261027142447_representation_highlights_v4.sql verificada no banco local isolado e aplicada no destino existente; seis anteriores intactas",
   "lexicon": {
@@ -46,8 +46,8 @@
     "runtime_probe": "datas, transição de era, trigonometria e entrada hostil; não equivale ao Edge hospedado"
   },
   "publication": {
-    "merged": false,
-    "deployed": false,
+    "merged": true,
+    "deployed": true,
     "personal_reading_repaired": false,
     "personal_data_changed": false
   },
@@ -60,7 +60,6 @@
   "limits": [
     "Sem certificação WCAG ou de fidelidade acadêmica",
     "Sem gestos nativos em aparelho iOS/Android",
-    "CI remota deve ser conferida no commit do PR",
     "Bundle web cerca de 840 kB minificado; aviso de chunk acima de 500 kB"
   ]
 }

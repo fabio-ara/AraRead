@@ -1,0 +1,44 @@
+{
+  "version": "0.4.0",
+  "date": "2026-10-27",
+  "scope": "Partial real ChatGPT web evidence in dedicated Chrome; synthetic content only",
+  "catalog": {
+    "write_tools": 25,
+    "read_tools": 22,
+    "total_tools": 47,
+    "oauth_grant_preserved": true,
+    "permission_policy_unchanged": true
+  },
+  "passed": [
+    "Assistant imported the synthetic English paragraph and prepared two saved Portuguese representations with editorial declaration",
+    "reading_display rendered the three tabs using the new SDK-backed resource",
+    "Keyboard selected text in Original and Tradução; both highlights were confirmed independently through the ordinary account connector",
+    "Historical calculator displayed approximately 82 years for 429?–347 B.C.E., operand explanation and the civil-year caveat",
+    "Escape closed contextual support",
+    "Reading coverage remained empty during these checks",
+    "Synthetic fixture removed by exact title and confirmed receipt; subsequent exact search returned zero"
+  ],
+  "confirmed_highlight_representations": [
+    "original",
+    "translation"
+  ],
+  "unconfirmed": [
+    "Third highlight in facilitated text",
+    "Vocabulary and sendMessage actions in the real host",
+    "Recovery in a second ChatGPT conversation",
+    "Personal presentation repair"
+  ],
+  "capture": {
+    "path": "docs/assets/chatgpt-v4-calculator.png",
+    "sha256": "d4c196017eb4d58acd179b3d14b39cb47af33fc92d71cdd3120adc1364cb5ec0",
+    "native_bytes_saved_outside_ui": true,
+    "visually_inspected": true
+  },
+  "limits": [
+    "The host displayed CSP disabled in its existing developer configuration; no security settings changed",
+    "The dedicated browser inspection stopped responding after scrolling; Computer Use later stopped because it could not establish the current URL confidently",
+    "Browser interaction stopped at the policy block; no alternative UI path was used to bypass it",
+    "The current connector session still exposes the older tool catalog, so it cannot invoke reading_repair",
+    "The personal reading remains unchanged; complete host acceptance and personal repair are not claimed"
+  ]
+}
