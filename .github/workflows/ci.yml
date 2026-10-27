@@ -6,6 +6,8 @@ jobs:
   check:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    env:
+      PLAYWRIGHT_IMAGE: mcr.microsoft.com/playwright:v1.64.1-noble@sha256:47b510dd9230bf0b9bfc9b20102241e577ea7a99334ab4c3ca19f19770e9b8ea
     steps:
       - uses: actions/checkout@v7.0.1
         with:
@@ -27,23 +29,17 @@ jobs:
           chmod 777 .local/ocr
           docker run --rm --network none --memory 512m --cpus 1 --pids-limit 64 --read-only --tmpfs /tmp:rw,noexec,nosuid,size=128m -v "$PWD/tests/fixtures:/input:ro" -v "$PWD/.local/ocr:/output" araread-ocr:ci /input/synthetic-scanned.pdf /output/scanned-import.json --language eng
           node --import tsx --env-file-if-exists=.env scripts/verify-ingestion-v3.ts .local/ocr/scanned-import.json
-      - name: Dependências dos navegadores pelo arquivo oficial Ubuntu
-        run: |
-          # O espelho Azure excedeu o gate de 20 min baixando as dependências
-          # WebKit. Preserva distribuição, chaves e validação APT; muda só a origem.
-          for source in /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do
-            if [ -f "$source" ]; then
-              sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g; s|https://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' "$source"
-            fi
-          done
-          npx playwright install --with-deps chromium webkit
       - name: servidor e testes reais
         run: |
           NODE_ENV=production npm run dev > /tmp/araread-server.log 2>&1 &
           for attempt in $(seq 1 30); do curl --fail --silent http://127.0.0.1:4317/health && break; sleep 1; done
           npm test
-          npm run test:e2e
-          PLAYWRIGHT_BROWSER=webkit npm run test:e2e
+      - name: Chromium e WebKit na imagem oficial fixada
+        run: |
+          docker pull "$PLAYWRIGHT_IMAGE"
+          for browser in chromium webkit; do
+            docker run --rm --init --network host --ipc=host -e CI=1 -e PLAYWRIGHT_BROWSER="$browser" -v "$PWD:/work" -w /work "$PLAYWRIGHT_IMAGE" npm run test:e2e
+          done
       - run: npm audit --audit-level=moderate
       - if: always()
         run: docker compose down

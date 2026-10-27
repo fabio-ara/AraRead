@@ -28,3 +28,9 @@ Os revisores automatizados independentes não concluíram: o serviço retornou H
 Playwright 1.56.1 passou em Chromium, mas WebKit 26.0 falhou em duas recargas com `setOffline(true)`, apesar de service worker ativo. A falha corresponde ao [relato upstream #42775](https://github.com/microsoft/playwright/issues/42775). A [correção #42894](https://github.com/microsoft/playwright/pull/42894) foi integrada em outubro; a dependência de testes foi atualizada para 1.64.1 e WebKit 27.2 passou nas dez jornadas sem pular testes. O host sintético teve a altura ajustada ao viewport para permitir interação real com seus controles fixos.
 
 Mouse, teclado e toque emulado foram exercitados. Não houve teste em aparelhos físicos iOS/Android, certificação de acessibilidade nem homologação das novas ações no ChatGPT real. O serviço hospedado e a leitura pessoal continuam na versão anterior, sem reparo ou alteração administrativa.
+
+## Preparação da CI
+
+A execução [40537650170](https://github.com/fabio-ara/AraRead/actions/runs/40537650170) aprovou tipos, documentação, auditoria pública, build, Docker, migrations e OCR, mas atingiu o limite de 20 minutos durante o download de 119 MB de bibliotecas WebKit pelo espelho Ubuntu do Azure. As suítes não chegaram a executar nessa tentativa. Uma troca de espelho também permaneceu demorada e foi substituída.
+
+A configuração final usa a imagem oficial `mcr.microsoft.com/playwright:v1.64.1-noble`, fixada por digest. Chromium 156 e WebKit 27.2 iniciaram e renderizaram a fixture local dentro dessa imagem, com Node 24.22.1. O núcleo roda antes da obtenção da imagem, e os mesmos testes de navegador continuam obrigatórios. Não houve remoção de testes nem substituição da prova remota por uma aprovação local. O resultado da revisão exata aparece nos checks do PR.
