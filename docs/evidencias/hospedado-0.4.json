@@ -1,0 +1,143 @@
+{
+  "version": "0.4.0",
+  "date": "2026-10-27",
+  "code_revision": "d8f95098f78cdeefae0be84bb1f4d7a4ec0edd20",
+  "frontend_revision": "97a80025badc0d29d97687cd09019cfb85666388",
+  "deployment": {
+    "checked_at": "2026-10-27T21:10:31.560Z",
+    "revision": "d8f95098f78cdeefae0be84bb1f4d7a4ec0edd20",
+    "version": 8,
+    "status": "ACTIVE",
+    "verify_jwt": false,
+    "auth": "Asymmetric JWT, issuer, audience, active session and OAuth grant verified in the function"
+  },
+  "schema": {
+    "migrations": [
+      {
+        "name": "20261024021521_araread_core.sql",
+        "sha256": "f8926b06ec6cb834aa0bb82243cf690ea81f4853ccc604401f9514cdcb9fa514"
+      },
+      {
+        "name": "20261024022151_auth_and_integrity.sql",
+        "sha256": "dc3830ae5c7a4e48f02b70dcfc06c0c4b441e45548ebde705beb05510c81bd20"
+      },
+      {
+        "name": "20261024123904_study_evolution.sql",
+        "sha256": "00fda574d2a834bd976bbfda661e2aec99ca6e91536763f75e4aeb7ceafbb5ab"
+      },
+      {
+        "name": "20261024171342_editorial_ingestion_v3.sql",
+        "sha256": "08c27a05788ad9f31a6bf7d1921786e43b81b23fb6bcbd54b4b9a2aeb5b32264"
+      },
+      {
+        "name": "20261024172646_preferences_profiles_v3.sql",
+        "sha256": "462a039f09d6c7bf2046b3d8f0c0af78ec7dbca81ab741035aa9423a8dd74d8e"
+      },
+      {
+        "name": "20261024180204_preference_reference_ownership_v3.sql",
+        "sha256": "b18c5113ad0a1f19651827e7bca1f3aa305030080bafded4b4bf0598f49a95bf"
+      },
+      {
+        "name": "20261027142447_representation_highlights_v4.sql",
+        "sha256": "5e9f641220c28a7b67cda0a1135ee1199eb7faa0f510d1d7ad4bd0846d6a99a5"
+      }
+    ],
+    "tables_with_forced_rls": 19,
+    "application_role_bypasses_rls": false,
+    "previous_checksums_preserved": true
+  },
+  "http": {
+    "level": "HTTP Edge e Auth/PostgreSQL hospedados",
+    "checked_at": "2026-10-27T21:12:00.200Z",
+    "passed": [
+      "saude com banco real; dados sem token recebem 401",
+      "CORS aceita somente a origem da interface",
+      "HTTP preserva bytes e hash; porcao e idioma reais",
+      "escrita, segunda leitura e recibo idempotente pelo gateway",
+      "duas identidades isoladas por RLS atraves do HTTP",
+      "PDF real no Edge, com avisos da extracao parcial",
+      "URL publica funciona no Edge e loopback e recusado",
+      "24 chamadas concorrentes preservam identidades pelo pooler transacional",
+      "0.4: paragrafo inteiro, grifo Unicode, recibo e isolamento no Edge",
+      "0.4: vocabulario com selecao e calculos puros nao mudam progresso",
+      "0.4: backup v3 restaura grifo em outra conta com novos IDs",
+      "sessao revogada perde acesso imediatamente no gateway"
+    ],
+    "synthetic_identities_removed": 2,
+    "does_not_validate": [
+      "interface hospedada",
+      "ChatGPT"
+    ]
+  },
+  "mcp_and_pages": {
+    "client": "SDK oficial MCP sobre HTTPS hospedado, fora do processo servidor",
+    "checked_at": "2026-10-27T21:26:17.639Z",
+    "passed": [
+      "descoberta, DCR, consentimento sintetico e PKCE reais no provedor",
+      "SDK oficial descobre contratos 0.4 e orientacao atraves do MCP hospedado",
+      "leitura e escrita reais, nova sessao MCP e conferencia independente pela API da interface",
+      "Pages apresenta três abas, salva grifo relido pelo MCP, calcula e retoma offline sem avanço",
+      "mapa, progresso, navegação fora de sequência, preferências e pacote privado de perfil no MCP hospedado",
+      "perspectiva, livro sem URL, contexto/variante, vocabulário salvo, envio na mesma leitura e recurso MCP Apps no runtime hospedado",
+      "token web nao substitui audiencia e permissao MCP",
+      "revogacao imediata e nova autorizacao real"
+    ],
+    "published_ui": {
+      "published_ui": true,
+      "desktop": true,
+      "mobile": true,
+      "phone_width_everywhere": true,
+      "three_tabs": true,
+      "keyboard": true,
+      "contextual_highlight": true,
+      "historical_calculation": true,
+      "reading_progress_unchanged": true,
+      "logout": true,
+      "service_worker": "shell e porção recuperados após recarga sem rede no Pages real"
+    },
+    "synthetic_identity_removed": true,
+    "synthetic_oauth_client_removed": true,
+    "does_not_validate": [
+      "ChatGPT"
+    ]
+  },
+  "restore": {
+    "checked_at": "2026-10-27T21:14:46.158Z",
+    "bundle_bytes": 17086904,
+    "passed": [
+      "perfil Edge informa cota real de 16 MiB",
+      "backup acima de 16 MiB restaura no gateway de 32 MiB",
+      "recibo confirmado e IDs remapeados",
+      "bytes originais iguais em contas distintas"
+    ],
+    "synthetic_identities_removed": 2
+  },
+  "ci": {
+    "pull_request": "https://github.com/fabio-ara/AraRead/actions/runs/40583710205",
+    "push": "https://github.com/fabio-ara/AraRead/actions/runs/40583703406",
+    "main": "https://github.com/fabio-ara/AraRead/actions/runs/40585274835",
+    "pages": "https://github.com/fabio-ara/AraRead/actions/runs/40586124174"
+  },
+  "data_preservation": {
+    "ordinary_authenticated_connector": true,
+    "consistent_backup_before_upgrade": true,
+    "all_previous_rows_preserved_in_18_export_sections": true,
+    "only_additive_column": "notes.anchor=null for previous notes",
+    "additional_receipts": "8 receipts of the removed synthetic ChatGPT fixture",
+    "personal_reading_repaired": false,
+    "administrative_access_to_personal_rows": false
+  },
+  "package": {
+    "source_bytes_windows": 3199761,
+    "source_bytes_ci_linux": 3188829,
+    "pdfjs": "6.4.299 official minified distribution",
+    "text_positions_operators_equivalent": true,
+    "source_upload_413_resolved": true
+  },
+  "limits": [
+    "No physical iOS/Android device tests",
+    "No human editorial review or accessibility certification",
+    "ChatGPT evidence is partial and reported separately",
+    "Personal presentation repair awaits an authenticated client exposing the new repair tools"
+  ]
+}

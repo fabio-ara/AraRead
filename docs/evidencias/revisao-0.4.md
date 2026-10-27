@@ -44,7 +44,7 @@ As reproduções do revisor foram locais, em memória, algumas com dependências
 
 Playwright 1.56.1 passou em Chromium, mas WebKit 26.0 falhou em duas recargas com `setOffline(true)`, apesar de service worker ativo. A falha corresponde ao [relato upstream #42775](https://github.com/microsoft/playwright/issues/42775). A [correção #42894](https://github.com/microsoft/playwright/pull/42894) foi integrada em outubro; a dependência de testes foi atualizada para 1.64.1 e WebKit 27.2 passou nas dez jornadas sem pular testes. O host sintético teve a altura ajustada ao viewport para permitir interação real com seus controles fixos.
 
-Mouse, teclado e toque emulado foram exercitados. Não houve teste em aparelhos físicos iOS/Android, certificação de acessibilidade nem homologação das novas ações no ChatGPT real. O serviço hospedado e a leitura pessoal continuam na versão anterior, sem reparo ou alteração administrativa.
+Mouse, teclado e toque emulado foram exercitados. Não houve teste em aparelhos físicos iOS/Android nem certificação de acessibilidade. A publicação e a homologação parcial no ChatGPT estão registradas em [STATUS](../../STATUS.md); a apresentação pessoal permanece sem reparo, por indisponibilidade do caminho autenticado de invocação nesta sessão.
 
 ## Preparação da CI
 
@@ -53,3 +53,8 @@ A execução [40537650170](https://github.com/fabio-ara/AraRead/actions/runs/405
 A configuração final usa a imagem oficial `mcr.microsoft.com/playwright:v1.64.1-noble`, fixada por digest. Chromium 156 e WebKit 27.2 iniciaram e renderizaram a fixture local dentro dessa imagem, com Node 24.22.1. O núcleo roda antes da obtenção da imagem, e os mesmos testes de navegador continuam obrigatórios. Não houve remoção de testes nem substituição da prova remota por uma aprovação local. O resultado da revisão exata aparece nos checks do PR.
 
 A [CI com imagem oficial](https://github.com/fabio-ara/AraRead/actions/runs/40543214317), revisão `f03d0d6`, passou em todos os gates. Os logs da tentativa anterior também mostraram `RATE_LIMIT` entre suítes rápidas que compartilham o endereço local do servidor. O workflow agora aguarda a janela real de um minuto antes de cada motor; o limite da aplicação permanece intacto. Esta separação impede que o consumo de uma suíte contamine a seguinte. A revisão `457dd69` passou tanto no [push](https://github.com/fabio-ara/AraRead/actions/runs/40544559777) quanto no [PR](https://github.com/fabio-ara/AraRead/actions/runs/40544570466). As correções posteriores de resposta atrasada exigem os checks da nova revisão, visíveis no PR.
+
+
+## Publicação verificada
+
+A revisão `d8f9509` passou em 102 testes do núcleo e dez jornadas em cada motor nas CIs do PR/push. O pacote Edge foi reduzido para cerca de 3,2 MB usando os arquivos minificados oficiais do PDF.js, após a API recusar o upload anterior (413). A CI agora compara a extração e aplica margem de tamanho antes do deploy. A versão 8 do Edge e o Pages passaram nos gates hospedados; [resultados](hospedado-0.4.json). A [prova parcial do ChatGPT](chatgpt-0.4.json) distingue ações confirmadas e etapas interrompidas pelo instrumento, sem estender conclusões locais ao host externo.
