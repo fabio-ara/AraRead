@@ -1,5 +1,13 @@
 # Alterações
 
+## 0.4.0 — 27/10/2026 (validação em andamento)
+
+- Passagens respeitam parágrafos e fronteiras estruturais; referências legadas continuam válidas, com reparo explícito que conserva progresso e histórico.
+- Seleção nativa e grifos nas três representações, com versão, segmento, pontos de código, confirmação, recuperação offline e backup compatível.
+- Vocabulário distingue ocorrência, definição geral e fonte; calculadora científica e datas civis compartilham execução determinística.
+- Painel compartilhado web/MCP, SDK oficial de capacidades e recuperação de resposta perdida. Migration aditiva em notas.
+- Estado efetivo de publicação e gates em [STATUS](STATUS.md); comportamento e limites em [Leitura 0.4](docs/leitura-0.4.md).
+
 ## 0.3.0 — 24/10/2026
 
 - Ingestão HTML/PDF com pré-verificação, reconstrução posicional, lacunas explícitas e adaptador OCR local aberto. Armazenamento textual canônico, retenção excepcional e deduplicação privada.

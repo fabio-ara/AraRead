@@ -27,7 +27,7 @@ async function getPublic(value:string,maxBytes:number,signal:AbortSignal):Promis
   socket.once('secureConnect',()=>{socket.removeListener('error',failed);callback(null,socket);});
  }});
  try{
-  const response=await client.request({method:'GET',path:url.pathname+url.search,signal,headers:{'User-Agent':'AraRead/0.3 (single-page user-directed importer)','Accept':'text/html, text/plain;q=0.8','Accept-Encoding':'identity'}});
+  const response=await client.request({method:'GET',path:url.pathname+url.search,signal,headers:{'User-Agent':'AraRead/0.4 (single-page user-directed importer)','Accept':'text/html, text/plain;q=0.8','Accept-Encoding':'identity'}});
   const status=response.statusCode,mime=String(response.headers['content-type']||'').split(';')[0].toLowerCase();
   if(status>=300&&status<400)return {body:Buffer.alloc(0),mime,status,location:typeof response.headers.location==='string'?response.headers.location:undefined};
   ensure(Number(response.headers['content-length']||0)<=maxBytes,'TOO_LARGE','Página excede o limite de bytes.',413);

@@ -2,22 +2,26 @@
 
 Inventário gerado dos pacotes instalados a partir do lockfile. As dependências transitivas e opcionais variam por plataforma; conserve também as licenças distribuídas dentro de cada pacote. Os textos encontrados estão em [THIRD_PARTY_LICENSES.txt](THIRD_PARTY_LICENSES.txt). Para outra plataforma, execute novamente `npx tsx scripts/licenses.ts` após `npm ci`.
 
-A identidade visual adapta tokens de CSS da família AraLearn/AraHub, consultados em modo somente leitura e licenciados sob MIT. Copyright (c) 2026 Fabio Eidi Ara (AraLearn) e Fabio Ara (AraHub); licença MIT preservada em [LICENSE](LICENSE), do mesmo titular. Não foram transplantados dados, segredos ou identificadores de instalação. Amostras editoriais, inclusive verso grego não atribuído a autor histórico e sem pretensão métrica, e PDF de teste são criações sintéticas do AraRead. KaTeX inclui fontes; PDF.js conserva avisos Apache. Imagens oficiais PostgreSQL/GoTrue/Node mantêm suas próprias licenças.
+Nenhum código foi copiado dos repositórios AraLearn/AraHub: foram consultados arquitetura e fluxos documentados, adaptando apenas conceitos. As amostras editoriais e o PDF de teste são criações sintéticas deste projeto. KaTeX inclui fontes; PDF.js e sua distribuição conservam os avisos Apache. PostgreSQL, GoTrue, Node e a imagem de testes Playwright são distribuições oficiais separadas; suas licenças permanecem nas distribuições correspondentes.
 
 | Pacote | Versão | Licença declarada |
 |---|---|---|
+| @babel/runtime | 7.29.10 | MIT |
+| @esbuild/win32-x64 | 0.28.2 | MIT |
 | @hono/node-server | 2.1.5 | MIT |
 | @modelcontextprotocol/client | 2.4.0 | Apache-2.0 |
 | jose | 6.2.13 | MIT |
 | @modelcontextprotocol/core | 2.4.0 | Apache-2.0 |
+| @modelcontextprotocol/ext-apps | 2.0.4 | MIT |
 | @modelcontextprotocol/node | 2.1.2 | Apache-2.0 |
 | @modelcontextprotocol/server | 2.4.0 | Apache-2.0 |
 | @napi-rs/canvas | 1.0.13 | MIT |
 | @napi-rs/canvas-win32-x64-msvc | 1.0.13 | MIT |
 | @oxc-project/types | 0.155.0 | MIT |
-| @playwright/test | 1.56.1 | Apache-2.0 |
+| @playwright/test | 1.64.1 | Apache-2.0 |
 | @rolldown/binding-win32-x64-msvc | 1.2.15 | MIT |
 | @rolldown/pluginutils | 1.0.1 | MIT |
+| @standard-schema/spec | 1.1.0 | MIT |
 | @supabase/auth-js | 2.118.0 | MIT |
 | @supabase/functions-js | 2.118.0 | MIT |
 | @supabase/phoenix | 0.4.5 | MIT |
@@ -45,6 +49,7 @@ A identidade visual adapta tokens de CSS da família AraLearn/AraHub, consultado
 | call-bind-apply-helpers | 1.0.2 | MIT |
 | call-bound | 1.0.4 | MIT |
 | commander | 15.0.0 | MIT |
+| complex.js | 2.4.3 | MIT |
 | content-disposition | 1.1.0 | MIT |
 | content-type | 1.0.5 | MIT |
 | cookie | 0.7.2 | MIT |
@@ -54,6 +59,7 @@ A identidade visual adapta tokens de CSS da família AraLearn/AraHub, consultado
 | css-what | 6.2.2 | BSD-2-Clause |
 | cssom | 0.5.0 | MIT |
 | debug | 4.4.3 | MIT |
+| decimal.js | 10.6.0 | MIT |
 | depd | 2.0.0 | MIT |
 | detect-libc | 2.1.2 | Apache-2.0 |
 | dom-serializer | 2.0.0 | MIT |
@@ -67,7 +73,9 @@ A identidade visual adapta tokens de CSS da família AraLearn/AraHub, consultado
 | es-define-property | 1.0.1 | MIT |
 | es-errors | 1.3.0 | MIT |
 | es-object-atoms | 1.1.2 | MIT |
+| esbuild | 0.28.2 | MIT |
 | escape-html | 1.0.3 | MIT |
+| escape-latex | 1.2.0 | MIT |
 | etag | 1.8.1 | MIT |
 | eventsource | 3.0.7 | MIT |
 | eventsource-parser | 3.1.1 | MIT |
@@ -75,6 +83,7 @@ A identidade visual adapta tokens de CSS da família AraLearn/AraHub, consultado
 | fdir | 6.5.0 | MIT |
 | finalhandler | 2.1.1 | MIT |
 | forwarded | 0.2.0 | MIT |
+| fraction.js | 5.3.4 | MIT |
 | fresh | 2.0.0 | MIT |
 | function-bind | 1.1.2 | MIT |
 | get-intrinsic | 1.3.0 | MIT |
@@ -94,12 +103,14 @@ A identidade visual adapta tokens de CSS da família AraLearn/AraHub, consultado
 | ipaddr.js | 2.2.0 | MIT |
 | is-promise | 4.0.0 | MIT |
 | isexe | 2.0.0 | ISC |
+| javascript-natural-sort | 0.7.1 | MIT |
 | jose | 6.1.0 | MIT |
 | katex | 0.19.1 | MIT |
 | lightningcss | 1.33.0 | MPL-2.0 |
 | lightningcss-win32-x64-msvc | 1.33.0 | MPL-2.0 |
 | linkedom | 0.18.12 | ISC |
 | math-intrinsics | 1.1.0 | MIT |
+| mathjs | 15.2.0 | Apache-2.0 |
 | media-typer | 1.1.1 | MIT |
 | merge-descriptors | 2.0.0 | MIT |
 | mime-db | 1.54.0 | MIT |
@@ -127,8 +138,8 @@ A identidade visual adapta tokens de CSS da família AraLearn/AraHub, consultado
 | picocolors | 1.1.1 | ISC |
 | picomatch | 4.0.7 | MIT |
 | pkce-challenge | 5.0.1 | MIT |
-| playwright | 1.56.1 | Apache-2.0 |
-| playwright-core | 1.56.1 | Apache-2.0 |
+| playwright | 1.64.1 | Apache-2.0 |
+| playwright-core | 1.64.1 | Apache-2.0 |
 | postcss | 8.5.31 | MIT |
 | postgres-array | 2.0.0 | MIT |
 | postgres-bytea | 1.0.1 | MIT |
@@ -143,6 +154,7 @@ A identidade visual adapta tokens de CSS da família AraLearn/AraHub, consultado
 | rolldown | 1.2.15 | MIT |
 | router | 2.2.0 | MIT |
 | safer-buffer | 2.1.2 | MIT |
+| seedrandom | 3.0.5 | MIT |
 | send | 1.2.1 | MIT |
 | serve-static | 2.2.1 | MIT |
 | setprototypeof | 1.2.0 | ISC |
@@ -155,6 +167,7 @@ A identidade visual adapta tokens de CSS da família AraLearn/AraHub, consultado
 | source-map-js | 1.2.2 | BSD-3-Clause |
 | split2 | 4.2.0 | ISC |
 | statuses | 2.0.2 | MIT |
+| tiny-emitter | 2.1.0 | MIT |
 | tinyglobby | 0.2.17 | MIT |
 | toidentifier | 1.0.1 | MIT |
 | tslib | 2.8.1 | 0BSD |
@@ -163,6 +176,7 @@ A identidade visual adapta tokens de CSS da família AraLearn/AraHub, consultado
 | esbuild | 0.25.12 | MIT |
 | type-is | 2.1.0 | MIT |
 | content-type | 2.1.0 | MIT |
+| typed-function | 4.2.2 | MIT |
 | typescript | 5.9.3 | Apache-2.0 |
 | uhyphen | 0.2.0 | ISC |
 | undici | 7.30.1 | MIT |
@@ -176,11 +190,3 @@ A identidade visual adapta tokens de CSS da família AraLearn/AraHub, consultado
 | zod | 4.6.7 | MIT |
 
 Pacotes sem arquivo de licença identificado na raiz: nenhum. O inventário não substitui a licença específica de arquivos internos.
-
-## Adaptador OCR opcional
-
-`Dockerfile.ocr` usa a distribuição Debian bookworm e seus pacotes Python 3, Poppler (`pdfinfo`, `pdftotext`, `pdftoppm`) e Tesseract com dados de idioma inglês/português. Não fazem parte do bundle JavaScript/Edge. A imagem conserva avisos e licenças em `/usr/share/doc/<pacote>/copyright` e licenças comuns em `/usr/share/common-licenses`.
-
-O pacote Poppler instalado declara GPL-2 ou GPL-3 para seus arquivos principais, com avisos específicos por arquivo; Tesseract declara Apache-2.0. Consulte os arquivos da distribuição para todo o inventário transitivo e os [fontes Poppler](https://poppler.freedesktop.org/) e [Tesseract](https://github.com/tesseract-ocr/tesseract). A licença MIT do AraRead cobre seu adaptador próprio, sem relicenciar esses executáveis. O gate local utilizou Tesseract 5.3.0; a versão efetiva acompanha cada suplemento produzido.
-
-As fixtures PDF da 0.3 são inteiramente sintéticas e geradas por `scripts/pdf-v3-fixtures.py`. ReportLab, Pillow e PyMuPDF/MuPDF são ferramentas de desenvolvimento opcionais; não são embarcadas no servidor nem no Edge. Nenhuma página da Stanford Encyclopedia foi copiada para as fixtures ou para o repositório.

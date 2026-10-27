@@ -1,5 +1,5 @@
 // Public shell only. Private material lives in per-account IndexedDB, never CacheStorage.
-const ROOT=new URL('.',self.location.href).pathname,SHELL='araread-shell-v2:'+ROOT;
+const ROOT=new URL('.',self.location.href).pathname,SHELL='araread-shell-v4:'+ROOT;
 self.addEventListener('install',event=>event.waitUntil(caches.open(SHELL).then(cache=>cache.addAll([ROOT,ROOT+'icon.svg',ROOT+'manifest.webmanifest'])).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>(k.startsWith('araread-shell-')&&!k.includes(':'))||(k.endsWith(':'+ROOT)&&k!==SHELL)).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',event=>{

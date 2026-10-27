@@ -1,6 +1,6 @@
 {
   "name": "araread",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Biblioteca pessoal de leitura assistida, na ordem da obra e com memória persistente.",
   "private": true,
   "engines": {
@@ -8,8 +8,8 @@
   },
   "scripts": {
     "dev": "tsx --env-file-if-exists=.env src/server.ts",
-    "build": "vite build",
-    "check": "tsc --noEmit",
+    "build": "npm run widget:build && vite build",
+    "check": "npm run widget:build && tsc --noEmit",
     "test": "tsx --env-file-if-exists=.env --test --test-concurrency=1 tests/*.test.ts",
     "test:e2e": "playwright test",
     "db:migrate": "tsx --env-file-if-exists=.env scripts/migrate.ts",
@@ -17,24 +17,29 @@
     "local:setup": "tsx scripts/local-setup.ts",
     "backup": "tsx --env-file-if-exists=.env scripts/backup.ts",
     "docs:check": "tsx scripts/check-docs.ts",
-    "audit:public": "tsx scripts/audit-public.ts"
+    "audit:public": "tsx scripts/audit-public.ts",
+    "widget:build": "tsx scripts/build-widget.ts",
+    "predev": "npm run widget:build",
+    "pretest": "npm run widget:build"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "type": "module",
   "devDependencies": {
-    "@playwright/test": "1.56.1",
+    "@playwright/test": "1.64.1",
     "@types/express": "5.0.3",
     "@types/katex": "0.16.7",
     "@types/node": "24.10.0",
     "@types/pg": "8.15.5",
+    "esbuild": "0.28.2",
     "tsx": "4.20.6",
     "typescript": "5.9.3",
     "vite": "8.3.5"
   },
   "dependencies": {
     "@modelcontextprotocol/client": "2.4.0",
+    "@modelcontextprotocol/ext-apps": "2.0.4",
     "@modelcontextprotocol/node": "2.1.2",
     "@modelcontextprotocol/server": "2.4.0",
     "@supabase/supabase-js": "2.118.0",
@@ -43,6 +48,7 @@
     "jose": "6.1.0",
     "katex": "0.19.1",
     "linkedom": "0.18.12",
+    "mathjs": "15.2.0",
     "pdfjs-dist": "6.4.299",
     "pg": "8.16.3",
     "undici": "7.30.1",

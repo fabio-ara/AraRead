@@ -1,0 +1,66 @@
+{
+  "version": "0.4.0",
+  "date": "2026-10-27",
+  "base_commit": "28dc609e841fdbb012dec2646dfa2cf3462cab43",
+  "scope": "Implementação e prova local; sem publicação hospedada",
+  "core": {
+    "passed": 102,
+    "failed": 0,
+    "skipped": 0,
+    "database": "PostgreSQL e Auth reais isolados; duas contas comuns"
+  },
+  "browsers": {
+    "playwright": "1.64.1",
+    "chromium": {
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0
+    },
+    "webkit": {
+      "version": "27.2",
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0
+    },
+    "scope": "mouse, teclado, toque emulado, seleção, novas consultas, duas sessões, recarga offline, sincronização, logout; sem aparelhos físicos"
+  },
+  "integration": {
+    "mcp_sdk": "cliente oficial com OAuth/Auth local real",
+    "mcp_apps": "SDK oficial em host sintético; capacidades presentes/ausentes, perda antes/depois de commit e resposta atrasada após troca de leitura",
+    "hosted": "não implantado/verificado nesta revisão",
+    "chatgpt_host": "não homologado nesta revisão"
+  },
+  "migration": "20261027142447_representation_highlights_v4.sql verificada no banco local isolado e aplicada no destino existente; seis anteriores intactas",
+  "lexicon": {
+    "real_queries": [
+      "casa (pt)",
+      "ontology (en)",
+      "free will (en)"
+    ],
+    "source": "Wikcionário/Wiktionary",
+    "persisted_public_text": false
+  },
+  "edge": {
+    "package": "preparado localmente",
+    "deno_check": "passou com libs e tipos explícitos",
+    "runtime_probe": "datas, transição de era, trigonometria e entrada hostil; não equivale ao Edge hospedado"
+  },
+  "publication": {
+    "merged": false,
+    "deployed": false,
+    "personal_reading_repaired": false,
+    "personal_data_changed": false
+  },
+  "review": {
+    "independent": "concluída em duas sessões CLI isoladas, somente leitura; nove achados reproduzidos e corrigidos",
+    "verified_findings": 9,
+    "static_security_findings": 0,
+    "human_review": false
+  },
+  "limits": [
+    "Sem certificação WCAG ou de fidelidade acadêmica",
+    "Sem gestos nativos em aparelho iOS/Android",
+    "CI remota deve ser conferida no commit do PR",
+    "Bundle web cerca de 840 kB minificado; aviso de chunk acima de 500 kB"
+  ]
+}

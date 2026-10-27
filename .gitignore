@@ -6,3 +6,4 @@ test-results/
 playwright-report/
 supabase/.temp/
 *.log
+src/widget-assets.ts

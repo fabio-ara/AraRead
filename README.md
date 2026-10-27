@@ -4,6 +4,8 @@ Um ambiente pessoal para estudar obras difíceis pelo chat. Peça uma leitura, a
 
 A evolução 0.3 acrescenta ingestão editorial validada, armazenamento textual, OCR local aberto, navegação conversacional e perfis reutilizáveis. A tradução permanece fiel ao original e separada de lentes interpretativas. A primeira explicação deve construir os conhecimentos necessários à passagem; verificações automáticas não certificam compreensão nem fidelidade acadêmica universal. Todas as telas mantêm largura máxima de 480 px.
 
+A [evolução 0.4](docs/leitura-0.4.md) acrescenta continuidade íntegra, grifos e apoios contextuais; sua validação está registrada no STATUS.
+
 **Disponível: 0.3.0, validada também no ChatGPT real.** Veja [STATUS](STATUS.md) para revisões, testes locais/hospedados, evidências e limites. O destino existente é o [GitHub Pages](https://fabio-ara.github.io/AraRead/), com API/Auth/[MCP OAuth](https://ltzoontstgpbegtakrgk.supabase.co/functions/v1/araread/mcp) no Supabase exclusivo Free. Não há serviços pagos, cadastro público nem descoberta de bibliotecas alheias. Conheça o [comportamento da 0.3](docs/leitura-0.3.md).
 
 ## Usar localmente
@@ -37,7 +39,7 @@ npm run build
 npm audit --audit-level=moderate
 ```
 
-O servidor e o banco locais devem estar ativos para as integrações; o teste de navegador usa Chrome instalado. A CI usa Chromium. As evidências e limites de cada prova estão na [matriz de testes](docs/testes.md).
+O servidor e o banco locais devem estar ativos para as integrações; o teste de navegador usa Chrome instalado. A CI usa Chromium e WebKit. Para WebKit local, instale-o com `npx playwright install webkit` e defina `PLAYWRIGHT_BROWSER=webkit`. As evidências e limites de cada prova estão na [matriz de testes](docs/testes.md).
 
 - [Mapa da documentação](docs/README.md): uso, operação e desenvolvimento.
 - [Guia de leitura](docs/guia-uso.md) e [fontes e formatos](docs/fontes-formatos.md).

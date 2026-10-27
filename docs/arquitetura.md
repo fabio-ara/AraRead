@@ -47,6 +47,13 @@ Veja [evolução](evolucao.md), [operação](operacao.md) e [segurança](seguran
 
 ## Preparação e apresentação 0.3
 
-`reading_context` não anuncia UI. O assistente prepara contexto e salva explicação/tradução com confronto editorial; somente `reading_display` publica as três representações alinhadas e atuais. O painel é de apresentação, sem chamadas de escrita ou botões de estudo. O mesmo contrato textual serve clientes sem MCP Apps. Perfis integram a assinatura da explicação; são excluídos da seleção da tradução.
+`reading_context` não anuncia UI. O assistente prepara contexto e salva explicação/tradução com confronto editorial; somente `reading_display` publica as três representações alinhadas e atuais. Na 0.4, seleção e apoios contextuais usam o mesmo componente em web e MCP; o controle principal continua pelo chat. O mesmo contrato textual serve clientes sem MCP Apps. Perfis integram a assinatura da explicação; são excluídos da seleção da tradução.
 
 O adaptador OCR é um processo local isolado de Poppler/Tesseract, com limites e proveniência. `scripts/prepare-edge.ts` inclui os módulos de ingestão, mas não o runtime OCR. Veja [Leitura 0.3](leitura-0.3.md) para precedência, integridade, migrations e limites.
+
+
+## Continuidade, seleção e apoios 0.4
+
+A fonte mantém a ordem e o cânone; `portion` escolhe fronteiras estruturais flexíveis e `passageInfo` identifica o escopo. Referências antigas permanecem válidas e não são migradas automaticamente. Reparo explícito altera a abertura, conserva cobertura/retomada e exige novas representações para o intervalo completo.
+
+`reader-selection.ts` mapeia DOM UTF-16 para pontos de código da versão; `reader-view.ts` e `reader-support.ts` compartilham seleção, três abas, grifos e apoios. Grifos reutilizam notas com âncora, sem nova tabela/serviço. `calculator.ts` é puro e comum aos runtimes; `study/vocabulary.ts` evolui a consulta existente. O SDK MCP Apps substitui a ponte manual e negocia capacidades. Veja o [contrato completo 0.4](leitura-0.4.md).

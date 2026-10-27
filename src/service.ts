@@ -1,10 +1,11 @@
+import {dispatchHighlights,listHighlights,checkSelector,targetText} from './study/highlights.ts';
 import { createHash,randomUUID } from 'node:crypto';
 import type { PoolClient } from 'pg';
 import { z } from 'zod';
 import { schemas,readTools,refSchema,blockSchema,language,type ToolName,type Ref } from './contracts.ts';
 import { transaction,type Identity } from './db.ts';
 import { AppError,ensure } from './errors.ts';
-import { cp,portion,sameRef,mergeIntervals,validateRef,type Element } from './anchors.ts';
+import { cp,portion,passageInfo,sameRef,mergeIntervals,validateRef,type Element } from './anchors.ts';
 import { config } from './config.ts';
 import { guidance,guidanceVersion } from './guidance.ts';
 import { extract } from './importers.ts';
@@ -31,7 +32,7 @@ async function preferences(c:PoolClient,identity?:Identity,r?:any){const legacy=
 async function reading(c:PoolClient,id:string,lock=false){const r=await one(c,`select * from araread.readings where id=$1${lock?' for update':''}`,[id]);ensure(r,'NOT_FOUND','Leitura não encontrada.',404);return r;}
 async function element(c:PoolClient,ref:Ref,readingId:string){return memberElement(c,readingId,ref);}
 async function quota(c:PoolClient,additional:number){
- const usage=await one(c,`select coalesce((select sum(octet_length(original)) from araread.sources),0)+coalesce((select sum(octet_length(text)) from araread.elements),0)+coalesce((select sum(octet_length(rewrite)+octet_length(additions::text)+octet_length(study_selection::text)+octet_length(provenance::text)) from araread.mediations),0)+coalesce((select sum(octet_length(text)+octet_length(attribution::text)) from araread.notes),0)+coalesce((select sum(octet_length(definition)+octet_length(details::text)) from araread.terms),0)+coalesce((select sum(octet_length(row_to_json(t)::text)) from araread."references" t),0)+coalesce((select sum(octet_length(row_to_json(t)::text)) from araread.perspectives t),0)+coalesce((select sum(octet_length(row_to_json(t)::text)) from araread.contexts t),0)+coalesce((select sum(octet_length(row_to_json(t)::text)) from araread.connections t),0)+coalesce((select sum(octet_length(row_to_json(t)::text)) from araread.profiles t),0)+coalesce((select sum(octet_length(row_to_json(t)::text)) from araread.preference_records t),0)+coalesce((select sum(octet_length(row_to_json(t)::text)) from araread.reading_maps t),0)+coalesce((select sum(octet_length(extraction::text)) from araread.sources),0)+coalesce((select sum(octet_length(editorial::text)) from araread.mediations),0) as bytes`);
+ const usage=await one(c,`select coalesce((select sum(octet_length(original)) from araread.sources),0)+coalesce((select sum(octet_length(text)) from araread.elements),0)+coalesce((select sum(octet_length(rewrite)+octet_length(additions::text)+octet_length(study_selection::text)+octet_length(provenance::text)) from araread.mediations),0)+coalesce((select sum(octet_length(text)+octet_length(attribution::text)+coalesce(octet_length(anchor::text),0)) from araread.notes),0)+coalesce((select sum(octet_length(definition)+octet_length(details::text)) from araread.terms),0)+coalesce((select sum(octet_length(row_to_json(t)::text)) from araread."references" t),0)+coalesce((select sum(octet_length(row_to_json(t)::text)) from araread.perspectives t),0)+coalesce((select sum(octet_length(row_to_json(t)::text)) from araread.contexts t),0)+coalesce((select sum(octet_length(row_to_json(t)::text)) from araread.connections t),0)+coalesce((select sum(octet_length(row_to_json(t)::text)) from araread.profiles t),0)+coalesce((select sum(octet_length(row_to_json(t)::text)) from araread.preference_records t),0)+coalesce((select sum(octet_length(row_to_json(t)::text)) from araread.reading_maps t),0)+coalesce((select sum(octet_length(extraction::text)) from araread.sources),0)+coalesce((select sum(octet_length(editorial::text)) from araread.mediations),0) as bytes`);
   ensure(Number(usage.bytes)+additional<=config.maxAccountBytes,'QUOTA',`A biblioteca atingiu a cota de ${config.maxAccountBytes/1024/1024} MiB. Exporte e remova material explicitamente antes de importar mais.`,413);
  return Number(usage.bytes);
 }
@@ -47,7 +48,7 @@ async function receiptResult(c:PoolClient,result:any){
 }
 async function neighbor(c:PoolClient,e:Element,ref:Ref,size:string,direction:'next'|'previous',readingId:string):Promise<Ref|null>{
  if(direction==='next'&&ref.end<cp(e.text).length)return portion(e,ref.end,size);
- if(direction==='previous'&&ref.start>0){let cur=portion(e,0,size),prev=cur;while(cur.end<ref.start){prev=cur;cur=portion(e,cur.end,size);}return cur.end===ref.start?cur:prev;}
+ if(direction==='previous'&&ref.start>0){let cur=portion(e,0,size);while(cur.end<ref.start)cur=portion(e,cur.end,size);return {...cur,end:ref.start};}
  const sort=direction==='next'?'asc':'desc',op=direction==='next'?'>':'<';
  const n=await one(c,`select n.* from araread.elements n join araread.reading_segments g on g.source_id=n.source_id join araread.reading_segments prev on prev.reading_id=g.reading_id and prev.source_id=$1 where g.reading_id=$3 and (g.ordinal,n.ordinal) ${op} (prev.ordinal,$2) order by g.ordinal ${sort},n.ordinal ${sort} limit 1`,[e.source_id,e.ordinal,readingId]);
  if(!n)return null;
@@ -67,12 +68,13 @@ export async function execute(name:ToolName,input:unknown,identity:Identity):Pro
    await c.query('select pg_advisory_xact_lock(hashtextextended($1,0))',[identity.id]);
    const previous=await one(c,'select * from araread.receipts where operation_id=$1',[a.operation_id]);
    if(previous){ensure(previous.request_hash===hash(name+json(a))||previous.request_hash===legacyHash(name,a,input),'IDEMPOTENCY_MISMATCH','Essa identidade de operação já foi usada para outra intenção.',409);return receiptResult(c,previous.result);}
-   if(!['source_import','source_append','work_delete','data_restore'].includes(name)&&!(name==='note_manage'&&a.action==='delete'))await quota(c,Buffer.byteLength(json(a)));
+   if(!['source_import','source_append','work_delete','data_restore'].includes(name)&&!(name==='highlight_remove'||name==='note_manage'&&a.action==='delete'))await quota(c,Buffer.byteLength(json(a)));
   }
   let r:any;
   if(write&&'reading_id'in a&&a.reading_id){r=await reading(c,a.reading_id,true);ensure(r.revision===a.expected_revision,'CONFLICT','Outra sessão alterou esta leitura. Recarregue e confira sua intenção.',409);}
   const result=await dispatch(name,a,identity,c,r);
   if(!write)return result;
+  if(name==='highlight_save')await quota(c,0);
   const receipt={...result,operation_id:a.operation_id,status:'confirmed'};
   const storedReceipt=name==='context_prepare'?{...receipt,materials:undefined,original:undefined,context_receipt_only:true}:receipt;
   await c.query('insert into araread.receipts(owner_id,operation_id,request_hash,result) values($1,$2,$3,$4)',[identity.id,a.operation_id,hash(name+json(a)),json(storedReceipt)]);
@@ -83,6 +85,11 @@ export async function execute(name:ToolName,input:unknown,identity:Identity):Pro
 
 async function dispatch(name:ToolName,a:any,identity:Identity,c:PoolClient,r?:any):Promise<any>{
  const uid=identity.id;
+ const highlightResult=await dispatchHighlights(name,a,c,r,uid);if(highlightResult!==undefined)return highlightResult;
+ if(name==='note_manage'&&(await one(c,'select kind from araread.notes where id=$1 and reading_id=$2',[a.note_id,r.id]))?.kind==='highlight'){
+  ensure(a.action==='delete','INVALID_NOTE_KIND','Use a gestão de grifos para esta marca; ela não é uma nota interpretativa.');
+  return dispatchHighlights('highlight_remove',{...a,highlight_id:a.note_id},c,r,uid);
+ }
  const preferenceResult=await dispatchPreferences(name,a,identity,c,r);if(preferenceResult!==undefined)return preferenceResult;
  const navigationResult=await dispatchNavigation(name,a,c,r,identity);if(navigationResult!==undefined)return navigationResult;
  const studyResult=await dispatchStudy(name,a,uid,c,r,n=>quota(c,n),identity);if(studyResult!==undefined)return studyResult;
@@ -119,7 +126,7 @@ async function dispatch(name:ToolName,a:any,identity:Identity,c:PoolClient,r?:an
  }
  if(name==='reading_context'){
   r=await reading(c,a.reading_id);const pref=await preferences(c,identity,r),lang=a.language||pref.language,size=a.size||pref.portion_size;
-  const storedRef=a.ref||r[a.position],e=await element(c,storedRef,r.id),ref=a.ref?storedRef:portion(e,storedRef.start,size);
+  const storedRef=a.ref||r[a.position],e=await element(c,storedRef,r.id),ref=a.ref||!a.size?storedRef:portion(e,storedRef.start,size);
   const source=await one(c,'select id,work_id,edition,original_language,partial,warnings,mime,filename,sha256,genres,origin,captured_at,derives_from,original_available,canonical_sha256,extraction,storage_policy from araread.sources where id=$1',[ref.source_id]);
   const work=await one(c,'select id,title,author from araread.works where id=$1',[source.work_id]);
   const values=[r.id,ref.element_id,ref.start,ref.end,lang];
@@ -130,7 +137,7 @@ async function dispatch(name:ToolName,a:any,identity:Identity,c:PoolClient,r?:an
   ensure(!a.variant_id||mediation,'NOT_FOUND','Variante não encontrada nesta porção/idioma.',404);
   const other=(await c.query('select distinct language from araread.mediations where reading_id=$1 and element_id=$2 and start_offset=$3 and end_offset=$4',values.slice(0,4))).rows;
   const next=await neighbor(c,e,ref,size,'next',r.id),previous=await neighbor(c,e,ref,size,'previous',r.id);
-  return {work,source,reading:r,ref,element:{id:e.id,kind:e.kind,locator:e.locator,meta:e.meta,ordinal:e.ordinal},original:cp(e.text).slice(ref.start,ref.end).join(''),mediation,other_languages:other.map(x=>x.language),effective_language:lang,
+  return {work,source,reading:r,ref,selection_context:{prefix:cp(e.text).slice(Math.max(0,ref.start-32),ref.start).join(''),suffix:cp(e.text).slice(ref.end,ref.end+32).join('')},passage:passageInfo(e,ref,size),element:{id:e.id,kind:e.kind,locator:e.locator,meta:e.meta,ordinal:e.ordinal},original:cp(e.text).slice(ref.start,ref.end).join(''),mediation,other_languages:other.map(x=>x.language),effective_language:lang,
    next_ref:next,previous_ref:previous,study:{selection:study.selection,signature:study.signature,materials:study.materials,gaps:study.gaps,variants:variants.map(m=>({id:m.id,language:m.language,representation:m.representation,study_selection:m.study_selection,context_id:m.context_id,context_signature:m.context_signature,status:m.status,created_at:m.created_at,provenance:m.provenance,context_recorded:!!m.context_id})),stale:!!mediation?.context_id&&mediation.context_signature!==study.signature,legacy_context_unknown:!!mediation&&!mediation.context_id},
    terms:(await c.query('select * from araread.terms where reading_id=$1 and language=$2 and element_id=$3 order by created_at desc limit 25',[r.id,lang,e.id])).rows,
    notes:(await c.query('select * from araread.notes where reading_id=$1 and element_id=$2 and not pending_link order by created_at desc limit 25',[r.id,e.id])).rows,
@@ -140,18 +147,24 @@ async function dispatch(name:ToolName,a:any,identity:Identity,c:PoolClient,r?:an
  if(name==='reading_display'){
   const ctx=await dispatch('reading_context',{...a,position:'opened',selection:{...a.selection,representation:'rewrite'}},identity,c);
   const explanation=ctx.mediation;
+  const interrupted=ctx.passage.starts_mid_unit||ctx.passage.ends_mid_unit;
+  ensure(!interrupted||explanation?.editorial?.review?.continuity_acknowledged,'PREPARATION_REQUIRED','A passagem interrompe uma construção original. Recomponha o parágrafo ou confira e declare a continuidade antes de apresentar.',409);
   ensure(explanation?.context_id&&explanation.context_signature&&!ctx.study.stale&&explanation.status!=='needs_review'&&explanation.editorial?.ready_to_present,'PREPARATION_REQUIRED','Prepare e confira a leitura facilitada desta passagem antes de apresentá-la.',409);
   const sameLanguage=ctx.source.original_language.split('-')[0].toLowerCase()===ctx.effective_language.split('-')[0].toLowerCase();
   const translated=sameLanguage?null:await dispatch('reading_context',{...a,ref:ctx.ref,position:'opened',selection:{representation:'translation',support_mode:'standard',perspective_id:null,include_notes:false}},identity,c);
   ensure(sameLanguage||translated?.mediation?.context_id&&translated.mediation.context_signature&&!translated.study.stale&&translated.mediation.status!=='needs_review'&&translated.mediation.editorial?.ready_to_present,'PREPARATION_REQUIRED','Prepare e confira a tradução fiel da mesma passagem antes de apresentar o painel.',409);
+  ensure(sameLanguage||!interrupted||translated.mediation.editorial?.review?.continuity_acknowledged,'PREPARATION_REQUIRED','A tradução precisa preservar e identificar a interrupção, sem completar a frase por conta própria.',409);
   const text=[explanation.rewrite,...explanation.additions.map((v:any)=>v.text)].join('\n\n');
-  const translation={id:translated?.mediation?.id,text:sameLanguage?ctx.original:translated.mediation.rewrite,status:sameLanguage?'same_language':'saved'};
-  return {ready:true,work:ctx.work,source:ctx.source,reading:ctx.reading,ref:ctx.ref,element:ctx.element,original:ctx.original,effective_language:ctx.effective_language,representations:{facilitated:{id:explanation.id,text,status:explanation.status},translation,original:{text:ctx.original}},location:{label:ctx.element.locator},fallback_text:`${ctx.work.title} · ${ctx.element.locator}\n\nLeitura facilitada\n${text}\n\nTradução${sameLanguage?' — original já no idioma de leitura':''}\n${translation.text}\n\nOriginal\n${ctx.original}`};
+  const segment=(body:string,representation:string,id?:string,key='main',kind='main')=>({text:body,representation,...(id?{mediation_id:id}:{}),segment:key,kind,base_offset:representation==='original'?ctx.ref.start:0,selector_prefix:representation==='original'?ctx.selection_context.prefix:'',selector_suffix:representation==='original'?ctx.selection_context.suffix:''});
+  const originalSegments=[segment(ctx.original,'original')];
+  const translation={id:translated?.mediation?.id,text:sameLanguage?ctx.original:translated.mediation.rewrite,status:sameLanguage?'same_language':'saved',segments:sameLanguage?originalSegments:[segment(translated.mediation.rewrite,'translation',translated.mediation.id)]};
+  const facilitatedSegments=[segment(explanation.rewrite,'rewrite',explanation.id),...explanation.additions.map((v:any,i:number)=>segment(v.text,'rewrite',explanation.id,`addition:${i}`,v.kind))];
+  return {ready:true,terms:ctx.terms,passage:ctx.passage,permissions:{write:identity.permissions==='write'},highlights:await listHighlights(c,ctx.reading.id,ctx.ref),work:ctx.work,source:ctx.source,reading:ctx.reading,ref:ctx.ref,element:ctx.element,original:ctx.original,effective_language:ctx.effective_language,representations:{facilitated:{id:explanation.id,text,status:explanation.status,segments:facilitatedSegments},translation,original:{text:ctx.original,segments:originalSegments}},location:{label:ctx.passage.label},fallback_text:`${ctx.work.title} · ${ctx.passage.label}\n\nLeitura facilitada\n${text}\n\nTradução${sameLanguage?' — original já no idioma de leitura':''}\n${translation.text}\n\nOriginal\n${ctx.original}`};
  }
  if(name==='source_elements'){
   r=await reading(c,a.reading_id);const pref=await preferences(c,identity,r),size=pref.portion_size;
   const items=(await c.query('select e.*,g.ordinal segment_ordinal from araread.elements e join araread.reading_segments g on g.source_id=e.source_id where g.reading_id=$1 order by g.ordinal,e.ordinal limit $2 offset $3',[r.id,a.limit,a.offset])).rows;
-  return {reading_id:r.id,source_id:r.source_id,revision:r.revision,items:items.map(e=>({id:e.id,kind:e.kind,locator:e.locator,ordinal:e.ordinal,segment_ordinal:e.segment_ordinal,preview:cp(e.text).slice(0,160).join(''),ref:portion(e,0,size)})),pagination:paging(a.offset,a.limit,Number((await one(c,'select count(*) from araread.elements e join araread.reading_segments g on g.source_id=e.source_id where g.reading_id=$1',[r.id])).count))};
+  return {reading_id:r.id,source_id:r.source_id,revision:r.revision,items:items.map(e=>({id:e.id,kind:e.kind,locator:e.locator,ordinal:e.ordinal,segment_ordinal:e.segment_ordinal,preview:cp(e.text).slice(0,160).join(''),ref:portion(e,0,size),full_ref:{source_id:e.source_id,element_id:e.id,start:0,end:cp(e.text).length},passage:passageInfo(e,portion(e,0,size),size)})),pagination:paging(a.offset,a.limit,Number((await one(c,'select count(*) from araread.elements e join araread.reading_segments g on g.source_id=e.source_id where g.reading_id=$1',[r.id])).count))};
  }
  if(name==='reading_history'){
   r=await reading(c,a.reading_id);
@@ -180,10 +193,13 @@ async function dispatch(name:ToolName,a:any,identity:Identity,c:PoolClient,r?:an
    const alignment=a.alignment||[a.ref];for(const ref of alignment){await element(c,ref,r.id);ensure(sameRef(ref,a.ref),'INVALID_ALIGNMENT','Cada representação deve corresponder exatamente à passagem, sem referências adicionais silenciosas.');}
    const originalElement=await element(c,a.ref,r.id),originalSource=await one(c,'select original_language from araread.sources where id=$1',[a.ref.source_id]);
    for(const claim of a.editorial_review?.claims||[]){const evidence=await ownEvidence(c,claim.evidence_ids);ensure(claim.status!=='documented'||evidence.some(v=>v.access==='available'&&v.consulted_at&&v.excerpt),'MISSING_EVIDENCE','Afirmação documentada exige fonte consultada disponível.');}
-   const editorial=editorialAssessment(cp(originalElement.text).slice(a.ref.start,a.ref.end).join(''),a.rewrite,a.representation,a.editorial_review,originalSource.original_language,lang);
+   const structural=passageInfo(originalElement,a.ref,pref.portion_size);
+   const editorial={...editorialAssessment(cp(originalElement.text).slice(a.ref.start,a.ref.end).join(''),a.rewrite,a.representation,a.editorial_review,originalSource.original_language,lang),structural};
+   if((structural.starts_mid_unit||structural.ends_mid_unit)&&!a.editorial_review?.continuity_acknowledged){editorial.ready_to_present=false;editorial.findings.push({code:'STRUCTURAL_CONTINUITY',detail:'Intervalo interrompe unidade original; recomponha ou declare a continuidade após conferência.',severity:'problem'});}
    const evidenceIds=[...new Set([...a.evidence_ids,...(a.editorial_review?.claims||[]).flatMap((claim:any)=>claim.evidence_ids),...a.additions.flatMap((addition:any)=>addition.support?.evidence_ids||[])])];
    await c.query('insert into araread.mediations(id,owner_id,reading_id,source_id,element_id,start_offset,end_offset,language,rewrite,additions,provenance,context_id,context_signature,representation,study_selection,alignment,evidence_ids,dependencies,supersedes,editorial,status) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21)',[...fields,lang,a.rewrite,json(a.additions),json(a.provenance),a.context_id||null,prepared?.signature||null,a.representation,json(prepared?.selection||{}),json(alignment),json(evidenceIds),json(a.dependencies),a.supersedes||null,json(editorial),editorial.findings.length?'needs_review':'unreviewed']);
   } else if(name==='term_save'){
+   if(a.details?.selection)checkSelector(await targetText(c,r.id,a.ref,a.details.selection),a.details.selection);
    if(a.details?.derived_from)ensure(await one(c,'select id from araread.mediations where id=$1 and reading_id=$2',[a.details.derived_from,r.id]),'INVALID_RELATION','Mediação de origem indisponível.');
    const termEvidence=await ownEvidence(c,a.details?.evidence_ids||[]);
    ensure(!a.details?.etymology||termEvidence.some(v=>v.access==='available'&&v.consulted_at&&v.excerpt),'MISSING_EVIDENCE','Etimologia exige fonte disponível e consulta declarada; sem fonte, registre a consulta como pendente em vez de inventá-la.');
@@ -214,7 +230,7 @@ async function dispatch(name:ToolName,a:any,identity:Identity,c:PoolClient,r?:an
    ensure(at(r.opened)||at(r.resume),'POSITION_CHANGED','A posição mudou. Consulte a passagem atual ou abra novamente a passagem desejada antes de continuar.',409);
    const principal=at(r.resume);
    // Permite a preferência de tamanho mudar sem apagar âncoras; aceita só porções emitidas pelos tamanhos válidos.
-   ensure(['short','medium','long'].some(s=>sameRef(portion(e,ref.start,s),ref)),'INVALID_REF','Use uma porção de continuidade emitida pelo servidor.');
+   ensure(sameRef(ref,r.opened)||sameRef(ref,r.resume)||['short','medium','long'].some(s=>sameRef(portion(e,ref.start,s),ref)),'INVALID_REF','Use uma porção atual emitida pelo servidor ou a referência exata já aberta/salva.');
    covered=mergeIntervals(covered,ref);const next=await neighbor(c,e,ref,size,'next',r.id);
    opened=next||ref;if(principal){resume=opened;atEnd=!next;}
   }
@@ -229,6 +245,7 @@ async function dispatch(name:ToolName,a:any,identity:Identity,c:PoolClient,r?:an
   const limit=a.section==='sources'&&a.include_original?1:a.limit,select=a.section==='sources'?(a.include_original?'id,owner_id,work_id,edition,original_language,partial,genres,origin,captured_at,sha256,encode(original,\'base64\') as original_base64,mime,filename,warnings,derives_from,original_available,canonical_sha256,extraction,storage_policy':'id,owner_id,work_id,edition,original_language,partial,genres,origin,captured_at,sha256,mime,filename,warnings,derives_from,original_available,canonical_sha256,extraction,storage_policy'):'*';
   const exportFilter=a.section==='preference_records'?" where scope<>'session'":'';
   const items=(await c.query(`select ${a.section==='references'?'*,consulted_at::text as consulted_at':select} from araread."${a.section}"${exportFilter} order by ${a.section==='preferences'?'owner_id':a.section==='receipts'?'operation_id':'id'} limit $1 offset $2`,[limit,a.offset])).rows;
+  if(a.section==='notes')for(const note of items)if(note.anchor?.mediation_id&&!await one(c,'select id from araread.mediations where id=$1 and reading_id=$2',[note.anchor.mediation_id,note.reading_id]))note.anchor={...note.anchor,unavailable_version:true};
   return {format:'araread/3',snapshot,sections,section:a.section,items,pagination:paging(a.offset,limit,Number((await one(c,`select count(*) from araread."${a.section}"${exportFilter}`)).count))};
  }
  if(name==='data_restore')return restoreBackup(c,uid,a.bundle,n=>quota(c,n));

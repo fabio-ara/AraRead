@@ -2,15 +2,19 @@ import {test,expect} from '@playwright/test';
 import {readFile} from 'node:fs/promises';
 import {randomUUID} from 'node:crypto';
 const accounts=JSON.parse(await readFile('.local/test-accounts.json','utf8'));
+// A interceptação de resposta exige SW bloqueado; shell/fila offline têm jornadas próprias.
+test.use({serviceWorkers:'block'});
 
 test('resposta perdida na importação técnica recupera recibo sem duplicar obra',async({page,request})=>{
+ page.setDefaultTimeout(10000);
  const login=await request.post('/auth/v1/token?grant_type=password',{data:accounts[0]}),token=(await login.json()).access_token;
  const api=async(name:string,args:any={})=>{const r=await request.post(`/api/${name}`,{headers:{authorization:`Bearer ${token}`},data:args});const out=await r.json();expect(out.ok,out.error?.message).toBeTruthy();return out.data;};
  const title=`Resposta perdida 0.3 ${randomUUID()}`;let work:any;
  try{
   await page.goto('/');await page.getByLabel('E-mail',{exact:true}).fill(accounts[0].email);await page.getByLabel('Senha',{exact:true}).fill(accounts[0].password);await page.getByRole('button',{name:'Entrar na biblioteca',exact:true}).click();await page.getByRole('button',{name:'Importar',exact:true}).click();
   await page.getByLabel('Título da obra',{exact:true}).fill(title);await page.getByLabel('Texto ou transcrição',{exact:true}).fill('Material sintético com resposta perdida depois do commit.');
-  await page.route('**/api/source_import',async route=>{await route.fetch();await route.abort('failed');},{times:1});await page.getByRole('button',{name:'Preservar e abrir leitura',exact:true}).click();await expect(page.getByText('Existe uma operação sem confirmação.',{exact:false})).toBeVisible();
+  // Corpo truncado depois do commit: WebKit pode repetir automaticamente um aborto de rede.
+  await page.route('**/api/source_import',async route=>{await route.fetch();await route.fulfill({status:200,contentType:'application/json',body:''});},{times:1});await page.getByRole('button',{name:'Preservar e abrir leitura',exact:true}).click();await expect(page.getByText('Existe uma operação sem confirmação.',{exact:false})).toBeVisible();
   await expect.poll(async()=>(await api('library_list',{query:title})).items.length).toBe(1);work=(await api('library_list',{query:title})).items[0];
   await page.getByRole('button',{name:'Configurações',exact:true}).click();await page.getByRole('button',{name:'Consultar recibo',exact:true}).click();await expect(page.getByText('O recibo confirmou a gravação.',{exact:true})).toBeVisible();expect((await api('library_list',{query:title})).items).toHaveLength(1);
  }finally{if(work)await api('work_delete',{operation_id:randomUUID(),work_id:work.work_id,confirm_title:title});}

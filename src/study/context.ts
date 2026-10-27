@@ -49,7 +49,8 @@ export async function prepareStudy(c:PoolClient,r:any,ref:Ref,language:string,ex
  if(omitted)gaps.push(`${omitted} material(is) não foram disponibilizados por excederem o orçamento de 64 KiB de apoios; reduza a seleção para consultá-los. O original não foi cortado por esse orçamento.`);
  const e=await memberElement(c,r.id,ref),source=await one(c,'select sha256 from araread.sources where id=$1',[ref.source_id]);
  const materialKeys={source:{id:ref.source_id,sha256:source.sha256,ref},notes:notes.map(n=>({id:n.id,hash:digest([n.text,n.kind,n.attribution,n.evidence_ids])})),terms:terms.map(t=>({id:t.id,hash:digest([t.definition,t.sense,t.details])})),references:references.map(v=>({id:v.id,sha256:v.sha256,access:v.access,consulted_at:v.consulted_at})),perspective:perspective?{id:perspective.id,version:perspective.version}:null,profile:profile?{id:profile.id,version:profile.version}:null};
- const signature=digest({ref,language,selection,materials:materialKeys,guidance_version:guidanceVersion});
+ // A orientação operacional evolui sem invalidar material cujo contexto é idêntico.
+ const signature=digest({ref,language,selection,materials:materialKeys,guidance_version:'1.2.0'});
  if(perspective&&!references.some(v=>v.access==='available'&&v.excerpt))gaps.push('Esta perspectiva não tem material de referência disponível; não atribua posições ao comentador sem consultar fonte pertinente.');
  if(references.some(v=>v.access!=='available'||!v.consulted_at))gaps.push('Há referências sugeridas ou sem consulta declarada. Não apresentá-las como consultadas.');
  return {pedagogy:editorialPreparation,selection,signature,materials:{notes,terms,references,perspective,profile},material_keys:materialKeys,gaps,ref,original:Array.from(e.text).slice(ref.start,ref.end).join(''),effective_language:language};

@@ -66,3 +66,13 @@ Consultas primárias da evolução: [GitHub Pages por workflow](https://docs.git
 - Mapa organizacional não reescreve títulos nem ordem do autor. Continuar fora da retomada conserva o percurso principal e só cobre o intervalo realmente confirmado.
 
 Veja [Leitura 0.3](leitura-0.3.md), [testes](testes.md) e [STATUS](../STATUS.md) para evidência e limitações, sem extrapolar provas anteriores.
+
+
+## Decisões da leitura 0.4
+
+- Parágrafo pertence à fonte; passagem é intervalo; parágrafo didático pertence à versão. Limites estruturais flexíveis evitam cortes artificiais sem reescrever o cânone. Referências legadas são preservadas, com reparo explícito e reversível da abertura.
+- Âncoras pertencem à representação/versão/segmento e usam pontos de código, citação e contexto. Reutilizar `notes` mantém RLS, backup, cotas e recibos; não foi criada tabela de marcações paralela.
+- Componente DOM compartilhado reduz divergência entre web e iframe, conservando seleção nativa. SDK MCP Apps 2.0.4 (MIT) negocia capacidades; esbuild 0.28.2 empacota o recurso sem rede externa. Math.js 15.2.0 (Apache-2.0) fornece parser mantido; executor escalar restrito evita executar a linguagem de expressões completa. Versões, dependências transitivas e avisos estão no lockfile e inventário de licenças.
+- `lexicon_lookup` e `term_save` foram evoluídos; o chat continua responsável por nova interpretação contextual. Não há serviço de modelo, chave ou banco de verbetes paralelo.
+
+- Playwright 1.64.1 substitui 1.56.1 somente na infraestrutura de testes: incorpora a correção oficial de recarga offline com service worker no WebKit. A CI executa os dois motores na imagem oficial 1.64.1-noble, fixada por digest. O download APT de bibliotecas WebKit excedeu 20 minutos no primeiro gate; a imagem já contém essas dependências e evita reconstruí-las em cada execução.

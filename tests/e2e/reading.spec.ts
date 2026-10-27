@@ -21,10 +21,10 @@ test('leitor apresenta três abas, preserva estudo pelo chat, responsividade e c
   const text='Uma hipótese é uma proposta para explicar algo que observamos. Ela pode ajudar a compreender o caso, mas não estabelece certeza.';
   await api('mediation_save',{operation_id:randomUUID(),reading_id:work.reading_id,expected_revision:prepared.revision,ref:c.ref,context_id:prepared.context_id,rewrite:text,editorial_review:editorialReview,provenance:{agent:'Fixture sintética de interface',guidance_version:'1.2.0'}});
   await page.reload();await page.getByRole('article').filter({has:page.getByRole('heading',{name:title,exact:true})}).getByRole('button',{name:'Retomar leitura',exact:true}).click();await expect(page.getByRole('tabpanel')).toHaveText(text);
-  await expect(page.locator('.reader button')).toHaveCount(3);await expect(page.getByRole('tab')).toHaveCount(3);
+  await expect(page.locator('.reader button:visible')).toHaveCount(3);await expect(page.getByRole('tab')).toHaveCount(3);
   expect((await page.locator('.reader').innerText()).replace(title,'')).not.toMatch(/UUID|sha256|revisão|recibo|offset|[a-f0-9]{8}-[a-f0-9]{4}/i);
-  await page.getByRole('tab',{name:'Tradução',exact:true}).click();await expect(page.getByText('O original já está no idioma de leitura.',{exact:true})).toBeVisible();await expect(page.getByRole('tabpanel')).toHaveText(c.original);
-  await page.getByRole('tab',{name:'Original',exact:true}).click();await expect(page.getByRole('tabpanel')).toHaveText(c.original);expect((await api('reading_context',{reading_id:work.reading_id})).reading.covered).toEqual([]);
+  await page.getByRole('tab',{name:'Tradução',exact:true}).click();await expect(page.getByText('O original já está no idioma de leitura.',{exact:true})).toBeVisible();await expect(page.getByRole('tabpanel')).toContainText(c.original);
+  await page.getByRole('tab',{name:'Original',exact:true}).click();await expect(page.getByRole('tabpanel')).toContainText(c.original);expect((await api('reading_context',{reading_id:work.reading_id})).reading.covered).toEqual([]);
   await page.getByRole('tab',{name:'Original',exact:true}).focus();await page.keyboard.press('Home');await expect(page.getByRole('tab',{name:'Leitura facilitada',exact:true})).toBeFocused();await expect(page.getByRole('tabpanel')).toHaveText(text);
   await mkdir('.local/evidence',{recursive:true});
   for(const width of [320,480,1440]){await page.setViewportSize({width,height:900});expect(await page.locator('main').evaluate(e=>e.getBoundingClientRect().width)).toBeLessThanOrEqual(480);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();await page.screenshot({path:`.local/evidence/v3-reader-${width}.png`,fullPage:true});}

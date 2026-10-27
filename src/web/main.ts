@@ -5,9 +5,9 @@ import './style.css';
 import {cacheGet,cacheSet,clearOwner,clearLegacyContexts} from './private-cache.ts';
 import {el,field} from './ui.ts';
 import {queue,enqueue,syncQueue,discardQueue,removeQueued,recoverQueue,restoreQueue,invalidateReading,revalidatePrepared,preparePassage,cachedPassages,removePassage,type Queued} from './offline.ts';
-import {readingPanel} from './study-panel.ts';
+import {readingPanel,disposeReadingPanel,refreshReadingPanel} from './study-panel.ts';
 
-const button=(text:string,action:()=>unknown,attrs:Record<string,any>={})=>el('button',{type:'button',onclick:()=>void guard(action),...attrs},text);
+const button=(text:string,action:()=>unknown,attrs:Record<string,any>={})=>el('button',{type:'button',onclick:()=>busy?notice('Aguarde a confirmação da gravação em andamento.'):void guard(action),...attrs},text);
 const tag=(text:string)=>el('span',{class:'tag'},text);
 const app=document.querySelector<HTMLDivElement>('#app')!;
 if(window.self!==window.top){app.textContent='Abra a biblioteca em uma aba própria para entrar e estudar.';throw Error('Biblioteca indisponível em frame externo. Use o painel MCP Apps no assistente.');}
@@ -20,7 +20,7 @@ let session:Session|null=(await auth.auth.getSession()).data.session;
 let passwordSetup=new URLSearchParams(location.search).get('account')==='setup';
 let account:any,library:any={items:[],pagination:{}},ctx:any,screen='library',languageOverride:string|undefined,query='',offset=0,busy=false;
 let message='',severity='info',pending:any=null;
-let queued:Queued[]=[],prepared:any[]=[],logoutRequested=false;
+let queued:Queued[]=[],prepared:any[]=[],logoutRequested=false,signingOut=false;
 let focusIntent:{tag:string,label:string,text:string}|null=null;
 const owner=()=>session?.user.id||'';
 const online=()=>navigator.onLine;
@@ -29,21 +29,22 @@ function notice(text:string,kind='info'){message=text;severity=kind;renderNotice
 function renderNotice(){const old=document.querySelector('#notice');const next=el('div',{id:'notice',class:`notice ${severity}`,role:severity==='error'?'alert':'status',hidden:!message},message);old?.replaceWith(next);}
 async function guard(action:()=>unknown){try{await action();}catch(e:any){notice(e.message||'A operação não pôde ser concluída.','error');}}
 class ApiError extends Error {constructor(public code:string,message:string){super(message);}}
-async function raw(tool:string,args:any={}){
- const current=(await auth.auth.getSession()).data.session;const response=await fetch(`${apiBase}/api/${tool}`,{method:'POST',headers:{'content-type':'application/json',authorization:`Bearer ${current?.access_token||session?.access_token||''}`},body:JSON.stringify(args)});
+async function raw(tool:string,args:any={},expectedOwner?:string){
+ const current=(await auth.auth.getSession()).data.session;if(expectedOwner&&current?.user.id!==expectedOwner)throw new ApiError('SESSION_CHANGED','A conta mudou antes do envio. Retome a intenção na conta de origem.');const response=await fetch(`${apiBase}/api/${tool}`,{method:'POST',headers:{'content-type':'application/json',authorization:`Bearer ${current?.access_token||session?.access_token||''}`},body:JSON.stringify(args)});
  const data=await response.json();if(!response.ok||!data.ok)throw new ApiError(data.error?.code||'ERROR',data.error?.message||`Falha ${response.status}`);return data.data;
 }
-async function call(tool:string,args:any={}){
- try{return await raw(tool,args);}catch(e){if(e instanceof ApiError&&['UNAUTHENTICATED','SESSION_REVOKED'].includes(e.code))notice('Sua sessão terminou. Entre novamente para sincronizar.','error');throw e;}
+async function call(tool:string,args:any={},expectedOwner?:string){
+ try{return await raw(tool,args,expectedOwner);}catch(e){if(e instanceof ApiError&&['UNAUTHENTICATED','SESSION_REVOKED'].includes(e.code))notice('Sua sessão terminou. Entre novamente para sincronizar.','error');throw e;}
 }
-async function mutate(tool:string,args:any){
- if(!online()&&ctx){const local=await enqueue(owner(),tool,args,ctx);queued=await queue(owner());render();return local;}
+async function mutate(tool:string,args:any,quiet=false){
+ if(busy)throw new Error('Aguarde a confirmação da gravação em andamento.');const uid=owner(),opened=ctx;
+ if(!online()&&ctx){const local=await enqueue(owner(),tool,args,ctx);queued=await queue(owner());if(!quiet)render();return local;}
  if(!online())throw new Error('Esta alteração exige conexão.');
  if(pending)throw new Error('Há uma operação sem confirmação. Consulte seu recibo em Configurações antes de continuar.');
- const request={tool,args:{...args,operation_id:crypto.randomUUID()}};pending=request;await cacheSet(owner(),'pending',request);busy=true;render();
- try{const receipt=await call(tool,request.args);if(receipt.status!=='confirmed')throw new Error('Gravação ainda sem confirmação.');pending=null;await cacheSet(owner(),'pending',null);if(receipt.reading_id){await invalidateReading(owner(),receipt.reading_id);prepared=await cachedPassages(owner());}return receipt;}
- catch(e){if(e instanceof ApiError){pending=null;await cacheSet(owner(),'pending',null);}else notice('A resposta se perdeu. O resultado ainda é desconhecido; consulte o recibo em Configurações.','error');throw e;}
- finally{busy=false;render();}
+ const request={tool,args:{...args,operation_id:crypto.randomUUID()}};pending=request;busy=true;if(!quiet)render();
+ try{await cacheSet(uid,'pending',request);const receipt=await call(tool,request.args,uid);if(receipt.status!=='confirmed')throw new Error('Gravação ainda sem confirmação.');if(pending===request)pending=null;await cacheSet(uid,'pending',null);if(receipt.reading_id){await invalidateReading(uid,receipt.reading_id);if(owner()===uid)prepared=await cachedPassages(uid);}return receipt;}
+ catch(e){if(e instanceof ApiError&&!['INTERNAL','ERROR'].includes(e.code)){if(pending===request)pending=null;await cacheSet(uid,'pending',null);}else if(owner()===uid)notice('A resposta se perdeu. O resultado ainda é desconhecido; consulte o recibo em Configurações.','error');throw e;}
+ finally{busy=false;if(!quiet||owner()!==uid||ctx!==opened)render();}
 }
 async function resolvePending(repeat=false){
  if(!pending)return;const request=pending;const result=await call('operation_get',{operation_id:request.args.operation_id});
@@ -66,7 +67,7 @@ function render(){
  const active=document.activeElement as HTMLInputElement;
  if(active&&app.contains(active))focusIntent={tag:active.tagName,label:active.getAttribute('aria-label')||active.labels?.[0]?.textContent||'',text:active.textContent||''};
  const openSummaries=[...app.querySelectorAll('details[open]>summary')].map(e=>e.textContent);
- app.replaceChildren();
+ disposeReadingPanel();app.replaceChildren();
  const nav=el('nav',{'aria-label':'Navegação principal'},button('Biblioteca',()=>{screen='library';ctx=null;languageOverride=undefined;return load();},{class:screen==='library'?'active':''}),button('Importar',()=>{screen='import';render();},{class:screen==='import'?'active':''}),button('Configurações',()=>{screen='settings';render();},{class:screen==='settings'?'active':''}));
  app.append(el('header',{class:'top'},el('div',{class:'top-inner'},el('a',{href:import.meta.env.BASE_URL,class:'brand','aria-label':`${config.name} — biblioteca`},el('span',{class:'brand-mark','aria-hidden':'true'},'AR'),config.name),session?nav:el('span',{class:'private-label'},'Sua biblioteca pessoal'),session?button('Sair',()=>logout(),{class:'quiet logout'}):null)));
  const main=el('main',{id:'main',tabIndex:-1});main.append(el('div',{id:'notice',class:'notice',hidden:true}));
@@ -125,7 +126,8 @@ function originalBlock(){
 }
 function readerView(){
  if(!ctx)return el('p',{},'Abra uma leitura na biblioteca.');
- return el('section',{class:'reader'},el('div',{class:'reader-title'},el('h1',{},ctx.work.title),el('p',{class:'muted'},[ctx.work.author,ctx.element.locator].filter(Boolean).join(' · '))),readingPanel(ctx,originalBlock));
+ const opened=ctx,uid=owner();
+ return el('section',{class:'reader'},el('div',{class:'reader-title'},el('h1',{},ctx.work.title),el('p',{class:'muted'},[ctx.work.author,ctx.passage?.label||ctx.element.locator].filter(Boolean).join(' · '))),readingPanel(ctx,originalBlock,{call,write:(tool,args)=>mutate(tool,args,true),online,changed:async display=>{if(ctx!==opened||owner()!==uid)return;opened.display=display;opened.reading.revision=display.reading.revision;await cacheSet(uid,'last-context',opened);const entries=await preparePassage(uid,opened);if(ctx===opened&&owner()===uid)prepared=entries;}}));
 }
 function settingsView(){
  const section=el('section',{class:'settings'},el('p',{class:'eyebrow'},'SUA LEITURA, SUAS ESCOLHAS'),el('h1',{},'Configurações'));
@@ -158,8 +160,27 @@ function consentView(){
  });return section;
 }
 async function switchOwner(){const previous=localStorage.getItem('araread-cache-owner');if(owner()&&previous!==owner()){if(previous&&!(await queue(previous)).length&&!await cacheGet(previous,'pending'))await clearOwner(previous);localStorage.setItem('araread-cache-owner',owner());}if(owner())await clearLegacyContexts(owner());ctx=null;account=null;pending=null;screen='library';}
-async function logout(force=false){const uid=owner();queued=await queue(uid);pending=await cacheGet(uid,'pending');if(!force&&(queued.length||pending)){logoutRequested=true;render();return;}logoutRequested=false;const result=await auth.auth.signOut({scope:'local'});await clearOwner(uid);localStorage.removeItem('araread-auth-v1');localStorage.removeItem('araread-auth-v1-code-verifier');localStorage.removeItem('araread-cache-owner');session=null;ctx=null;account=null;pending=null;screen='library';message=result.error?'Sessão removida deste dispositivo. A revogação remota exige conexão.':'';render();}
-window.addEventListener('online',()=>void guard(async()=>{queued=await syncQueue(owner(),call);await load();notice(queued.length?'Conexão restabelecida. Confira as pendências em Configurações.':'Conexão restabelecida; alterações locais confirmadas quando havia pendências.');}));window.addEventListener('offline',()=>{render();});
-auth.auth.onAuthStateChange((event,next)=>{if(event==='PASSWORD_RECOVERY'&&next){session=next;passwordSetup=true;queueMicrotask(()=>void guard(async()=>{await switchOwner();render();}));return;}if(next&&session?.user.id===next.user.id){session=next;return;}if(event==='SIGNED_OUT'||(session&&next?.user.id!==session.user.id)){session=next;queueMicrotask(()=>void guard(async()=>{await switchOwner();if(!next)message='Sessão encerrada. Entre novamente para sincronizar.';await load();render();}));}});
+async function logout(force=false){const uid=owner();queued=await queue(uid);pending=await cacheGet(uid,'pending');if(!force&&(queued.length||pending)){logoutRequested=true;render();return;}logoutRequested=false;signingOut=true;try{const result=await auth.auth.signOut({scope:'local'});await clearOwner(uid);localStorage.removeItem('araread-auth-v1');localStorage.removeItem('araread-auth-v1-code-verifier');localStorage.removeItem('araread-cache-owner');session=null;ctx=null;account=null;pending=null;screen='library';message=result.error?'Sessão removida deste dispositivo. A revogação remota exige conexão.':'';render();}finally{signingOut=false;}}
+let reconnecting:Promise<void>|undefined;
+function reconnect(){
+ if(reconnecting)return reconnecting;
+ reconnecting=(async()=>{
+  const uid=owner();if(!uid)return;const ownedCall=(tool:string,args:any)=>call(tool,args,uid);const synced=await syncQueue(uid,ownedCall);if(owner()!==uid)return;queued=synced;
+  if(screen!=='reader')await load();else{
+   const opened=ctx,revision=opened?.reading.revision;prepared=await revalidatePrepared(uid,ownedCall);
+   if(opened?.display){const fresh=await ownedCall('reading_context',{reading_id:opened.reading.id,ref:opened.ref,language:opened.effective_language}),highlights=await ownedCall('highlight_list',{reading_id:opened.reading.id,ref:opened.ref});
+    if(owner()===uid&&ctx===opened&&opened.reading.revision===revision&&!busy){Object.assign(opened.reading,fresh.reading);Object.assign(opened.display.reading,fresh.reading);opened.display.highlights=highlights;opened.display.terms=fresh.terms;refreshReadingPanel(opened.display);await cacheSet(uid,'last-context',opened);const entries=await preparePassage(uid,opened);if(owner()===uid&&ctx===opened)prepared=entries;}
+   }
+  }
+  if(owner()===uid)notice(queued.length?'Conexão restabelecida. Confira as pendências em Configurações.':'Conexão restabelecida; alterações locais confirmadas quando havia pendências.');
+ })().finally(()=>{reconnecting=undefined;});
+ return reconnecting;
+}
+window.addEventListener('offline',()=>{if(screen==='reader')notice('Sem conexão. A seleção e a pergunta foram preservadas; gravações locais aguardam sincronização.');else render();});
+auth.auth.onAuthStateChange((event,next)=>{if(event==='SIGNED_OUT'&&signingOut){session=next;return;}if(event==='PASSWORD_RECOVERY'&&next){const alreadyOpen=passwordSetup&&session?.user.id===next.user.id;session=next;passwordSetup=true;if(!alreadyOpen)queueMicrotask(()=>void guard(async()=>{await switchOwner();render();}));return;}if(next&&session?.user.id===next.user.id){session=next;return;}if(event==='SIGNED_OUT'||(session&&next?.user.id!==session.user.id)){session=next;queueMicrotask(()=>void guard(async()=>{await switchOwner();if(!next)message='Sessão encerrada. Entre novamente para sincronizar.';await load();render();}));}});
 await switchOwner();await guard(load);render();
+window.addEventListener('online',()=>void guard(reconnect));
+// The browser can reconnect while the asynchronous module is still loading.
+// Recover that missed event after identity and private storage are initialized.
+if(online()&&owner()&&(await queue(owner())).length)await guard(reconnect);
 if(import.meta.env.PROD&&'serviceWorker'in navigator)void navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`);
