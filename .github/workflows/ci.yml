@@ -38,6 +38,9 @@ jobs:
         run: |
           docker pull "$PLAYWRIGHT_IMAGE"
           for browser in chromium webkit; do
+            # As suítes compartilham o endereço local. Respeita a janela real
+            # do limitador HTTP, sem relaxar a proteção para executar testes.
+            sleep 60
             docker run --rm --init --network host --ipc=host -e CI=1 -e PLAYWRIGHT_BROWSER="$browser" -v "$PWD:/work" -w /work "$PLAYWRIGHT_IMAGE" npm run test:e2e
           done
       - run: npm audit --audit-level=moderate
