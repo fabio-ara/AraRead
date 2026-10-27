@@ -5,9 +5,9 @@ import './style.css';
 import {cacheGet,cacheSet,clearOwner,clearLegacyContexts} from './private-cache.ts';
 import {el,field} from './ui.ts';
 import {queue,enqueue,syncQueue,discardQueue,removeQueued,recoverQueue,restoreQueue,invalidateReading,revalidatePrepared,preparePassage,cachedPassages,removePassage,type Queued} from './offline.ts';
-import {readingPanel} from './study-panel.ts';
+import {readingPanel,disposeReadingPanel} from './study-panel.ts';
 
-const button=(text:string,action:()=>unknown,attrs:Record<string,any>={})=>el('button',{type:'button',onclick:()=>void guard(action),...attrs},text);
+const button=(text:string,action:()=>unknown,attrs:Record<string,any>={})=>el('button',{type:'button',onclick:()=>busy?notice('Aguarde a confirmação da gravação em andamento.'):void guard(action),...attrs},text);
 const tag=(text:string)=>el('span',{class:'tag'},text);
 const app=document.querySelector<HTMLDivElement>('#app')!;
 if(window.self!==window.top){app.textContent='Abra a biblioteca em uma aba própria para entrar e estudar.';throw Error('Biblioteca indisponível em frame externo. Use o painel MCP Apps no assistente.');}
@@ -29,21 +29,22 @@ function notice(text:string,kind='info'){message=text;severity=kind;renderNotice
 function renderNotice(){const old=document.querySelector('#notice');const next=el('div',{id:'notice',class:`notice ${severity}`,role:severity==='error'?'alert':'status',hidden:!message},message);old?.replaceWith(next);}
 async function guard(action:()=>unknown){try{await action();}catch(e:any){notice(e.message||'A operação não pôde ser concluída.','error');}}
 class ApiError extends Error {constructor(public code:string,message:string){super(message);}}
-async function raw(tool:string,args:any={}){
- const current=(await auth.auth.getSession()).data.session;const response=await fetch(`${apiBase}/api/${tool}`,{method:'POST',headers:{'content-type':'application/json',authorization:`Bearer ${current?.access_token||session?.access_token||''}`},body:JSON.stringify(args)});
+async function raw(tool:string,args:any={},expectedOwner?:string){
+ const current=(await auth.auth.getSession()).data.session;if(expectedOwner&&current?.user.id!==expectedOwner)throw new ApiError('SESSION_CHANGED','A conta mudou antes do envio. Retome a intenção na conta de origem.');const response=await fetch(`${apiBase}/api/${tool}`,{method:'POST',headers:{'content-type':'application/json',authorization:`Bearer ${current?.access_token||session?.access_token||''}`},body:JSON.stringify(args)});
  const data=await response.json();if(!response.ok||!data.ok)throw new ApiError(data.error?.code||'ERROR',data.error?.message||`Falha ${response.status}`);return data.data;
 }
-async function call(tool:string,args:any={}){
- try{return await raw(tool,args);}catch(e){if(e instanceof ApiError&&['UNAUTHENTICATED','SESSION_REVOKED'].includes(e.code))notice('Sua sessão terminou. Entre novamente para sincronizar.','error');throw e;}
+async function call(tool:string,args:any={},expectedOwner?:string){
+ try{return await raw(tool,args,expectedOwner);}catch(e){if(e instanceof ApiError&&['UNAUTHENTICATED','SESSION_REVOKED'].includes(e.code))notice('Sua sessão terminou. Entre novamente para sincronizar.','error');throw e;}
 }
 async function mutate(tool:string,args:any,quiet=false){
+ if(busy)throw new Error('Aguarde a confirmação da gravação em andamento.');const uid=owner(),opened=ctx;
  if(!online()&&ctx){const local=await enqueue(owner(),tool,args,ctx);queued=await queue(owner());if(!quiet)render();return local;}
  if(!online())throw new Error('Esta alteração exige conexão.');
  if(pending)throw new Error('Há uma operação sem confirmação. Consulte seu recibo em Configurações antes de continuar.');
- const request={tool,args:{...args,operation_id:crypto.randomUUID()}};pending=request;await cacheSet(owner(),'pending',request);busy=true;if(!quiet)render();
- try{const receipt=await call(tool,request.args);if(receipt.status!=='confirmed')throw new Error('Gravação ainda sem confirmação.');pending=null;await cacheSet(owner(),'pending',null);if(receipt.reading_id){await invalidateReading(owner(),receipt.reading_id);prepared=await cachedPassages(owner());}return receipt;}
- catch(e){if(e instanceof ApiError&&!['INTERNAL','ERROR'].includes(e.code)){pending=null;await cacheSet(owner(),'pending',null);}else notice('A resposta se perdeu. O resultado ainda é desconhecido; consulte o recibo em Configurações.','error');throw e;}
- finally{busy=false;if(!quiet)render();}
+ const request={tool,args:{...args,operation_id:crypto.randomUUID()}};pending=request;busy=true;if(!quiet)render();
+ try{await cacheSet(uid,'pending',request);const receipt=await call(tool,request.args,uid);if(receipt.status!=='confirmed')throw new Error('Gravação ainda sem confirmação.');if(pending===request)pending=null;await cacheSet(uid,'pending',null);if(receipt.reading_id){await invalidateReading(uid,receipt.reading_id);if(owner()===uid)prepared=await cachedPassages(uid);}return receipt;}
+ catch(e){if(e instanceof ApiError&&!['INTERNAL','ERROR'].includes(e.code)){if(pending===request)pending=null;await cacheSet(uid,'pending',null);}else if(owner()===uid)notice('A resposta se perdeu. O resultado ainda é desconhecido; consulte o recibo em Configurações.','error');throw e;}
+ finally{busy=false;if(!quiet||owner()!==uid||ctx!==opened)render();}
 }
 async function resolvePending(repeat=false){
  if(!pending)return;const request=pending;const result=await call('operation_get',{operation_id:request.args.operation_id});
@@ -66,7 +67,7 @@ function render(){
  const active=document.activeElement as HTMLInputElement;
  if(active&&app.contains(active))focusIntent={tag:active.tagName,label:active.getAttribute('aria-label')||active.labels?.[0]?.textContent||'',text:active.textContent||''};
  const openSummaries=[...app.querySelectorAll('details[open]>summary')].map(e=>e.textContent);
- app.replaceChildren();
+ disposeReadingPanel();app.replaceChildren();
  const nav=el('nav',{'aria-label':'Navegação principal'},button('Biblioteca',()=>{screen='library';ctx=null;languageOverride=undefined;return load();},{class:screen==='library'?'active':''}),button('Importar',()=>{screen='import';render();},{class:screen==='import'?'active':''}),button('Configurações',()=>{screen='settings';render();},{class:screen==='settings'?'active':''}));
  app.append(el('header',{class:'top'},el('div',{class:'top-inner'},el('a',{href:import.meta.env.BASE_URL,class:'brand','aria-label':`${config.name} — biblioteca`},el('span',{class:'brand-mark','aria-hidden':'true'},'AR'),config.name),session?nav:el('span',{class:'private-label'},'Sua biblioteca pessoal'),session?button('Sair',()=>logout(),{class:'quiet logout'}):null)));
  const main=el('main',{id:'main',tabIndex:-1});main.append(el('div',{id:'notice',class:'notice',hidden:true}));
@@ -125,7 +126,8 @@ function originalBlock(){
 }
 function readerView(){
  if(!ctx)return el('p',{},'Abra uma leitura na biblioteca.');
- return el('section',{class:'reader'},el('div',{class:'reader-title'},el('h1',{},ctx.work.title),el('p',{class:'muted'},[ctx.work.author,ctx.passage?.label||ctx.element.locator].filter(Boolean).join(' · '))),readingPanel(ctx,originalBlock,{call,write:(tool,args)=>mutate(tool,args,true),online,changed:async display=>{ctx.display=display;ctx.reading.revision=display.reading.revision;await cacheSet(owner(),'last-context',ctx);prepared=await preparePassage(owner(),ctx);}}));
+ const opened=ctx,uid=owner();
+ return el('section',{class:'reader'},el('div',{class:'reader-title'},el('h1',{},ctx.work.title),el('p',{class:'muted'},[ctx.work.author,ctx.passage?.label||ctx.element.locator].filter(Boolean).join(' · '))),readingPanel(ctx,originalBlock,{call,write:(tool,args)=>mutate(tool,args,true),online,changed:async display=>{if(ctx!==opened||owner()!==uid)return;opened.display=display;opened.reading.revision=display.reading.revision;await cacheSet(uid,'last-context',opened);const entries=await preparePassage(uid,opened);if(ctx===opened&&owner()===uid)prepared=entries;}}));
 }
 function settingsView(){
  const section=el('section',{class:'settings'},el('p',{class:'eyebrow'},'SUA LEITURA, SUAS ESCOLHAS'),el('h1',{},'Configurações'));

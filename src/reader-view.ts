@@ -17,6 +17,7 @@ export function mountReader(root:HTMLElement,display:any,adapter:ReaderAdapter={
  const show=(title:string,body:HTMLElement)=>{const header=node('div','','context-sheet-header');header.append(node('h2',title),buttons('Fechar',close));sheet.replaceChildren(header,body);sheet.scrollTop=0;sheet.hidden=false;menu.hidden=true;sheet.focus({preventScroll:true});};
  const run=async(fn:()=>Promise<void>)=>{if(working)return;working=true;try{await fn();}catch(e:any){announce(e.message||'Não foi possível concluir. Sua seleção foi preservada.');if(e.code==='CONFLICT'&&adapter.call){const c=await adapter.call('reading_context',{reading_id:display.reading.id,ref:display.ref});display.reading.revision=c.reading.revision;}}finally{working=false;}};
  function paint(){
+  if(abort.signal.aborted)return;
   const ranges:Range[]=[];for(const group of segments)for(const entry of group){
    // CSS highlights do not recreate nodes, so native selection and focus survive writes.
    for(const h of display.highlights?.items||[]){const t=h.target,m=entry.model;if(h.state==='orphaned'||t.representation!==m.representation||t.mediation_id!==m.mediation_id||t.segment!==m.segment)continue;const r=rangeForOffsets(entry.root,t.start-m.base_offset,t.end-m.base_offset);if(r)ranges.push(r);}

@@ -26,7 +26,7 @@
   },
   "integration": {
     "mcp_sdk": "cliente oficial com OAuth/Auth local real",
-    "mcp_apps": "SDK oficial em host sintético; capacidades presentes/ausentes e perda antes/depois de commit",
+    "mcp_apps": "SDK oficial em host sintético; capacidades presentes/ausentes, perda antes/depois de commit e resposta atrasada após troca de leitura",
     "hosted": "não implantado/verificado nesta revisão",
     "chatgpt_host": "não homologado nesta revisão"
   },

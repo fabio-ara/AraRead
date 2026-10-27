@@ -18,11 +18,17 @@ test('seleção real e grifos nas três abas, recarga, outra sessão, offline e 
    await page.getByRole('tab',{name:label,exact:true}).click();const segment=page.locator('.passage:visible .text-segment').first();const box=(await segment.boundingBox())!;
    if(index===0){await page.evaluate(()=>window.getSelection()?.removeAllRanges());await page.getByRole('tabpanel').focus();await page.keyboard.down('Shift');for(let n=0;n<7;n++)await page.keyboard.press('ArrowRight');await page.keyboard.up('Shift');}else await page.mouse.dblclick(box.x+22,box.y+12);
    const selected=await page.evaluate(()=>window.getSelection()?.toString());expect(selected?.length).toBeGreaterThan(0);if(index===0)expect(selected).toBe('Palavra');
-   await expect(page.getByRole('button',{name:'Destacar',exact:true})).toBeVisible();await page.getByRole('button',{name:'Destacar',exact:true}).tap();await expect(page.getByRole('status').filter({hasText:'Destaque salvo e relido no servidor.'})).toBeVisible();
+   await expect(page.getByRole('button',{name:'Destacar',exact:true})).toBeVisible();
+   if(index===0)await page.evaluate(()=>{const original=window.fetch;window.fetch=async(...args:Parameters<typeof fetch>)=>{const response=await original(...args);if(String(args[0]).endsWith('/api/highlight_save'))await new Promise<void>(resolve=>{(window as any).resumeSave=()=>{window.fetch=original;resolve();};});return response;};});
+   await page.getByRole('button',{name:'Destacar',exact:true}).tap();
+   if(index===0){await page.waitForFunction(()=>!!(window as any).resumeSave);await page.getByRole('button',{name:'Biblioteca',exact:true}).click();await expect(page.getByRole('tabpanel')).toBeVisible();await page.evaluate(()=>(window as any).resumeSave());}
+   await expect(page.getByRole('status').filter({hasText:'Destaque salvo e relido no servidor.'})).toBeVisible();
    await expect(page.getByText(`Destaques desta passagem (${index+1})`,{exact:true})).toBeVisible();
    expect((await api('highlight_list',{reading_id:w.reading_id})).items.map((v:any)=>v.target.exact)).toContain(selected);
   }
   expect((await api('highlight_list',{reading_id:w.reading_id})).items).toHaveLength(3);expect((await api('reading_context',{reading_id:w.reading_id})).reading.covered).toEqual([]);
+  await page.getByRole('button',{name:'Biblioteca',exact:true}).click();await expect(page.getByRole('heading',{name:'Minha biblioteca',exact:true})).toBeVisible();expect(await page.evaluate(()=>(CSS as any).highlights?.has('araread-saved')||false)).toBe(false);
+  await page.getByRole('article').filter({has:page.getByRole('heading',{name:title,exact:true})}).getByRole('button',{name:'Retomar leitura',exact:true}).click();await expect(page.getByText('Destaques desta passagem (3)',{exact:true})).toBeVisible();await page.getByRole('tab',{name:'Original',exact:true}).click();
   const selectText=async(text:string)=>page.locator('.passage:visible .text-segment').first().evaluate((e,text)=>{const t=e.firstChild!,at=t.textContent!.indexOf(text),s=window.getSelection()!;s.setBaseAndExtent(t,at,t,at+text.length);},text);
   await selectText('429?–347 B.C.E.');await page.getByRole('button',{name:'Calcular',exact:true}).click();await expect(page.getByText('Aproximadamente 82 anos',{exact:true})).toBeVisible();await expect(page.getByLabel('Ano inicial',{exact:true})).toHaveValue('429');await expect(page.getByLabel('Ano final',{exact:true})).toHaveValue('347');await page.getByRole('button',{name:'Salvar cálculo como nota',exact:true}).click();await expect(page.getByText('Cálculo guardado como nota. A leitura não avançou.',{exact:true})).toBeVisible();expect((await api('reading_history',{reading_id:w.reading_id,kind:'notes'})).items.some((n:any)=>n.kind==='note'&&n.text.includes('Aproximadamente 82 anos'))).toBeTruthy();
   await page.setViewportSize({width:390,height:900});await page.screenshot({path:'.local/evidence/v4-calculator.png',fullPage:true});
@@ -39,5 +45,5 @@ test('seleção real e grifos nas três abas, recarga, outra sessão, offline e 
   await page.reload();await context.setOffline(false);await expect.poll(async()=>(await api('highlight_list',{reading_id:w.reading_id})).items.length).toBe(4);
   await page.getByRole('article').filter({has:page.getByRole('heading',{name:title,exact:true})}).getByRole('button',{name:'Retomar leitura',exact:true}).click();await page.getByText('Destaques desta passagem (4)',{exact:true}).click();await page.getByRole('button',{name:'Remover destaque',exact:true}).first().click();await expect.poll(async()=>(await api('highlight_list',{reading_id:w.reading_id})).items.length).toBe(3);
   expect(failures).toEqual([]);expect((await api('reading_context',{reading_id:w.reading_id})).reading.covered).toEqual([]);
- }finally{await context.setOffline(false).catch(()=>{});await api('work_delete',{operation_id:randomUUID(),work_id:w.work_id,confirm_title:title}).catch(()=>{});}
+ }finally{await page.evaluate(()=>(window as any).resumeSave?.()).catch(()=>{});await context.setOffline(false).catch(()=>{});await api('work_delete',{operation_id:randomUUID(),work_id:w.work_id,confirm_title:title}).catch(()=>{});}
 });

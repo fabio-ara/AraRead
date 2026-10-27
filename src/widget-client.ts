@@ -14,20 +14,20 @@ const pendingKey=()=>`araread-pending:${current.reading.owner_id}:${current.read
 const recovery=document.createElement('div');status.after(recovery);
 function refreshRecovery(){
  recovery.replaceChildren();if(!current||!connected||!app.getHostCapabilities()?.serverTools)return;
- const pending=pendingStore.getItem(pendingKey());if(!pending)return;
+ const key=pendingKey(),reading=current,pending=pendingStore.getItem(key);if(!pending)return;
  const button=document.createElement('button');button.textContent='Recuperar gravação';button.onclick=()=>void view!.run(async()=>{
   const request=JSON.parse(pending),known=await call('operation_get',{operation_id:request.args.operation_id}),result=known.status==='confirmed'?known:await call(request.name,request.args);
-  if(result.status!=='confirmed')throw Error('Sem confirmação.');pendingStore.removeItem(pendingKey());
-  const latest=await call('reading_context',{reading_id:current.reading.id,ref:current.ref});current.reading.revision=latest.reading.revision;
-  current.highlights=await call('highlight_list',{reading_id:current.reading.id,ref:current.ref});render();view!.announce('Gravação anterior confirmada pelo recibo.');
+  if(result.status!=='confirmed')throw Error('Sem confirmação.');pendingStore.removeItem(key);
+  const latest=await call('reading_context',{reading_id:reading.reading.id,ref:reading.ref});reading.reading.revision=latest.reading.revision;
+  reading.highlights=await call('highlight_list',{reading_id:reading.reading.id,ref:reading.ref});if(current===reading){render();view!.announce('Gravação anterior confirmada pelo recibo.');}
  });recovery.append(button);
 }
 async function write(name:string,args:any){
- let saved=pendingStore.getItem(pendingKey()),request=saved?JSON.parse(saved):null;
+ const key=pendingKey();let saved=pendingStore.getItem(key),request=saved?JSON.parse(saved):null;
  if(request){refreshRecovery();throw Error('Há gravação incerta. Use “Recuperar gravação” antes de criar outra intenção.');}
- request={name,args:{...args,operation_id:crypto.randomUUID()}};pendingStore.setItem(pendingKey(),JSON.stringify(request));
- try{const result=await call(name,request.args);if(result.status!=='confirmed')throw Error('Gravação não confirmada.');pendingStore.removeItem(pendingKey());return result;}
- catch(e:any){if(typeof e.code==='string'&&!['INTERNAL','HOST_ERROR','ERROR'].includes(e.code))pendingStore.removeItem(pendingKey());refreshRecovery();throw e;}
+ request={name,args:{...args,operation_id:crypto.randomUUID()}};pendingStore.setItem(key,JSON.stringify(request));
+ try{const result=await call(name,request.args);if(result.status!=='confirmed')throw Error('Gravação não confirmada.');pendingStore.removeItem(key);return result;}
+ catch(e:any){if(typeof e.code==='string'&&!['INTERNAL','HOST_ERROR','ERROR'].includes(e.code))pendingStore.removeItem(key);refreshRecovery();throw e;}
 }
 function render(){
  if(!current)return;view?.dispose();const supported=connected&&!!app.getHostCapabilities()?.serverTools;
