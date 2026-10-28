@@ -58,6 +58,8 @@ test('edição compartilhada: autoria, duas contas, RLS, anonimato e estudo sem 
   const move={expected_revision:1,version_id:version.version_id,action:'continue',passage_id:first};const results=await Promise.allSettled([call('edition_annotate',{...move,operation_id:op()}),call('edition_annotate',{...move,operation_id:op()})]);assert.equal(results.filter(r=>r.status==='fulfilled').length,1);
   assert.deepEqual((await call('edition_reader',{version_id:version.version_id},bob)).state.covered,[]);
   const resumed=await call('edition_reader',{version_id:version.version_id},await login(0));assert.equal(resumed.state.covered.length,1);
+  await call('edition_plan',{operation_id:op(),expected_revision:0,scope:'reader',scope_id:version.version_id,action:'set',values:{font_size:24},explicit_request:true});
+  const personal=await call('edition_reader',{version_id:version.version_id});assert.equal(personal.preferences.values.font_size,24);assert.equal(personal.preferences.origins.font_size.scope,'reader');assert.deepEqual(personal.preferences.precedence,['reader','account','default']);assert.notEqual((await call('edition_reader',{version_id:version.version_id},bob)).preferences.values.font_size,24);
   const supports=content[0].supports;assert.equal(supports.some((s:any)=>s.kind==='mnemonic'),true);assert.equal(supports.some((s:any)=>s.kind==='humor'),true);
   assert.equal(activityFeedback(content[0].activities[1],'Texto livre').correct,null);
  });

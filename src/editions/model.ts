@@ -15,7 +15,7 @@ export function configuration(records:any[],projectId?:string,profileId?:string,
   const r=records.find(r=>r.scope===scope&&(scope==='account'||scope==='profile'&&r.scope_id===profileId||scope==='project'&&r.scope_id===projectId||scope==='session'&&r.scope_id===sessionId||scope==='reader'&&r.scope_id===readerId));
   if(r)for(const [key,value]of Object.entries(r.values)){values[key]=value;origins[key]={scope,revision:r.revision,record_id:r.id};}
  }
- return {values,origins,records:records.map(({id,scope,scope_id,revision,values})=>({id,scope,scope_id,revision,values})),precedence:['session','project','profile','account','default']};
+ return {values,origins,records:records.map(({id,scope,scope_id,revision,values})=>({id,scope,scope_id,revision,values})),precedence:readerId?['reader','account','default']:['session','project','profile','account','default']};
 }
 export function publishedConfiguration(config:any){
  const keys=['language','objective','explanation','definitions','examples','mnemonics','humor','activities','translation_style'];
