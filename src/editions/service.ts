@@ -183,10 +183,10 @@ async function annotate(c:PoolClient,a:any,uid:string){
    if(a.action==='review')ensure(!await one(c,"select id from araread.edition_annotations where owner_id=$1 and version_id=$2 and passage_id=$3 and kind='review'",[uid,a.version_id,a.passage_id]),'EXISTS','Esta passagem já está marcada para revisão.');
    let response=null;
    if(a.action==='answer'){const activity=row.content.activities.find((x:any)=>x.id===a.activity_id);ensure(activity,'NOT_FOUND','Atividade não encontrada nesta passagem.',404);response=activityFeedback(activity,a.text,a.self_assessment);}
-   else if(a.action!=='highlight')ensure(a.text.trim(),'EMPTY_NOTE','Escreva o conteúdo da anotação.');
+   else if(!['highlight','review'].includes(a.action))ensure(a.text.trim(),'EMPTY_NOTE','Escreva o conteúdo da anotação.');
    const id=randomUUID();await c.query('insert into araread.edition_annotations(id,owner_id,version_id,passage_id,kind,target,text,activity_id,response) values($1,$2,$3,$4,$5,$6,$7,$8,$9)',[id,uid,a.version_id,a.passage_id,a.action,a.target?json(a.target):null,a.text,a.activity_id||null,response?json(response):null]);result={annotation_id:id,response};
   }
  }
  await c.query('update araread.edition_readers set revision=revision+1,opened=$3,resume=$4,covered=$5 where owner_id=$1 and version_id=$2',[uid,a.version_id,state.opened,state.resume,state.covered]);
- return {version_id:a.version_id,revision:a.expected_revision+1,state:{...state,revision:a.expected_revision+1},...result};
+ return {version_id:a.version_id,revision:a.expected_revision+1,state:{opened:state.opened,resume:state.resume,covered:state.covered,revision:a.expected_revision+1},...result};
 }
