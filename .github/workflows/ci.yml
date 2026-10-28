@@ -5,7 +5,7 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 35
     env:
       PLAYWRIGHT_IMAGE: mcr.microsoft.com/playwright:v1.64.1-noble@sha256:47b510dd9230bf0b9bfc9b20102241e577ea7a99334ab4c3ca19f19770e9b8ea
     steps:
@@ -23,6 +23,10 @@ jobs:
       - run: npm run local:setup
       - run: docker compose up -d --wait
       - run: npm run db:migrate && npm run local:accounts
+      - name: Conversão real DOC e MOBI em contêiner isolado
+        run: |
+          docker build -f Dockerfile.convert -t araread-convert:1 .
+          npx tsx scripts/verify-legacy-conversion.ts
       - name: OCR aberto local com recursos limitados
         run: |
           docker build -f Dockerfile.ocr -t araread-ocr:ci .
@@ -35,6 +39,8 @@ jobs:
           NODE_ENV=production npm run dev > /tmp/araread-server.log 2>&1 &
           for attempt in $(seq 1 30); do curl --fail --silent http://127.0.0.1:4317/health && break; sleep 1; done
           npm test
+      - name: Medição de conteúdo compartilhado e tráfego sintético
+        run: node --import tsx --env-file-if-exists=.env scripts/benchmark-editions.ts
       - name: Chromium e WebKit na imagem oficial fixada
         run: |
           docker pull "$PLAYWRIGHT_IMAGE"
@@ -45,5 +51,17 @@ jobs:
             docker run --rm --init --network host --ipc=host -e CI=1 -e PLAYWRIGHT_BROWSER="$browser" -v "$PWD:/work" -w /work "$PLAYWRIGHT_IMAGE" npm run test:e2e
           done
       - run: npm audit --audit-level=moderate
+      - name: Evidências sintéticas da revisão
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: edition-evidence-${{ github.sha }}
+          path: |
+            .local/evidence/editions*.png
+            .local/evidence/edition-widget*.png
+            .local/evidence/editions*.json
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 1
       - if: always()
         run: docker compose down

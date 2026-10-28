@@ -9,9 +9,13 @@ Uma importação conserva texto canônico, estrutura, hash canônico e SHA-256 d
 | HTML fornecido | Texto de títulos, parágrafos, listas, citações, notas, tabela e descrições de figuras | Scripts, anexos e interação não executados; SVG/MathML viram texto original com interpretação pendente; não reproduz layout |
 | URL HTTPS pública | Obtém uma única página HTML e aplica o importador HTML | Sem login, cookies, paywall, páginas internas ou coleções; respeita bloqueios identificados em robots.txt |
 | PDF com camada textual | Reconstrução posicional de parágrafos, títulos, colunas, notas e linhas de tabela, com página autêntica | Ordem e estrutura heurísticas, sujeitas a conferência; figuras não interpretadas; até 500 páginas e 15 s de extração |
+| DOCX | Parágrafos, títulos, tabelas, notas e marcação de fórmulas na ordem do documento | Figuras/OMML podem exigir confronto visual; conserva os bytes quando necessários |
+| PPTX | Slides na ordem das relações do pacote, títulos, texto, tabelas e notas | Não reproduz animação nem diagramação; conserva o original visual |
+| EPUB | Documentos na ordem do spine, texto e estrutura HTML | Sem execução de scripts, obtenção externa ou DRM; diferenças visuais permanecem declaradas |
+| DOC / MOBI | Conversão local para DOCX / EPUB com LibreOffice / calibre, seguida dos mesmos importadores | Conversor isolado, sem rede; conserva bytes e hash da entrada, ferramenta/versão e advertência de perda. Gate real ainda pendente na revisão em desenvolvimento |
 | Blocos estruturados via MCP/API | Tipos e metadados fornecidos, incluindo versos, hipóteses, definições e provas | A estrutura é fornecida pelo remetente; tipos desconhecidos permanecem conservados, sem interpretação inventada |
 
-EPUB e DOCX não estão implementados. PDF digitalizado recebe lacunas; a pré-verificação rejeita fonte inteiramente sem texto até receber transcrição ou suplemento do OCR local Poppler/Tesseract. O OCR não executa no Edge e permanece não revisado, com retenção obrigatória do PDF. Quando disponível, o binário original pode ser obtido pela API autenticada `/api/original/:source_id` ou pelo backup com originais. Ele é servido como bytes de anexo, nunca executado como HTML.
+Pacotes ZIP são conferidos antes e depois da expansão: entradas, tamanho real, caminhos, tipo, DTD, macros e arquivos cifrados são limitados ou rejeitados. Isso não certifica a fidelidade da extração. PDF digitalizado recebe lacunas; a pré-verificação rejeita fonte inteiramente sem texto até receber transcrição ou suplemento do OCR local Poppler/Tesseract. OCR e conversão DOC/MOBI não executam no Edge. Quando disponível na biblioteca privada, o binário original pode ser obtido pela API autenticada `/api/original/:source_id` ou pelo backup com originais. Ele é servido como bytes de anexo, nunca executado como HTML.
 
 ## Referências e correções
 
@@ -23,7 +27,7 @@ Correções e material adicional usam `source_import` com `work_id` e `derives_f
 
 ## Direitos e obtenção pública
 
-A biblioteca e as adaptações permanecem privadas. A licença do código não autoriza reproduzir obras de terceiros. O usuário deve ter direito de fornecer o material. A obtenção de uma página acessível não dispensa considerar seus termos; robots.txt não determina sozinho todos os direitos. O importador não autentica em sites, não interpreta links de anexos e não segue imagens.
+A biblioteca anterior e os projetos de autoria permanecem privados. Uma edição pode ser privada, disponibilizada por convite ou publicada após declaração de direitos, revisão e ação explícita. A licença MIT do código não autoriza reproduzir obras de terceiros; metadados e declaração de permissão também não equivalem a uma verificação jurídica automática. A obtenção de uma página acessível não dispensa considerar seus termos; robots.txt não determina sozinho todos os direitos. O importador não autentica em sites, não interpreta links de anexos e não segue imagens.
 
 URLs exigem HTTPS sem credenciais na porta padrão. Cada salto valida resolução DNS pública, fixa o endereço validado na conexão TLS e rejeita redes privadas/reservadas, inclusive IPv6 mapeado. Há limite de 8 MiB, dez segundos para a obtenção, três redirecionamentos e tipo HTML. A política pode rejeitar fontes legítimas; nesses casos, forneça texto autorizado em vez de enfraquecer o controle.
 

@@ -11,6 +11,8 @@ import {citationSchema} from './contracts.ts';
 import {canonicalHash} from '../ingestion/quality.ts';
 import {profileDefinition,parameterSchemas} from './preference-contracts.ts';
 import {validateProfileDefinition} from './preferences.ts';
+import {restoreEditions} from '../editions/backup.ts';
+import {editionBackupSections} from '../editions/backup-contracts.ts';
 
 export const backupSections=['works','sources','elements','readings','mediations','notes','terms','events','preferences','receipts','reading_segments','references','perspectives','contexts','connections','reading_maps','profiles','preference_records'] as const;
 const jsonFields=new Set(['genres','warnings','meta','opened','resume','covered','additions','provenance','ref','target_ref','study','study_selection','alignment','evidence_ids','dependencies','details','attribution','selection','materials','gaps','extraction','editorial','items','definition','value','anchor']);
@@ -35,6 +37,11 @@ const row=z.record(z.string(),z.unknown());
 const bundleSchema=z.object({format:z.enum(['araread/1','araread/2','araread/3']),snapshot:z.string().optional(),exported_at:z.iso.datetime().optional(),sections:z.object(Object.fromEntries(backupSections.map((s,i)=>[s,i<10?z.array(row).max(100000):z.array(row).max(100000).default([])])) as z.ZodRawShape)}).strict();
 
 export async function restoreBackup(c:PoolClient,uid:string,input:any,quota:(n:number)=>Promise<unknown>){
+ const editionData=input?.format==='araread/4'?input.sections:null;
+ if(editionData){
+  ensure([...backupSections,...editionBackupSections].every(s=>Array.isArray(editionData[s])),'INVALID_BACKUP','Backup v4 precisa das seções legadas e editoriais.');
+  input={...input,format:'araread/3',sections:Object.fromEntries(backupSections.map(s=>[s,editionData[s]]))};
+ }
  if(input?.format==='araread/2')ensure(backupSections.slice(0,15).every(s=>Array.isArray(input?.sections?.[s])),'INVALID_BACKUP','Backup v2 precisa das quinze seções.');
  if(input?.format==='araread/3')ensure(backupSections.every(s=>Array.isArray(input?.sections?.[s])),'INVALID_BACKUP','Backup v3 precisa de todas as seções declaradas.');
  const parsed=bundleSchema.safeParse(input);ensure(parsed.success,'INVALID_BACKUP','Backup incompleto ou inválido.');
@@ -101,5 +108,6 @@ export async function restoreBackup(c:PoolClient,uid:string,input:any,quota:(n:n
   await c.query(`insert into araread."${section}"(${cols.join(',')}) values(${cols.map((_,i)=>`$${i+1}`).join(',')})`,cols.map(k=>r[k]==null?null:jsonFields.has(k)?JSON.stringify(r[k]):r[k]));
  }
  const pref=data.preferences[0];if(pref){ensure(schemas.preferences_set.safeParse({operation_id:randomUUID(),expected_revision:0,language:pref.language,portion_size:pref.portion_size}).success,'INVALID_BACKUP','Preferências inválidas.');await c.query('insert into araread.preferences(owner_id,language,portion_size,study) values($1,$2,$3,$4) on conflict do nothing',[uid,pref.language,pref.portion_size,JSON.stringify(remap(pref.study||{}))]);}
- return {id_map:map,restored_readings:data.readings.length,archived_receipts:data.receipts,receipt_policy:'Recibos históricos são proveniência arquivada. Novas intenções usam novas identidades; contextos preservam sua assinatura histórica.'};
+ const editionResult=editionData?await restoreEditions(c,uid,editionData,map,quota):{};
+ return {id_map:map,restored_readings:data.readings.length,archived_receipts:data.receipts,receipt_policy:'Recibos históricos são proveniência arquivada. Novas intenções usam novas identidades; contextos preservam sua assinatura histórica.',...editionResult};
 }

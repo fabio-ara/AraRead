@@ -18,6 +18,8 @@ export function assessExtraction(blocks:Block[],warnings:string[],method:string,
  return {version:1,status:!useful||contaminated?'rejected':originalRequired?'partial':'ready',useful_characters:useful,textual_elements:textual,structure,gaps,warnings:[...warnings,...(contaminated?['Extração contaminada por controles de navegação.']:[])],original_required:originalRequired,method,removed_elements:removed};
 }
 export function requireReadable(quality:ExtractionQuality){if(quality.status==='rejected')throw new AppError('EXTRACTION_REJECTED','A extração ainda não permite iniciar a leitura. Confira a pré-verificação; forneça uma transcrição ou prepare OCR local e reimporte uma versão identificável.',422,quality);}
-const ordered=(v:any):any=>Array.isArray(v)?v.map(ordered):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,ordered(v[k])])):v;
+const ordered=(v:any):any=>v instanceof Date?v.toISOString():Array.isArray(v)?v.map(ordered):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,ordered(v[k])])):v;
+/** JSONB may reorder object keys; semantic hashes must survive a database round trip. */
+export const contentHash=(value:unknown)=>createHash('sha256').update(JSON.stringify(ordered(value))).digest('hex');
 /** IDs and fallback locators are not part of the content identity. */
-export const canonicalHash=(blocks:Block[])=>createHash('sha256').update(JSON.stringify(ordered(blocks.map(b=>({kind:b.kind,text:b.text,locator:b.locator||'',meta:b.meta}))))).digest('hex');
+export const canonicalHash=(blocks:Block[])=>contentHash(blocks.map(b=>({kind:b.kind,text:b.text,locator:b.locator||'',meta:b.meta})));

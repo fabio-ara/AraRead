@@ -17,6 +17,10 @@ import {requireReadable} from './ingestion/quality.ts';
 import {dispatchNavigation,validReadingUnit} from './study/navigation.ts';
 import {dispatchPreferences,resolvePreferences} from './study/preferences.ts';
 import {editorialAssessment} from './study/editorial.ts';
+import {dispatchEditions} from './editions/service.ts';
+import {editionBackupSections} from './editions/backup-contracts.ts';
+import {exportEditionSection,editionSnapshot} from './editions/backup.ts';
+import {editionDisplay} from './editions/presentation.ts';
 
 const hash=(x:string|Buffer)=>createHash('sha256').update(x).digest('hex');
 const paging=(offset:number,limit:number,total:number)=>({offset,limit,total,next_offset:offset+limit<total?offset+limit:null});
@@ -31,10 +35,13 @@ async function one(c:PoolClient,sql:string,args:unknown[]=[]){return (await c.qu
 async function preferences(c:PoolClient,identity?:Identity,r?:any){const legacy=await one(c,'select * from araread.preferences')||{revision:0};return {...legacy,...(await resolvePreferences(c,r,identity)).values};}
 async function reading(c:PoolClient,id:string,lock=false){const r=await one(c,`select * from araread.readings where id=$1${lock?' for update':''}`,[id]);ensure(r,'NOT_FOUND','Leitura não encontrada.',404);return r;}
 async function element(c:PoolClient,ref:Ref,readingId:string){return memberElement(c,readingId,ref);}
-async function quota(c:PoolClient,additional:number){
+async function quota(c:PoolClient,additional:number,enforce=true){
  const usage=await one(c,`select coalesce((select sum(octet_length(original)) from araread.sources),0)+coalesce((select sum(octet_length(text)) from araread.elements),0)+coalesce((select sum(octet_length(rewrite)+octet_length(additions::text)+octet_length(study_selection::text)+octet_length(provenance::text)) from araread.mediations),0)+coalesce((select sum(octet_length(text)+octet_length(attribution::text)+coalesce(octet_length(anchor::text),0)) from araread.notes),0)+coalesce((select sum(octet_length(definition)+octet_length(details::text)) from araread.terms),0)+coalesce((select sum(octet_length(row_to_json(t)::text)) from araread."references" t),0)+coalesce((select sum(octet_length(row_to_json(t)::text)) from araread.perspectives t),0)+coalesce((select sum(octet_length(row_to_json(t)::text)) from araread.contexts t),0)+coalesce((select sum(octet_length(row_to_json(t)::text)) from araread.connections t),0)+coalesce((select sum(octet_length(row_to_json(t)::text)) from araread.profiles t),0)+coalesce((select sum(octet_length(row_to_json(t)::text)) from araread.preference_records t),0)+coalesce((select sum(octet_length(row_to_json(t)::text)) from araread.reading_maps t),0)+coalesce((select sum(octet_length(extraction::text)) from araread.sources),0)+coalesce((select sum(octet_length(editorial::text)) from araread.mediations),0) as bytes`);
-  ensure(Number(usage.bytes)+additional<=config.maxAccountBytes,'QUOTA',`A biblioteca atingiu a cota de ${config.maxAccountBytes/1024/1024} MiB. Exporte e remova material explicitamente antes de importar mais.`,413);
- return Number(usage.bytes);
+ const editionTables=['edition_projects','edition_passages','edition_versions','edition_settings','edition_reviews','edition_annotations','edition_readers','edition_groups','edition_comments','edition_archives'];
+ const editorial=await one(c,`select (${editionTables.map(t=>`coalesce((select sum(octet_length(row_to_json(t)::text)) from araread.${t} t where owner_id=(select araread.owner())),0)`).join('+')})+coalesce((select sum(octet_length(metadata::text)+octet_length(blocks::text)+coalesce(octet_length(original),0)) from araread.edition_sources where owner_id=(select araread.owner())),0) bytes`);
+ const bytes=Number(usage.bytes)+Number(editorial.bytes);
+ if(enforce)ensure(bytes+additional<=config.maxAccountBytes,'QUOTA',`A biblioteca atingiu a cota de ${config.maxAccountBytes/1024/1024} MiB. Exporte e remova material explicitamente antes de importar mais.`,413);
+ return bytes;
 }
 async function receiptResult(c:PoolClient,result:any){
  if(!result.context_receipt_only)return result;
@@ -60,6 +67,7 @@ export async function execute(name:ToolName,input:unknown,identity:Identity):Pro
  ensure(Object.hasOwn(schemas,name),'TOOL_NOT_FOUND','Operação inexistente.',404);const schema=schemas[name];
  const parsed=schema.safeParse(input);if(!parsed.success)throw new AppError('VALIDATION','Confira os campos da operação.',400,parsed.error.issues.map(x=>({path:x.path,message:x.message})));
  const a:any=parsed.data,write=!readTools.has(name);
+ const cleanup=name==='work_delete'||name==='highlight_remove'||name==='note_manage'&&a.action==='delete'||name==='edition_annotate'&&a.action==='delete'||name==='edition_publish'&&a.action==='withdraw'||name==='edition_group'&&['leave','revoke','remove_comment'].includes(a.action)||name==='edition_plan'&&a.action==='reset';
  for(const key of ['language','original_language'])if(typeof a[key]==='string')a[key]=Intl.getCanonicalLocales(a[key])[0];
  ensure(!write||identity.permissions==='write','FORBIDDEN','Esta conexão tem permissão apenas de leitura.',403);
  return transaction(identity,async c=>{
@@ -68,13 +76,13 @@ export async function execute(name:ToolName,input:unknown,identity:Identity):Pro
    await c.query('select pg_advisory_xact_lock(hashtextextended($1,0))',[identity.id]);
    const previous=await one(c,'select * from araread.receipts where operation_id=$1',[a.operation_id]);
    if(previous){ensure(previous.request_hash===hash(name+json(a))||previous.request_hash===legacyHash(name,a,input),'IDEMPOTENCY_MISMATCH','Essa identidade de operação já foi usada para outra intenção.',409);return receiptResult(c,previous.result);}
-   if(!['source_import','source_append','work_delete','data_restore'].includes(name)&&!(name==='highlight_remove'||name==='note_manage'&&a.action==='delete'))await quota(c,Buffer.byteLength(json(a)));
+   if(!cleanup&&!['source_import','source_append','data_restore'].includes(name))await quota(c,Buffer.byteLength(json(a)));
   }
   let r:any;
   if(write&&'reading_id'in a&&a.reading_id){r=await reading(c,a.reading_id,true);ensure(r.revision===a.expected_revision,'CONFLICT','Outra sessão alterou esta leitura. Recarregue e confira sua intenção.',409);}
   const result=await dispatch(name,a,identity,c,r);
   if(!write)return result;
-  if(name==='highlight_save')await quota(c,0);
+  if(!cleanup&&(name==='highlight_save'||name.startsWith('edition_')))await quota(c,0);
   const receipt={...result,operation_id:a.operation_id,status:'confirmed'};
   const storedReceipt=name==='context_prepare'?{...receipt,materials:undefined,original:undefined,context_receipt_only:true}:receipt;
   await c.query('insert into araread.receipts(owner_id,operation_id,request_hash,result) values($1,$2,$3,$4)',[identity.id,a.operation_id,hash(name+json(a)),json(storedReceipt)]);
@@ -85,6 +93,15 @@ export async function execute(name:ToolName,input:unknown,identity:Identity):Pro
 
 async function dispatch(name:ToolName,a:any,identity:Identity,c:PoolClient,r?:any):Promise<any>{
  const uid=identity.id;
+ if(name==='reading_display'&&!a.reading_id){
+  const context=await dispatchEditions('edition_context',{...a,batch_limit:1},c,identity,n=>quota(c,n));
+  ensure(context?.passage?.assessment?.ready,'EDITORIAL_PENDING','Prepare e confira a passagem antes de anunciar o painel.');
+  if(!context.version)context.version={id:context.project.id,title:context.project.title,version:0,state:'sample'};
+  const personal=a.version_id?await dispatchEditions('edition_reader',{version_id:a.version_id},c,identity,n=>quota(c,n)):null;
+  const display=editionDisplay(context,personal,!!a.version_id&&context.version.state!=='withdrawn'&&identity.permissions==='write');
+  return {...display,reading:{...display.reading,owner_id:uid},reader_preferences:personal?.preferences?.values||context.config.values};
+ }
+ const editionResult=await dispatchEditions(name,a,c,identity,n=>quota(c,n));if(editionResult!==undefined)return editionResult;
  const highlightResult=await dispatchHighlights(name,a,c,r,uid);if(highlightResult!==undefined)return highlightResult;
  if(name==='note_manage'&&(await one(c,'select kind from araread.notes where id=$1 and reading_id=$2',[a.note_id,r.id]))?.kind==='highlight'){
   ensure(a.action==='delete','INVALID_NOTE_KIND','Use a gestão de grifos para esta marca; ela não é uma nota interpretativa.');
@@ -94,7 +111,7 @@ async function dispatch(name:ToolName,a:any,identity:Identity,c:PoolClient,r?:an
  const navigationResult=await dispatchNavigation(name,a,c,r,identity);if(navigationResult!==undefined)return navigationResult;
  const studyResult=await dispatchStudy(name,a,uid,c,r,n=>quota(c,n),identity);if(studyResult!==undefined)return studyResult;
  if(name==='assistant_guidance')return {version:guidanceVersion,instructions:guidance};
- if(name==='account_context')return {account:{id:uid},preferences:await preferences(c,identity,r),guidance_version:guidanceVersion,capabilities:{model_key_required:false,formats:['text','markdown','html','pdf','url','structured'],ocr:'local_tesseract_preparation',storage_policy:'text_first',backup_format:'araread/3',max_import_bytes:config.maxBytes,max_account_bytes:config.maxAccountBytes,used_bytes:await quota(c,0),mcp_protocol:'2026-07-28',max_context_support_bytes:65536,quota_basis:'Conteúdo lógico antes da compressão; não equivale ao disco PostgreSQL nem inclui todos os índices/recibos.',offline:'Até 12 porções/2 MiB preparadas e 40 alterações/1 MiB em fila local, com confirmação posterior e conflitos explícitos.'}};
+ if(name==='account_context')return {account:{id:uid},preferences:await preferences(c,identity,r),guidance_version:guidanceVersion,capabilities:{model_key_required:false,formats:['text','markdown','html','pdf','epub','docx','pptx','url','structured'],local_conversion:['doc','mobi'],ocr:'local_tesseract_preparation',storage_policy:'text_first',backup_format:'araread/4',backup_legacy_formats:['araread/1','araread/2','araread/3'],max_import_bytes:config.maxBytes,max_account_bytes:config.maxAccountBytes,used_bytes:await quota(c,0,false),mcp_protocol:'2026-07-28',max_context_support_bytes:65536,quota_basis:'Conteúdo lógico antes da compressão; não equivale ao disco PostgreSQL nem inclui todos os índices/recibos.',offline:'Edições: capítulos completos preparados até a cota local de 8 MiB (teto 16 MiB) e 80 intenções/1 MiB. Biblioteca anterior: 12 porções/2 MiB e 40 alterações/1 MiB. Confirmação por recibos; conflitos explícitos.'}};
  if(name==='library_list'){
   const filter=`from araread.readings r join araread.sources s on s.id=r.source_id join araread.works w on w.id=s.work_id where w.title ilike $1 or w.author ilike $1`;
   const total=Number((await one(c,`select count(*) ${filter}`,[`%${a.query}%`])).count);
@@ -240,13 +257,19 @@ async function dispatch(name:ToolName,a:any,identity:Identity,c:PoolClient,r?:an
  }
  if(name==='data_export'){
   await c.query('select pg_advisory_xact_lock(hashtextextended($1,0))',[uid]);
-  const snapshot=String((await one(c,'select generation from araread.export_clock'))?.generation||0);
+  const snapshot=String((await one(c,'select generation from araread.export_clock'))?.generation||0)+(a.format==='araread/4'?':'+await editionSnapshot(c):'');
   ensure(!a.snapshot||a.snapshot===snapshot,'EXPORT_CHANGED','A biblioteca mudou entre páginas. Reinicie a exportação; nenhum backup consistente foi confirmado.',409);
+  const exportSections=a.format==='araread/4'?[...sections,...editionBackupSections]:sections;
+  ensure((exportSections as readonly string[]).includes(a.section),'INVALID_BACKUP','Use araread/4 para exportar edições.');
+  if((editionBackupSections as readonly string[]).includes(a.section)){
+   const limit=a.section==='edition_sources'&&a.include_original?1:a.limit,{items,total}=await exportEditionSection(c,a.section,a.offset,limit,a.include_original);
+   return {format:a.format,snapshot,sections:exportSections,section:a.section,items,pagination:paging(a.offset,limit,total)};
+  }
   const limit=a.section==='sources'&&a.include_original?1:a.limit,select=a.section==='sources'?(a.include_original?'id,owner_id,work_id,edition,original_language,partial,genres,origin,captured_at,sha256,encode(original,\'base64\') as original_base64,mime,filename,warnings,derives_from,original_available,canonical_sha256,extraction,storage_policy':'id,owner_id,work_id,edition,original_language,partial,genres,origin,captured_at,sha256,mime,filename,warnings,derives_from,original_available,canonical_sha256,extraction,storage_policy'):'*';
   const exportFilter=a.section==='preference_records'?" where scope<>'session'":'';
   const items=(await c.query(`select ${a.section==='references'?'*,consulted_at::text as consulted_at':select} from araread."${a.section}"${exportFilter} order by ${a.section==='preferences'?'owner_id':a.section==='receipts'?'operation_id':'id'} limit $1 offset $2`,[limit,a.offset])).rows;
   if(a.section==='notes')for(const note of items)if(note.anchor?.mediation_id&&!await one(c,'select id from araread.mediations where id=$1 and reading_id=$2',[note.anchor.mediation_id,note.reading_id]))note.anchor={...note.anchor,unavailable_version:true};
-  return {format:'araread/3',snapshot,sections,section:a.section,items,pagination:paging(a.offset,limit,Number((await one(c,`select count(*) from araread."${a.section}"${exportFilter}`)).count))};
+  return {format:a.format,snapshot,sections:exportSections,section:a.section,items,pagination:paging(a.offset,limit,Number((await one(c,`select count(*) from araread."${a.section}"${exportFilter}`)).count))};
  }
  if(name==='data_restore')return restoreBackup(c,uid,a.bundle,n=>quota(c,n));
  if(name==='work_delete'){

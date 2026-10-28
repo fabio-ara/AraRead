@@ -1,0 +1,117 @@
+{
+  "checked_at": "2026-10-28T22:29:24.936Z",
+  "revision": "44fc310ee9c6fb8787a78a93062749b0a0555e6c",
+  "working_tree_dirty": false,
+  "environment": "PostgreSQL/Auth locais reais, papel authenticated, duas contas sintéticas",
+  "content_rows_before_and_after": {
+    "edition_projects": 1,
+    "edition_sources": 2,
+    "edition_passages": 4,
+    "edition_versions": 1,
+    "edition_settings": 1,
+    "edition_reviews": 4
+  },
+  "logical_json_bytes": {
+    "edition_projects": 2994,
+    "edition_sources": 3866,
+    "edition_passages": 28924,
+    "edition_versions": 2802,
+    "edition_settings": 346,
+    "edition_reviews": 1580
+  },
+  "physical_new_tables": {
+    "edition_projects": {
+      "heap": 8192,
+      "table_with_toast": 16384,
+      "indexes": 49152,
+      "total": 65536
+    },
+    "edition_sources": {
+      "heap": 8192,
+      "table_with_toast": 16384,
+      "indexes": 49152,
+      "total": 65536
+    },
+    "edition_passages": {
+      "heap": 8192,
+      "table_with_toast": 65536,
+      "indexes": 65536,
+      "total": 131072
+    },
+    "edition_versions": {
+      "heap": 8192,
+      "table_with_toast": 32768,
+      "indexes": 131072,
+      "total": 163840
+    },
+    "edition_settings": {
+      "heap": 8192,
+      "table_with_toast": 16384,
+      "indexes": 49152,
+      "total": 65536
+    },
+    "edition_reviews": {
+      "heap": 8192,
+      "table_with_toast": 16384,
+      "indexes": 49152,
+      "total": 65536
+    }
+  },
+  "personal_states": [
+    {
+      "reader_rows": 1,
+      "annotation_rows": 1,
+      "json_bytes": 628
+    },
+    {
+      "reader_rows": 1,
+      "annotation_rows": 1,
+      "json_bytes": 628
+    }
+  ],
+  "traffic": [
+    {
+      "reader": 1,
+      "passages": 4,
+      "response_body_bytes": 49988,
+      "gzip_if_transport_enabled_bytes": 15598,
+      "elapsed_ms": 45
+    },
+    {
+      "reader": 2,
+      "passages": 4,
+      "response_body_bytes": 49992,
+      "gzip_if_transport_enabled_bytes": 15592,
+      "elapsed_ms": 32
+    }
+  ],
+  "limits": [
+    "Corpus pequeno: quatro passagens, dois capítulos. Não representa capacidade do Supabase Free nem teste de carga.",
+    "Tabelas TEMP copiam schema, compressão e índices; alocações excluem WAL, bloat e backups do provedor.",
+    "Tráfego conta corpo HTTP real sem cabeçalhos/TLS. Gzip é apenas estimativa separada, não compressão observada no transporte.",
+    "A fonte incorporada conserva um snapshot do autor além da biblioteca legada. Nenhum snapshot adicional é criado por leitor.",
+    "Recibos e histórico operacional não entram no total das tabelas editoriais selecionadas."
+  ],
+  "component_json_bytes": {
+    "original_structured": 2002,
+    "translation": 862,
+    "facilitated": 2020,
+    "supports": 15809,
+    "activities": 2516,
+    "evidence": 378
+  },
+  "offline_chapters": [
+    {
+      "chapter": "1. Hipóteses e evidências",
+      "passages": 2,
+      "contexts_json_bytes": 25184,
+      "meaning": "Payload de contextos completo, antes do envelope e overhead do IndexedDB; a jornada web mede a entrada efetivamente gravada."
+    },
+    {
+      "chapter": "2. Datas e sentidos",
+      "passages": 2,
+      "contexts_json_bytes": 24734,
+      "meaning": "Payload de contextos completo, antes do envelope e overhead do IndexedDB; a jornada web mede a entrada efetivamente gravada."
+    }
+  ]
+}

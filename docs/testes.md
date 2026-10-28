@@ -1,5 +1,15 @@
 # Testes e evidências
 
+## Evolução 0.5 — validação em curso
+
+O gate acrescenta autoria e leitura da mesma edição por duas contas, publicação anônima autorizada, configuração privada, convites, idempotência, revisão e integridade de versões. O cliente MCP oficial exercita o fluxo editorial e o painel com os contratos registrados. A restauração v4 confere hashes, referências, isolamento, preservação de notas e compartilhamento inativo. A integração em `44fc310` passou em 134/134 testes, com PostgreSQL e Auth reais no ambiente isolado da CI.
+
+Vinte e duas verificações puras passaram: DOCX/PPTX/EPUB, proteção de pacotes compactados, matriz editorial adversarial, alinhamentos, seleção Unicode e hash estável após JSONB. IndexedDB com duas abas passou em Chromium e WebKit, incluindo escrita durante sincronização e repetição pelo recibo. O painel foi inspecionado em host sintético com tabela, fórmula e apoio preparado. O gate real de DOC/MOBI usa LibreOffice e calibre isolados e passou na CI, assim como OCR. Essas provas não homologam o cliente ChatGPT.
+
+Em `44fc310`, Chromium passou 14/14 jornadas e WebKit 13/14. Todas as jornadas novas passaram; uma corrida no teste legado de recibos foi corrigida em `1fed71c`, junto da retomada anônima. O gate corrigido ainda precisa ser confirmado. [Revisão e análise dos achados](evidencias/revisao-0.5.md). Os gates `tests/hosted-editions.ts` e `tests/hosted-edition-ui.ts` foram preparados para duas contas comuns, publicação sintética, isolamento, backup v4, configurações e capítulo offline no Pages real; só serão registrados como aprovados depois de executados.
+
+As jornadas antigas continuam exigidas. A navegação explícita para Biblioteca acompanha a nova página inicial Edições, preservando as asserções sobre leitura, notas, seleção, retomada e offline. A CI mantém banco isolado, duas contas e todas as migrations; não faz reset no projeto hospedado. Resultados e revisão definitiva serão registrados em [STATUS](../STATUS.md) após o gate completo.
+
 ## Validação local 0.4
 
 O gate do núcleo passou em 102/102 testes locais com Auth/PostgreSQL reais, incluindo instalação/evolução, compatibilidade de recibos/backup, RLS entre contas, parágrafos legados, seleção por representação, versões órfãs, datas civis e entradas matemáticas hostis. As regressões da revisão independente incluem citações literais de UUID, espaços em fronteiras legadas, oração parentética e pontuação CJK. O cliente MCP oficial conferiu também o JSON Schema real de saída; o campo de contexto da seleção foi acrescentado ao contrato após essa verificação.

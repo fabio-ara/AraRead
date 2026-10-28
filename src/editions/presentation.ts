@@ -1,0 +1,15 @@
+/** Shared presentation adapter: web and MCP use the same stored segments. */
+export function editionDisplay(context:any,state:any,write=false){
+ const p=context.passage,content=p.content,values=context.config.values;
+ const model=(s:any)=>({text:s.text,language:s.language,representation:s.representation,segment:s.id,base_offset:s.base_offset||0,...(s.representation==='original'?{original_kind:s.kind,original_meta:s.meta}:{mediation_id:p.id}),kind:'main'});
+ const original=p.originals.map(model),facilitated=content.segments.filter((s:any)=>s.representation==='facilitated').map(model),translation=content.segments.filter((s:any)=>s.representation==='translation').map(model);
+ const highlights=(state?.annotations||[]).filter((a:any)=>a.kind==='highlight'&&a.passage_id===p.id).map((a:any)=>({id:a.id,ref:content.refs[0],state:'anchored',language:values.language,target:{...a.target,segment:a.target.segment_id,...(a.target.representation==='original'?{}:{mediation_id:p.id})}}));
+ const originalText=original.map((s:any)=>s.text).join('\n\n'),translationText=(translation.length?translation:original).map((s:any)=>s.text).join('\n\n'),facilitatedText=facilitated.map((s:any)=>s.text).join('\n\n');
+ return {edition:true,ready:true,work:{title:context.version.title},source:{original_language:p.originals[0]?.language||'und'},reading:{id:context.version.id,revision:state?.state.revision||0},ref:content.refs[0],element:{kind:'paragraph',locator:content.title},effective_language:values.language,default_tab:state?.preferences?.values.tab||'facilitated',permissions:{write},representations:{facilitated:{segments:facilitated},translation:translation.length?{segments:translation}:{status:'same_language',segments:original},original:{segments:original}},highlights:{items:highlights,pagination:{next_offset:null}},terms:[],version:context.version,passage:context.passage,config:context.config,original:originalText,location:{label:content.title||content.chapter},fallback_text:`${context.version.title}\n\nLeitura facilitada\n${facilitatedText}\n\nTradução\n${translationText}\n\nOriginal\n${originalText}`};
+}
+export function selectorFromReader(passage:string,target:any){return {passage_id:passage,representation:target.representation,segment_id:target.segment,start:target.start,end:target.end,exact:target.exact,prefix:target.prefix,suffix:target.suffix};}
+export function matchingSupport(content:any,target:any,kind:string,humor=false){
+ if(kind==='humor'&&!humor)return {item:null,expanded:false,message:'O humor está desabilitado nas suas preferências.'};
+ const matches=content.supports.filter((s:any)=>s.kind===kind&&s.target.representation===target.representation&&s.target.segment_id===target.segment_id&&s.target.start<=target.start&&s.target.end>=target.end).sort((a:any,b:any)=>(a.target.end-a.target.start)-(b.target.end-b.target.start));
+ const item=matches[0]||null;return {item,expanded:!!item&&(item.target.start!==target.start||item.target.end!==target.end),message:item?'':'Não há apoio preparado para este trecho.'};
+}

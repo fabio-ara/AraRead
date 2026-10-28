@@ -1,5 +1,15 @@
 # Estado verificável
 
+## Evolução 0.5 — implementação em validação, ainda não publicada
+
+A árvore de desenvolvimento inclui edições compartilhadas, autoria em quatro etapas, leitor independente, configurações persistidas, grupos por convite, capítulos offline e importadores DOCX/PPTX/EPUB. Backup v4, integração editorial do painel MCP e proteções de relações/revisões passaram na integração com banco e Auth reais. As leituras e provas históricas abaixo não foram substituídas por essas alterações.
+
+Provas de `44fc310`: 134/134 testes do núcleo, conversão real DOC/MOBI, OCR, instalação/evolução e pacote Edge aprovados na [CI](https://github.com/fabio-ara/AraRead/actions/runs/40779927646). Chromium passou 14/14 jornadas; WebKit, 13/14, com uma corrida no teste de recibos corrigida em `1fed71c`. Todas as jornadas novas passaram nos dois navegadores. [Revisão crítica e limites](docs/evidencias/revisao-0.5.md), [medição de armazenamento/tráfego](docs/evidencias/armazenamento-0.5.json), [leitor em 320 px](docs/assets/editions-320-webkit.png), [desktop](docs/assets/editions-desktop-chromium.png) e [autoria](docs/assets/editions-authoring-webkit.png).
+
+Em `1fed71c`, o teste de recibos e a retomada anônima passaram, mas uma resposta atrasada da Biblioteca apagou o formulário de importação já aberto. O defeito foi reproduzido e corrigido; a regressão retém essa resposta antes de preencher o rascunho. Ainda faltam o gate final, integração no branch principal, implantação e homologação hospedada da 0.5. O backup privado anterior à atualização foi obtido pelo conector autenticado comum, com snapshot consistente das 18 seções. Nenhum dado pessoal integra as fixtures ou as evidências públicas. Não há declaração de entrega integral enquanto essas etapas estiverem pendentes.
+
+## Entrega 0.4.0 — histórica
+
 **AraRead 0.4.0 publicado em 27/10/2026**, no [GitHub Pages](https://fabio-ara.github.io/AraRead/) e na função Edge existente, versão 8. O [PR #3](https://github.com/fabio-ara/AraRead/pull/3) integrou `d8f9509` em `97a8002`, após os gates. Continuidade estrutural compatível, reparo explícito da apresentação, grifos por representação e vocabulário/cálculo contextual estão implementados. [Comportamento e recuperação](docs/leitura-0.4.md).
 
 **Validação:** 102/102 testes com PostgreSQL/Auth reais e duas contas; 10/10 jornadas Chromium e 10/10 WebKit, sem pulos. Duas revisões independentes apontaram nove falhas, reproduzidas e corrigidas. Tipos, build, Docker, migrations, OCR, documentação e auditorias passaram. A distribuição minificada oficial do PDF.js resolveu o limite de upload do deploy; texto, posições e operadores foram comparados na CI. [CI do PR](https://github.com/fabio-ara/AraRead/actions/runs/40583710205), [push](https://github.com/fabio-ara/AraRead/actions/runs/40583703406), [main](https://github.com/fabio-ara/AraRead/actions/runs/40585274835) e [Pages](https://github.com/fabio-ara/AraRead/actions/runs/40586124174).

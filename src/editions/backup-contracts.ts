@@ -1,0 +1,1 @@
+export const editionBackupSections=['edition_projects','edition_sources','edition_passages','edition_reviews','edition_versions','edition_settings','edition_readers','edition_annotations','edition_groups','edition_invites','edition_members','edition_comments','edition_archives'] as const;
