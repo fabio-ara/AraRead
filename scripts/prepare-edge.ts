@@ -8,6 +8,7 @@ for(const path of [fn,`${fn}/src`,`${fn}/vendor`])await mkdir(path,{recursive:tr
 for(const name of await readdir('src'))if(name.endsWith('.ts'))await copyFile(`src/${name}`,`${fn}/src/${name}`);
 await cp('src/study',`${fn}/src/study`,{recursive:true});
 await cp('src/ingestion',`${fn}/src/ingestion`,{recursive:true});
+await cp('src/editions',`${fn}/src/editions`,{recursive:true});
 // Distribuição oficial da mesma versão, incluindo os avisos de licença.
 // Evita exceder o limite de 5 MB de código-fonte da API de deploy.
 for(const name of ['pdf','pdf.worker'])await copyFile(`node_modules/pdfjs-dist/legacy/build/${name}.min.mjs`,`${fn}/vendor/${name}.mjs`);

@@ -9,6 +9,9 @@ export const pool = new pg.Pool({connectionString:ca?databaseUrl.href:config.dat
 // Falhas em conexão ociosa não podem derrubar o processo nem registrar consultas.
 pool.on('error',error=>console.error(JSON.stringify({event:'database_idle_error',code:(error as any)?.code||'CONNECTION'})));
 export interface Identity {id:string;session_id:string;client_id?:string;permissions:'read'|'write';}
+export async function publicTransaction<T>(fn:(client:pg.PoolClient)=>Promise<T>):Promise<T>{
+ const c=await pool.connect();try{await c.query('begin read only');await c.query('set local role anon');await c.query("select set_config('request.jwt.claim.sub','',true),set_config('request.jwt.claims','{}',true),set_config('statement_timeout','6000',true)");const result=await fn(c);await c.query('commit');return result;}catch(e){await c.query('rollback');throw e;}finally{c.release();}
+}
 export async function transaction<T>(identity:Identity,fn:(client:pg.PoolClient)=>Promise<T>):Promise<T>{
  const c=await pool.connect();
  try {

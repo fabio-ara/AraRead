@@ -1,12 +1,12 @@
 # AraRead
 
-Um ambiente pessoal para estudar obras difíceis pelo chat. Peça uma leitura, acompanhe a passagem nas abas **Leitura facilitada | Tradução | Original** e converse para entender conceitos, consultar fontes, escolher outra seção ou retomar o estudo. O AraRead conserva obras, versões, notas, progresso e preferências explícitas. A IA continua no assistente conectado, sem chave de modelo no backend.
+Um ambiente para preparar edições de estudo e ler obras difíceis, com **Leitura facilitada | Tradução | Original**. O assistente conectado produz e revisa o material; a edição publicada pode ser estudada pelo site, sem ChatGPT, MCP ou chamadas generativas. Fonte, edição e estado pessoal do leitor têm identidades e permissões distintas.
 
-A evolução 0.3 acrescenta ingestão editorial validada, armazenamento textual, OCR local aberto, navegação conversacional e perfis reutilizáveis. A tradução permanece fiel ao original e separada de lentes interpretativas. A primeira explicação deve construir os conhecimentos necessários à passagem; verificações automáticas não certificam compreensão nem fidelidade acadêmica universal. Todas as telas mantêm largura máxima de 480 px.
+A evolução 0.5 em desenvolvimento acrescenta autoria em quatro etapas, configurações compartilhadas entre web e MCP, fontes canônicas reutilizadas, apoios preparados, atividades opcionais, grupos privados por convite e capítulos completos offline. Leituras pessoais anteriores continuam acessíveis. A tradução não adota perfis interpretativos; verificações automáticas não certificam compreensão nem fidelidade acadêmica. Todas as telas mantêm largura máxima de 480 px.
 
-A [evolução 0.4](docs/leitura-0.4.md) acrescenta continuidade íntegra, grifos e apoios contextuais; sua validação está registrada no STATUS.
+Veja o [guia de autoria e leitura](docs/guia-uso.md), a [arquitetura](docs/arquitetura.md) e os [formatos de entrada](docs/fontes-formatos.md). A [evolução 0.4](docs/leitura-0.4.md) documenta a continuidade das leituras pessoais anteriores.
 
-**Disponível: 0.3.0, validada também no ChatGPT real.** Veja [STATUS](STATUS.md) para revisões, testes locais/hospedados, evidências e limites. O destino existente é o [GitHub Pages](https://fabio-ara.github.io/AraRead/), com API/Auth/[MCP OAuth](https://ltzoontstgpbegtakrgk.supabase.co/functions/v1/araread/mcp) no Supabase exclusivo Free. Não há serviços pagos, cadastro público nem descoberta de bibliotecas alheias. Conheça o [comportamento da 0.3](docs/leitura-0.3.md).
+**Publicada: 0.4.0. A evolução 0.5 ainda não foi publicada.** O [STATUS](STATUS.md) distingue implementação, testes locais, prova hospedada e limitações. O destino existente é o [GitHub Pages](https://fabio-ara.github.io/AraRead/), com API/Auth/[MCP OAuth](https://ltzoontstgpbegtakrgk.supabase.co/functions/v1/araread/mcp) no Supabase exclusivo Free. Não há chave de modelo, cadastro público nem descoberta de bibliotecas pessoais alheias.
 
 ## Usar localmente
 
@@ -25,7 +25,7 @@ npm run dev
 
 Abra **http://127.0.0.1:4317**. Para uso pessoal local, preencha e-mail e uma senha exclusiva de teste e use “Criar conta local de teste”. As duas identidades geradas pelo comando são exclusivamente sintéticas para a suíte; suas credenciais ficam em `.local/test-accounts.json`, ignorado pelo Git. Não use senhas reais de outros serviços nesse ambiente de desenvolvimento.
 
-Diga ao assistente: “Quero estudar este artigo”, “Explique o problema antes dos termos”, “Mostre o mapa da obra” ou “Retome meu percurso principal”. O chat prepara e guarda as representações antes de apresentar um único painel. A página web oferece autenticação, visualização e recuperação técnica; os controles de estudo ficam no chat. Sem MCP Apps, o assistente apresenta o conteúdo em texto.
+Para autoria, diga ao assistente: “Prepare uma edição a partir destas fontes; consulte a configuração do projeto e apresente uma amostra antes do lote”. Para estudar, abra uma edição no site e use índice, apoios, notas e retomada. A página também configura a autoria e registra aprovação, revisão e publicação. No chat, somente `reading_display` anuncia o painel pronto; sem MCP Apps, há uma apresentação textual equivalente.
 
 ## Verificar e conhecer
 

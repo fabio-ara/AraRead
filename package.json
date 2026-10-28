@@ -1,7 +1,7 @@
 {
   "name": "araread",
-  "version": "0.4.0",
-  "description": "Biblioteca pessoal de leitura assistida, na ordem da obra e com memória persistente.",
+  "version": "0.5.0",
+  "description": "Edições de estudo, autoria assistida e leitura autônoma com memória pessoal.",
   "private": true,
   "engines": {
     "node": ">=24.14.0"
@@ -44,6 +44,7 @@
     "@modelcontextprotocol/server": "2.4.0",
     "@supabase/supabase-js": "2.118.0",
     "express": "5.1.0",
+    "fflate": "0.8.3",
     "ipaddr.js": "2.2.0",
     "jose": "6.1.0",
     "katex": "0.19.1",

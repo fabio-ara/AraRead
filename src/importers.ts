@@ -1,8 +1,10 @@
 import { lookup } from 'node:dns/promises';
+import {createHash} from 'node:crypto';
 import { connect } from 'node:tls';
 import { Client } from 'undici';
 import {extractHtml,prose} from './ingestion/html.ts';
 import {extractPdf} from './ingestion/pdf.ts';
+import {extractPackage} from './ingestion/office.ts';
 import {assessExtraction,canonicalHash} from './ingestion/quality.ts';
 import {applyOcr,ocrSchema,type OcrPreparation} from './ingestion/ocr.ts';
 import ipaddr from 'ipaddr.js';
@@ -78,7 +80,8 @@ export async function extract(input:ImportInput):Promise<Extraction>{
  ensure(bytes.length>0&&bytes.length<=MAX,'TOO_LARGE','Forneça um original de até 8 MiB.',413);
  let blocks:Block[],warnings:string[]=[],mime='text/plain',removed=0,metadata={title:'',author:'',edition:''};
  if(input.format==='pdf'){const result=await extractPdf(bytes);blocks=result.blocks;warnings=result.warnings;removed=result.removed;mime='application/pdf';}
- else if(input.format==='structured'){blocks=input.blocks!.map(x=>blockSchema.parse(x));mime='application/json';}
+ else if(['docx','pptx','epub'].includes(input.format)){const result=extractPackage(bytes,input.format as 'docx'|'pptx'|'epub');blocks=result.blocks;warnings=result.warnings;removed=result.removed;metadata=result.metadata;mime=result.mime;}
+ else if(input.format==='structured'){blocks=input.blocks!.map(x=>blockSchema.parse(x));mime='application/json';const conversion=blocks[0]?.meta.conversion as any;if(conversion){ensure(conversion.original_sha256===createHash('sha256').update(bytes).digest('hex'),'INVALID_CONVERSION','O hash do original não corresponde ao preparo local.');warnings.push('Conversão local declarada; texto e ordem exigem confronto com o original preservado.');mime=conversion.format==='doc'?'application/msword':conversion.format==='mobi'?'application/x-mobipocket-ebook':mime;blocks[0].meta.essential_visual=true;}}
  else if(['url','html'].includes(input.format)){const result=extractHtml(utf8(bytes));blocks=result.blocks;warnings=result.warnings;removed=result.removed;metadata=result.metadata;mime='text/html';}
  else {blocks=textBlocks(utf8(bytes),input.format==='markdown');if(input.format==='markdown')mime='text/markdown';}
  ensure(blocks.length>0&&blocks.length<=20000,'EMPTY_SOURCE','A fonte não contém texto extraível dentro do limite de 20 mil elementos.');
@@ -86,6 +89,6 @@ export async function extract(input:ImportInput):Promise<Extraction>{
  if(input.ocr){ensure(input.format==='pdf','INVALID_OCR','Preparo OCR exige o PDF original.');blocks=applyOcr(blocks,bytes,ocrSchema.parse(input.ocr));warnings.push('OCR preparado localmente com Tesseract; proveniência declarada, sem certificação humana. Confira negações, fórmulas, tabelas e ordem no original.');}
  const labels:Record<string,string>={paragraph:'parágrafo',heading:'título',list:'item',quote:'citação',note:'nota',verse:'estrofe',equation:'fórmula',table:'tabela',code:'código',figure:'figura'},counts:Record<string,number>={};
  blocks=blocks.map(b=>({...b,locator:b.locator||`${labels[b.kind]||'elemento'} ${counts[b.kind]=(counts[b.kind]||0)+1}`}));
- const quality=assessExtraction(blocks,warnings,input.format==='pdf'?'pdfjs-positional-v1':input.format==='html'||input.format==='url'?'semantic-html-v1':'text-v1',removed);
- return {blocks,warnings,quality,metadata,canonical_hash:canonicalHash(blocks),original:bytes,mime,filename:input.filename||({pdf:'original.pdf',markdown:'original.md',html:'original.html',url:'original.html',structured:'original.json'} as Record<string,string>)[input.format]||'original.txt'};
+ const quality=assessExtraction(blocks,warnings,input.format==='pdf'?'pdfjs-positional-v1':input.format==='html'||input.format==='url'?'semantic-html-v1':['docx','pptx','epub'].includes(input.format)?`${input.format}-package-v1`:'text-v1',removed);
+ return {blocks,warnings,quality,metadata,canonical_hash:canonicalHash(blocks),original:bytes,mime,filename:input.filename||({pdf:'original.pdf',epub:'original.epub',docx:'original.docx',pptx:'original.pptx',markdown:'original.md',html:'original.html',url:'original.html',structured:'original.json'} as Record<string,string>)[input.format]||'original.txt'};
 }

@@ -1,10 +1,12 @@
 # Ler com continuidade
 
-A experiência corrente está descrita em [Leitura 0.3](leitura-0.3.md): chat conduz o estudo, painel tem três abas e fontes passam por pré-verificação. As provas de versões anteriores abaixo são históricas; o [STATUS](../STATUS.md) identifica a revisão efetivamente verificada.
+A evolução em desenvolvimento separa três responsabilidades: a fonte canônica conserva o original; a edição guarda explicações, traduções e apoios preparados; cada leitor mantém suas próprias posições, notas, grifos e respostas. O assistente conduz a autoria. O site conduz o estudo de uma edição já preparada, sem chamadas a modelos. O [STATUS](../STATUS.md) identifica o que está publicado e a revisão efetivamente verificada.
 
-O usuário pode ter poucos minutos no transporte público. Ele precisa entender uma passagem difícil, perguntar sem perder a posição e encontrar a mesma explicação mais tarde. O AraRead guarda esse percurso de forma independente da conversa e do modelo de IA escolhido. Não gera cursos, avaliações ou pontos.
+O usuário pode ter poucos minutos no transporte público. Ele precisa consultar uma passagem, interromper e retomar sem perder a posição, inclusive sem rede quando o capítulo foi preparado. A explicação comum é guardada uma vez; o estado pessoal não é compartilhado. Atividades são opcionais e têm referência ou critérios explícitos; não há pontuação nem avaliação generativa silenciosa.
 
 ## A fonte determina a ordem
+
+Uma edição pode reunir fontes autorizadas, com versões publicadas identificáveis. Nova produção não muda o texto de uma versão anterior nem transfere anotações automaticamente. Compartilhamento exige direitos declarados e publicação explícita; uma fonte da biblioteca pessoal só entra na edição quando sua pessoa proprietária a incorpora. Grupos compartilham comentários voluntários, sem compartilhar memória pessoal.
 
 Uma obra tem versões identificáveis e elementos ordenados. Uma porção aponta para a fonte, o elemento e o intervalo exato; uma mediação se vincula a essa referência. O texto original fica preservado e consultável. A reescrita mantém hipóteses, condições e incertezas; não pode substituir um argumento por um resumo.
 

@@ -8,10 +8,10 @@ if(!token)throw new Error('Configure ARAREAD_ACCESS_TOKEN apenas no ambiente do 
 async function call(tool:string,args:unknown){const r=await fetch(`${origin}/api/${tool}`,{method:'POST',headers:{authorization:`Bearer ${token}`,'content-type':'application/json'},body:JSON.stringify(args)});const out=await r.json();if(!r.ok||!out.ok)throw new Error(out.error?.message||`HTTP ${r.status}`);return out.data;}
 if(mode==='export'){
  const sections:Record<string,unknown[]>={};let snapshot:string|undefined;
- const manifest=await call('data_export',{section:'works',limit:1});snapshot=manifest.snapshot;
+ const manifest=await call('data_export',{format:'araread/4',section:'works',limit:1});snapshot=manifest.snapshot;
  for(const section of manifest.sections){
   sections[section]=[];let offset:number|null=0;
-  while(offset!==null){const page=await call('data_export',{section,offset,limit:50,include_original:true,snapshot});snapshot=page.snapshot;sections[section].push(...page.items);offset=page.pagination.next_offset;}
+  while(offset!==null){const page=await call('data_export',{format:manifest.format,section,offset,limit:50,include_original:true,snapshot});snapshot=page.snapshot;sections[section].push(...page.items);offset=page.pagination.next_offset;}
  }
  await writeFile(file,JSON.stringify({format:manifest.format,snapshot,exported_at:new Date().toISOString(),sections}),{mode:0o600,flag:'wx'});console.log('Backup privado consistente criado, incluindo os bytes originais quando disponíveis. Proteja o arquivo.');
 }else{

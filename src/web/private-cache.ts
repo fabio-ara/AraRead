@@ -1,6 +1,12 @@
 const dbPromise=new Promise<IDBDatabase>((resolve,reject)=>{const r=indexedDB.open('araread-private-v1',1);r.onupgradeneeded=()=>r.result.createObjectStore('data');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});
 export async function cacheGet<T=any>(owner:string,key:string):Promise<T|undefined>{const db=await dbPromise;return new Promise((resolve,reject)=>{const r=db.transaction('data').objectStore('data').get(`${owner}:${key}`);r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}
 export async function cacheSet(owner:string,key:string,value:unknown){const db=await dbPromise;return new Promise<void>((resolve,reject)=>{const tx=db.transaction('data','readwrite');tx.objectStore('data').put(value,`${owner}:${key}`);tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);});}
+export async function cacheUpdate<T>(owner:string,key:string,update:(value:T|undefined)=>T):Promise<T>{
+ const db=await dbPromise;return new Promise((resolve,reject)=>{const tx=db.transaction('data','readwrite'),store=tx.objectStore('data'),request=store.get(`${owner}:${key}`);let value:T,failure:unknown;
+  request.onsuccess=()=>{try{value=update(request.result);store.put(value,`${owner}:${key}`);}catch(e){failure=e;tx.abort();}};
+  tx.oncomplete=()=>resolve(value);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(failure||tx.error||Error('Atualização local interrompida.'));
+ });
+}
 export async function clearPrivate(){const db=await dbPromise;return new Promise<void>((resolve,reject)=>{const tx=db.transaction('data','readwrite');tx.objectStore('data').clear();tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);});}
 export async function clearOwner(owner:string){const db=await dbPromise;return new Promise<void>((resolve,reject)=>{const tx=db.transaction('data','readwrite'),store=tx.objectStore('data'),prefix=`${owner}:`,cursor=store.openKeyCursor(IDBKeyRange.bound(prefix,prefix+'\uffff'));cursor.onsuccess=()=>{const entry=cursor.result;if(entry){store.delete(entry.primaryKey);entry.continue();}};tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);});}
 export async function cacheRemove(owner:string,key:string){const db=await dbPromise;return new Promise<void>((resolve,reject)=>{const tx=db.transaction('data','readwrite');tx.objectStore('data').delete(`${owner}:${key}`);tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);});}

@@ -1,4 +1,5 @@
 import {highlightOutputs} from './study/highlights.ts';
+import {editionOutputs} from './editions/contracts.ts';
 import {z} from 'zod';
 import {refSchema,language,type ToolName} from './contracts.ts';
 import {navigationOutputs} from './study/navigation.ts';
@@ -8,11 +9,12 @@ const row=z.record(z.string(),z.unknown());
 const receipt=z.object({operation_id:id,status:z.literal('confirmed')});
 const saved=receipt.extend({reading_id:id,source_id:id.optional(),revision:rev,ref:refSchema.optional(),entity_id:id.optional(),effective_language:language.optional()}).passthrough();
 export const outputs:Record<ToolName,z.ZodType>={
+ ...editionOutputs,
  ...preferenceOutputs,
  ...highlightOutputs,
  ...navigationOutputs,
  source_preview:z.object({quality:row,metadata:row,canonical_hash:z.string(),preview:z.array(row),total_elements:rev,original_bytes:rev}),
- reading_display:z.object({ready:z.literal(true),terms:z.array(row),passage:row,permissions:row,highlights:row,work:row,source:row,reading:row,ref:refSchema,element:row,original:z.string(),effective_language:language,representations:z.object({facilitated:row,translation:row,original:row}),location:row,fallback_text:z.string()}),
+ reading_display:z.object({ready:z.literal(true),terms:z.array(row),passage:row,permissions:row,highlights:row,work:row,source:row,reading:row,ref:refSchema,element:row,original:z.string(),effective_language:language,representations:z.object({facilitated:row,translation:row,original:row}),location:row,fallback_text:z.string()}).passthrough(),
  source_append:saved.extend({segment_id:id,manifest_version:rev,first_new_ref:refSchema,resume:refSchema,previous_references_preserved:z.boolean(),warnings:z.array(z.string())}),
  reference_save:saved.extend({reference_id:id,apa:z.string(),consultation:z.literal('declared'),structural_hash:z.string()}),
  perspective_save:saved.extend({perspective_id:id,version:rev}),
@@ -34,7 +36,7 @@ export const outputs:Record<ToolName,z.ZodType>={
  reading_history:z.object({reading_id:id,source_id:id,revision:rev,items:z.array(row),pagination:page}),
  mediation_save:saved,term_save:saved,note_save:saved,reading_move:saved,
  operation_get:z.union([receipt.passthrough(),z.object({operation_id:id,status:z.literal('unknown'),message:z.string()})]),
- data_export:z.object({format:z.literal('araread/3'),snapshot:z.string(),sections:z.array(z.string()),section:z.string(),items:z.array(row),pagination:page}),
- data_restore:receipt.extend({id_map:z.record(id,id),restored_readings:rev,archived_receipts:z.array(row),receipt_policy:z.string()}),
+ data_export:z.object({format:z.enum(['araread/3','araread/4']),snapshot:z.string(),sections:z.array(z.string()),section:z.string(),items:z.array(row),pagination:page}),
+ data_restore:receipt.extend({id_map:z.record(id,id),restored_readings:rev,archived_receipts:z.array(row),receipt_policy:z.string()}).passthrough(),
  work_delete:receipt.extend({work_id:id,deleted:z.literal(true)}),
 };

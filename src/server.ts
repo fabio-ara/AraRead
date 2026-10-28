@@ -9,6 +9,7 @@ import { schemas,type ToolName } from './contracts.ts';
 import { AppError,ensure } from './errors.ts';
 import { mcpHandler } from './mcp.ts';
 import { transaction,pool } from './db.ts';
+import {publicEdition} from './editions/public.ts';
 
 export async function createApp(){
  if(config.local){ensure(['127.0.0.1','localhost'].includes(new URL(config.origin).hostname),'CONFIG','Modo local restrito ao loopback.');}
@@ -45,6 +46,7 @@ export async function createApp(){
  // Exige identidade e sessão ativa antes de ler um corpo maior que o MCP comum.
  app.post('/api/data_restore',async(req,res,next)=>{try{const identity=await authenticate(req.headers.authorization);await transaction(identity,async c=>ensure((await c.query('select araread_private.session_active($1,$2) as active',[identity.id,identity.session_id])).rows[0].active,'SESSION_REVOKED','Sessão revogada.',401));res.locals.identity=identity;next();}catch(e){next(e);}},express.json({limit:'128mb'}),async(req,res)=>{res.json({ok:true,data:await execute('data_restore',req.body,res.locals.identity)});});
  app.use(express.json({limit:'16mb'}));
+ app.post('/api/public/:tool',async(req,res)=>{res.json({ok:true,data:await publicEdition(req.params.tool,req.body)});});
  app.post('/api/:tool',async(req,res)=>{
   const name=req.params.tool as ToolName;ensure(Object.hasOwn(schemas,name),'TOOL_NOT_FOUND','Operação inexistente.',404);
   const identity=await authenticate(req.headers.authorization);

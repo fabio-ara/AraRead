@@ -1,0 +1,6 @@
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends python3 libreoffice-writer calibre && rm -rf /var/lib/apt/lists/*
+COPY scripts/convert-legacy.py /app/convert-legacy.py
+ENV QT_QPA_PLATFORM=offscreen CALIBRE_CONFIG_DIRECTORY=/tmp/araread-calibre XDG_RUNTIME_DIR=/tmp/araread-runtime
+USER 65534:65534
+ENTRYPOINT ["python3", "/app/convert-legacy.py"]

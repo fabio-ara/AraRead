@@ -2,6 +2,36 @@
 
 O endpoint `/mcp` usa Streamable HTTP pelo SDK oficial. A implementação foi exercitada com protocolo `2026-07-28` e compatibilidade do SDK com o fluxo legado `2025-11-25`. A aplicação não trata um handshake antigo como regra universal. Os contratos executáveis estão em [contracts.ts](../src/contracts.ts) e [outputs.ts](../src/outputs.ts); o SDK publica seus JSON Schemas. A API web `/api/:ferramenta` chama os mesmos casos de uso, com sessão web em vez de token OAuth do recurso MCP.
 
+## Edições de estudo
+
+As ferramentas novas agrupam operações por etapa. Todas usam os mesmos casos de uso na web e no MCP; cada escrita exige identidade, sessão, permissão, revisão esperada e recibo idempotente.
+
+| Ferramenta | Operação |
+|---|---|
+| `edition_configuration` | Configuração privada efetiva, origens, revisões e perfis próprios |
+| `edition_catalog` | Edições acessíveis por obra, conceito ou tradição; consulta autenticada também retorna projetos próprios e retomada recente |
+| `edition_context` | Projeto e tarefas limitadas para autoria, ou passagem de uma versão exata; não anuncia painel |
+| `edition_project` | Criar, atualizar identificação/direitos ou derivar projeto próprio |
+| `edition_source` | Incorporar fonte própria pré-verificada, sem tornar pública a biblioteca pessoal |
+| `edition_plan` | Guardar/restaurar escolhas explícitas no escopo e revisão indicados |
+| `edition_sample` | Preparar amostra, pedir mudanças ou registrar aprovação pela pessoa autora na interface |
+| `edition_batch` | Receber até cinco passagens completas por lote, após amostra aprovada |
+| `edition_review` | Registrar parecer sobre IDs exatos de versões das passagens |
+| `edition_publish` | Publicar versão privada, por convite ou pública; retirar versão própria |
+| `edition_reader` | Consultar estado pessoal sem alterá-lo |
+| `edition_annotate` | Abrir, confirmar/continuar, retomar, anotar, destacar, responder, pedir apoio, marcar para revisar ou excluir registro próprio |
+| `edition_groups` / `edition_group` | Consultar grupos; criar, convidar, aderir, sair, revogar participação e gerir comentários próprios |
+
+`reading_display` continua sendo o único anúncio de MCP Apps. Aceita `reading_id` do domínio anterior, ou `version_id`/`project_id` editorial com `passage_id` opcional. O projeto apresenta uma amostra sem gravação pessoal; a versão permite ações conforme identidade/capacidade do host. O fallback textual contém as três representações. A UI usa os mesmos segmentos e apoios guardados do site.
+
+Projeto, configuração e leitor possuem revisões distintas. Adesão por convite usa revisão zero para a participação nova e retorna a revisão atual do grupo; operações posteriores conferem essa revisão. Uma exclusão de anotação criada offline pode indicar `annotation_operation_id`: o serviço resolve somente o recibo confirmado da mesma conta e versão, sem aproximação textual.
+
+A API pública aceita apenas `POST /api/public/edition_catalog` e `edition_context` com `version_id`. Rascunhos, configurações privadas, notas, preferências e grupos não fazem parte desse acesso. Nenhuma consulta pública escreve progresso. Conteúdo de uma versão substituída continua identificável; retirada impede acesso público e novas anotações.
+
+Para recuperação completa use `data_export` com `format: "araread/4"`, mesma `snapshot` e `include_original:true` em todas as páginas. O padrão v3 mantém clientes antigos. O v4 inclui domínio anterior, edições e estado pessoal; `data_restore` continua aceitando v1/v2/v3. Consulte [recuperação](operacao.md).
+
+## Biblioteca pessoal anterior
+
 | Ferramenta | Efeito e contrato principal |
 |---|---|
 | `account_context` | Lê conta autenticada, preferências, cota e capacidades |

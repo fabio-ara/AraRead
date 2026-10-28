@@ -21,6 +21,10 @@ A cota conta originais, texto dos elementos, reescritas/acréscimos, seleções/
 
 ## Backup privado
 
+A interface e a CLI exportam `araread/4`, que inclui as dezoito seções anteriores e treze seções editoriais. Na API/MCP, peça `format:'araread/4'`; a omissão conserva `araread/3` para clientes anteriores e não inclui edições. Use a lista `sections` devolvida pelo manifesto, com o mesmo snapshot em todas as páginas. Alterações próprias ou mudanças de disponibilidade nas versões compartilhadas invalidam o snapshot.
+
+A restauração v4 confere os hashes de fonte, passagem e versão e retorna mapa explícito de IDs. As versões restauradas são privadas, sem reativar compartilhamento ou aprovação da amostra. Convites, grupos e comentários anteriores ficam como histórico inerte. Notas de uma edição cujo conteúdo não está disponível conservam sua referência no arquivo privado de recuperação. O aplicativo aceita também v1, v2 e v3 e não sobrescreve leituras existentes. Restauração é transacional e exige conferir o recibo antes de repetir uma intenção.
+
 Na interface, Configurações prepara o JSON completo em um campo de texto, incluindo originais. Nenhum arquivo é baixado pela UI. A ferramenta CLI escreve bytes diretamente no sistema de arquivos:
 
 ```powershell
@@ -30,9 +34,9 @@ npm run backup -- restore .local/minha-biblioteca.json
 
 Esses comandos exigem `ARAREAD_ACCESS_TOKEN` no ambiente do processo, obtido legitimamente para sua própria conta pela API Auth; não o passe como argumento, não o grave em script/commit e não o envie no chat. `APP_ORIGIN` escolhe a instância. A CLI não extrai credenciais do navegador. O usuário pode preferir a exportação no campo privado e a restauração pela própria interface, que usa a sessão já autenticada.
 
-A exportação v3 confere um snapshot lógico entre todas as páginas das dezoito seções. Use o mesmo token retornado na primeira chamada e `include_original:true`. `EXPORT_CHANGED` exige reiniciar a tentativa completa; não rotule um conjunto parcial como backup. Fontes antigas ou marcadas `original_available:true` exigem os bytes. Fontes textuais novas restauram pelo hash canônico dos elementos, sem inventar um binário ausente. Preferências temporárias de sessão não entram no backup. Arquivo de destino existente não é sobrescrito. Guarde o JSON em armazenamento confiável com criptografia externa e retenção adequada.
+A exportação confere um snapshot lógico entre todas as páginas das seções selecionadas pelo formato. Use o mesmo token retornado na primeira chamada e `include_original:true`. `EXPORT_CHANGED` exige reiniciar a tentativa completa; não rotule um conjunto parcial como backup. Fontes antigas ou marcadas `original_available:true` exigem os bytes. Fontes textuais novas restauram pelo hash canônico dos elementos, sem inventar um binário ausente. Preferências temporárias de sessão não entram no backup. Arquivo de destino existente não é sobrescrito. Guarde o JSON em armazenamento confiável com criptografia externa e retenção adequada.
 
-A restauração aceita `araread/1`, `araread/2` e `araread/3`, valida originais por SHA-256 e relações/intervalos, cria IDs novos e conserva relações, proveniência, idiomas, cobertura e histórico. Ela não sobrescreve leituras existentes nem preferências já presentes na conta. O recibo traz `id_map` e os recibos antigos como arquivo de proveniência; chaves antigas não são reativadas. Duas restaurações intencionais com novas identidades criam duas cópias.
+Na parte legada, a restauração valida originais por SHA-256 e relações/intervalos, cria IDs novos e conserva relações, proveniência, idiomas, cobertura e histórico. Ela não sobrescreve leituras existentes nem preferências já presentes na conta. O recibo traz `id_map` e os recibos antigos como arquivo de proveniência; chaves antigas não são reativadas. Duas restaurações intencionais com novas identidades criam duas cópias.
 
 Para evitar duplicação em falha de rede, a CLI grava antes um arquivo `.restore-request.json` ao lado do backup, com identidade e hash da intenção. Reexecutar com o mesmo arquivo recupera o recibo ou repete a mesma chave. Não remova esse arquivo enquanto houver resultado incerto. O recibo confirmado fica em `.restore-receipt.json`; se ele já existir, a escrita local protegida não o substitui. A interface também conserva intenção pendente no IndexedDB e permite consultá-la/repeti-la em Configurações.
 
@@ -45,6 +49,8 @@ O chat oferece exclusão explícita de nota e de suas derivações registradas, 
 Para código defeituoso, volte ao artefato anterior compatível com o schema; não edite migrations aplicadas nem execute reset em produção. Uma correção de dados exige backup, análise do impacto e migration ou operação explicitamente revisada. Para perda de volume local, reinstale a instância, crie uma identidade legítima e restaure o backup, conferindo o mapa de IDs. A suíte de atualização usa banco temporário exclusivo, sem apagar o banco de desenvolvimento.
 
 ## Fila e cópias no dispositivo
+
+Em Edições, prepare um capítulo conectado antes de sair da rede. Todas as suas passagens precisam ter o mesmo hash de versão; a operação não apresenta uma cópia parcial como capítulo completo. O limite local é configurável de 1 a 16 MiB, com padrão de 8 MiB. A fila editorial tem até 80 intenções/1 MiB, separada da biblioteca anterior. Na reconexão, confira recibos e conflitos antes de descartar uma intenção; remover uma nota criada offline pode referenciar o recibo da criação. Limpar uma cópia de capítulo não remove os dados pessoais do servidor.
 
 Filas anteriores de notas/progresso offline conservam proprietário, leitura, fonte, intervalo, revisão e identidade da intenção. O serviço é consultado antes de repetir. O acréscimo seguro de nota ou grifo admite revisão atualizada automaticamente; progresso conflitante pede conferir/reaplicar. Não altere uma chave para tentar contornar um resultado desconhecido. A recuperação de pendências é JSON privado, sem credenciais, importável apenas na mesma conta.
 
@@ -72,3 +78,10 @@ O preparo Edge usa somente os dois módulos minificados oficiais do PDF.js fixad
 Se a recuperação encontrar alteração concorrente, o painel conserva a intenção e oferece **Conferir e reaplicar gravação**. Confira o texto antes de confirmar; uma nova confirmação usa a revisão atual e a mesma identidade da operação. Respostas atrasadas não removem pendências posteriores. Na web, a sincronização atualiza os grifos da passagem aberta e conserva a seleção e a pergunta em edição.
 
 Para a apresentação fragmentada de uma leitura antiga, use a [prévia e o reparo](leitura-0.4.md#reparo-de-apresentação) sob a conta proprietária. Não reimporte a fonte, não remapeie cobertura e não substitua uma mediação de intervalo diferente. Uma biblioteca pessoal só é alterada com autorização e acesso legítimo; prova sintética não comprova reparo pessoal.
+
+
+## Evolução 0.5 em validação
+
+O catálogo reúne 61 ferramentas, orientação 1.4.0 e recurso MCP Apps ui://araread/reader-v5.html. As edições usam os mesmos contratos no site e no MCP. Atualize o catálogo pelo mecanismo oficial do cliente quando disponível; isso não autoriza ampliar consentimentos. Aplique as duas migrations editoriais novas somente no destino confirmado, após backup consistente e gate integrado. Não reexecute migrations históricas nem faça reset remoto.
+
+Retirar uma versão suspende sua distribuição e novas alterações, preservando referências e histórico. Isso não elimina fisicamente a edição nem libera todo o seu armazenamento. Remover uma obra da biblioteca anterior não elimina o snapshot já incorporado a uma edição. A exclusão integral de conta e a política de retenção exigem operação autorizada do provedor; não prometa que a retirada editorial seja apagamento.

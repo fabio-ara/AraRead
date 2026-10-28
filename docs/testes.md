@@ -1,5 +1,13 @@
 # Testes e evidências
 
+## Evolução 0.5 — validação em curso
+
+O gate acrescenta autoria e leitura da mesma edição por duas contas, publicação anônima autorizada, configuração privada, convites, idempotência, revisão e integridade de versões. O cliente MCP oficial exercita o fluxo editorial e o painel com os contratos registrados. A restauração v4 confere hashes, referências, isolamento, preservação de notas e compartilhamento inativo. Esses testes escritos ainda aguardam a execução integrada desta revisão.
+
+Vinte e uma verificações puras passaram: DOCX/PPTX/EPUB, proteção de pacotes compactados e matriz editorial adversarial, alinhamentos e seleção Unicode. O teste de IndexedDB com duas abas passou em Chromium e WebKit, incluindo escrita nova durante sincronização e repetição pelo recibo. O painel de três abas foi inspecionado em host sintético com tabela, fórmula e apoio preparado. Esses resultados não substituem PostgreSQL/Auth reais nem homologação no cliente externo. O gate real de DOC/MOBI usa LibreOffice e calibre isolados, e permanece pendente.
+
+As jornadas antigas continuam exigidas. A navegação explícita para Biblioteca acompanha a nova página inicial Edições, preservando as asserções sobre leitura, notas, seleção, retomada e offline. A CI mantém banco isolado, duas contas e todas as migrations; não faz reset no projeto hospedado. Resultados e revisão definitiva serão registrados em [STATUS](../STATUS.md) após o gate completo.
+
 ## Validação local 0.4
 
 O gate do núcleo passou em 102/102 testes locais com Auth/PostgreSQL reais, incluindo instalação/evolução, compatibilidade de recibos/backup, RLS entre contas, parágrafos legados, seleção por representação, versões órfãs, datas civis e entradas matemáticas hostis. As regressões da revisão independente incluem citações literais de UUID, espaços em fronteiras legadas, oração parentética e pontuação CJK. O cliente MCP oficial conferiu também o JSON Schema real de saída; o campo de contexto da seleção foi acrescentado ao contrato após essa verificação.

@@ -8,6 +8,7 @@ import {schemas,type ToolName} from './contracts.ts';
 import {AppError,ensure} from './errors.ts';
 import {mcpHandler} from './mcp.ts';
 import {pool,transaction,type Identity} from './db.ts';
+import {publicEdition} from './editions/public.ts';
 
 const windows=new Map<string,{count:number;until:number}>();
 async function active(identity:Identity){await transaction(identity,async c=>ensure((await c.query('select araread_private.session_active($1,$2) as active',[identity.id,identity.session_id])).rows[0].active,'SESSION_REVOKED','Sessão revogada.',401));}
@@ -36,6 +37,10 @@ export async function edgeFetch(request:Request):Promise<Response>{
   if(path==='/health'&&request.method==='GET'){await pool.query('select 1');return json({status:'ok',version:config.version});}
   if(path==='/api/config'&&request.method==='GET')return json({name:config.name,version:config.version,local:false,supabase_url:new URL(config.authUrl).origin,publishable_key:process.env.AUTH_PUBLISHABLE_KEY,mcp_url:config.mcpAudience});
   if(['/.well-known/oauth-protected-resource','/.well-known/oauth-protected-resource/mcp'].includes(path)&&request.method==='GET')return json({resource:config.mcpAudience,authorization_servers:[config.issuer],scopes_supported:['email'],bearer_methods_supported:['header']});
+  if(path.startsWith('/api/public/')&&request.method==='POST'){
+   const now=Date.now(),window=windows.get('public');if(!window||window.until<now)windows.set('public',{count:1,until:now+60000});else ensure(++window.count<=600,'RATE_LIMIT','Muitas consultas públicas. Aguarde um minuto.',429);
+   return json({ok:true,data:await publicEdition(path.slice('/api/public/'.length),await jsonBody(request,8192))});
+  }
   const identity=await authenticate(request.headers.get('authorization')||undefined,path==='/mcp');
   const now=Date.now(),window=windows.get(identity.id);if(!window||window.until<now)windows.set(identity.id,{count:1,until:now+60000});else ensure(++window.count<=240,'RATE_LIMIT','Muitas operações. Aguarde um minuto.',429);
   if(windows.size>10000)for(const [key,value]of windows)if(value.until<now)windows.delete(key);

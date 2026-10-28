@@ -14,7 +14,7 @@ export function makeMcp(identity:Identity){
  for(const name of Object.keys(schemas) as ToolName[]){
   server.registerTool(name,{
    title:name,description:descriptions[name],inputSchema:schemas[name],
-   ...(name==='reading_display'?{_meta:{ui:{resourceUri:widgetUri,visibility:['model','app']}}}:['highlight_save','highlight_remove','highlight_list','reading_context','operation_get','lexicon_lookup','contextual_calculate','term_save','note_save'].includes(name)?{_meta:{ui:{visibility:['model','app']}}}:{}),
+   ...(name==='reading_display'?{_meta:{ui:{resourceUri:widgetUri,visibility:['model','app']}}}:['highlight_save','highlight_remove','highlight_list','reading_context','operation_get','lexicon_lookup','contextual_calculate','term_save','note_save','edition_reader','edition_annotate'].includes(name)?{_meta:{ui:{visibility:['model','app']}}}:{}),
    outputSchema:z.object({ok:z.boolean(),data:outputs[name].optional(),error:z.object({code:z.string(),message:z.string(),details:z.unknown().optional()}).optional()}),
    annotations:{readOnlyHint:readTools.has(name),destructiveHint:['highlight_remove','work_delete','note_manage','preferences_unset','profile_manage'].includes(name),idempotentHint:true,openWorldHint:['source_import','source_preview','lexicon_lookup'].includes(name)},
   },async (input:unknown)=>{

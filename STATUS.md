@@ -1,5 +1,13 @@
 # Estado verificável
 
+## Evolução 0.5 — implementação em validação, ainda não publicada
+
+A árvore de desenvolvimento inclui edições compartilhadas, autoria em quatro etapas, leitor independente, configurações persistidas, grupos por convite, capítulos offline e importadores DOCX/PPTX/EPUB. O backup v4, a integração editorial do painel MCP e as proteções adicionais de relações/revisões estão implementados, mas ainda aguardam o gate integrado final. As leituras e provas históricas abaixo não foram substituídas por essas alterações.
+
+Provas parciais: testes de ingestão e domínio editorial, jornada web inicial Chromium/WebKit, dezesseis verificações editoriais adversariais e painel em host sintético com tabela, fórmula e apoio preparado. O pacote Edge gerado tem 3.596.060 bytes. Ainda não há prova hospedada da 0.5; conversão real DOC/MOBI, restauração v4, revisão final e integração/publicação permanecem pendentes. O estado definitivo deve identificar o commit e o gate exatos, e não reutilizar provas invalidadas por mudanças posteriores.
+
+## Entrega 0.4.0 — histórica
+
 **AraRead 0.4.0 publicado em 27/10/2026**, no [GitHub Pages](https://fabio-ara.github.io/AraRead/) e na função Edge existente, versão 8. O [PR #3](https://github.com/fabio-ara/AraRead/pull/3) integrou `d8f9509` em `97a8002`, após os gates. Continuidade estrutural compatível, reparo explícito da apresentação, grifos por representação e vocabulário/cálculo contextual estão implementados. [Comportamento e recuperação](docs/leitura-0.4.md).
 
 **Validação:** 102/102 testes com PostgreSQL/Auth reais e duas contas; 10/10 jornadas Chromium e 10/10 WebKit, sem pulos. Duas revisões independentes apontaram nove falhas, reproduzidas e corrigidas. Tipos, build, Docker, migrations, OCR, documentação e auditorias passaram. A distribuição minificada oficial do PDF.js resolveu o limite de upload do deploy; texto, posições e operadores foram comparados na CI. [CI do PR](https://github.com/fabio-ara/AraRead/actions/runs/40583710205), [push](https://github.com/fabio-ara/AraRead/actions/runs/40583703406), [main](https://github.com/fabio-ara/AraRead/actions/runs/40585274835) e [Pages](https://github.com/fabio-ara/AraRead/actions/runs/40586124174).

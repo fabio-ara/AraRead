@@ -2,7 +2,7 @@
 
 Inventário gerado dos pacotes instalados a partir do lockfile. As dependências transitivas e opcionais variam por plataforma; conserve também as licenças distribuídas dentro de cada pacote. Os textos encontrados estão em [THIRD_PARTY_LICENSES.txt](THIRD_PARTY_LICENSES.txt). Para outra plataforma, execute novamente `npx tsx scripts/licenses.ts` após `npm ci`.
 
-Nenhum código foi copiado dos repositórios AraLearn/AraHub: foram consultados arquitetura e fluxos documentados, adaptando apenas conceitos. As amostras editoriais e o PDF de teste são criações sintéticas deste projeto. KaTeX inclui fontes; PDF.js e sua distribuição conservam os avisos Apache. PostgreSQL, GoTrue, Node e a imagem de testes Playwright são distribuições oficiais separadas; suas licenças permanecem nas distribuições correspondentes.
+Nenhum código foi copiado dos repositórios AraLearn/AraHub: foram consultados arquitetura e fluxos documentados, adaptando apenas conceitos. As amostras editoriais e o PDF de teste são criações sintéticas deste projeto. KaTeX inclui fontes; PDF.js e sua distribuição conservam os avisos Apache. PostgreSQL, GoTrue, Node e a imagem de testes Playwright são distribuições oficiais separadas; suas licenças permanecem nas distribuições correspondentes. Os contêineres opcionais de preparo instalam [LibreOffice](https://www.libreoffice.org/licenses/), [calibre](https://calibre-ebook.com/about), [Poppler](https://poppler.freedesktop.org/) e [Tesseract](https://tesseract-ocr.github.io/tessdoc/), sob suas próprias licenças, e conservam os arquivos de copyright dos pacotes Debian em /usr/share/doc. Esses programas não são incorporados ao JavaScript do site ou ao Edge, nem relicenciados como MIT.
 
 | Pacote | Versão | Licença declarada |
 |---|---|---|
@@ -81,6 +81,7 @@ Nenhum código foi copiado dos repositórios AraLearn/AraHub: foram consultados 
 | eventsource-parser | 3.1.1 | MIT |
 | express | 5.1.0 | MIT |
 | fdir | 6.5.0 | MIT |
+| fflate | 0.8.3 | MIT |
 | finalhandler | 2.1.1 | MIT |
 | forwarded | 0.2.0 | MIT |
 | fraction.js | 5.3.4 | MIT |

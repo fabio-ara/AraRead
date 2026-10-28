@@ -19,7 +19,8 @@ function question(v:View,chosen:any,language:string){
 export function attachReaderSupports(v:View){
  const {display:d,adapter:a}=v;
  const persist=async(name:string,args:any)=>{if(!a.write)throw Error('Gravação indisponível neste host.');const result=await a.write(name,{reading_id:d.reading.id,expected_revision:d.reading.revision,ref:d.ref,...args});if(result.status==='local'){v.announce('Nota somente local, aguardando sincronização.');return result;}if(result.status!=='confirmed')throw Error('Gravação sem confirmação. Consulte o recibo antes de repetir.');d.reading.revision=result.revision;await a.changed?.(d);return result;};
- v.menu.append(button('Entender',()=>v.run(async()=>{
+ if(a.supports)a.supports(v);
+ if(!a.supports)v.menu.append(button('Entender',()=>v.run(async()=>{
   const chosen=v.getSelection();if(!chosen)return;const language=chosen.target.representation==='original'?d.source.original_language:d.effective_language;
   const body=el('div'),term=el('input'),result=el('div');term.value=chosen.exact.trim().slice(0,120);term.maxLength=120;
   body.append(field('Palavra ou expressão',term),result);

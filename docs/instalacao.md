@@ -63,14 +63,14 @@ Render foi retirado por decisão do titular. A instalação não depende de outr
 
 Após conferir identidade/organização/projeto exclusivos e configurar os segredos, execute `npx tsx scripts/prepare-edge.ts`. O pacote gerado fica em `.local/edge-release`, sem credenciais. Publique pela CLI Supabase 2.122.0, com `functions deploy araread --workdir .local/edge-release --project-ref <ref-confirmado>`, usando a autenticação legítima da conta independente. Preserve o projeto de destino em cada comando; não use `--prune`. O tamanho e a compatibilidade de cada pacote precisam ser conferidos no gate da revisão corrente.
 
-O adaptador verifica JWT ES256/RS256, emissor, audiência, sessão, cliente e permissão antes dos dados. `verify_jwt=false` desativa somente o verificador legado do gateway, necessário para descoberta OAuth pública e para os tokens assimétricos destinados ao recurso próprio; não habilita dados anônimos. Os gates comprovam 401 sem token, rejeição de audiência incorreta e revogação imediata. Veja [segurança](seguranca.md).
+O adaptador verifica JWT ES256/RS256, emissor, audiência, sessão, cliente e permissão antes dos dados. `verify_jwt=false` desativa somente o verificador legado do gateway, necessário para descoberta OAuth pública e para os tokens assimétricos destinados ao recurso próprio; não libera dados privados. Os endpoints editoriais públicos usam apenas o conteúdo explicitamente publicado, com RLS e papel anônimo em transação de leitura. Os gates comprovam 401 sem token, rejeição de audiência incorreta e revogação imediata. Veja [segurança](seguranca.md).
 
 Para publicar a interface, configure a variável do repositório `ARAREAD_API_BASE` com a URL pública da função exclusiva. O workflow `.github/workflows/pages.yml` compila com `ARAREAD_BASE_PATH=/AraRead/` e `VITE_API_BASE`, publica somente `dist` e exige CI aprovada para a revisão exata de `main`. Ative Pages com origem GitHub Actions depois da auditoria/autorização pública. Uma execução privada não torna a biblioteca pública nem é prova de publicação. Para forks, ajuste o caminho do projeto no workflow e as URLs Auth/CORS; não copie destinos do titular. O antigo `prepare-site.ts` foi retirado. O Site anterior agora contém somente uma página de encaminhamento ao Pages e conserva sua audiência privada; não é mais o frontend do produto.
 
 ## Artefato e gates externos
 
 ```powershell
-docker build -t araread:local-0.3.0 .
+docker build -t araread:local-0.5.0 .
 ```
 
 A imagem contém app/build/dependências e roda como usuário `node`, sem `.env`, dados ou chaves locais. Um build bem-sucedido não demonstra implantação. Confira saúde, interface, migrações novas, originais privados, OAuth/PKCE pelo gateway, revogação, duas contas e escrita/retomada reais. Só depois execute a [prova no cliente externo](conectar-assistente.md). Na reversão, retorne o artefato compatível sem apagar banco; migrations com dados não são desfeitas automaticamente. Use backup e uma migration corretiva revisada quando necessário.
@@ -97,3 +97,19 @@ node --import tsx --env-file-if-exists=.env scripts/verify-ingestion-v3.ts .loca
 O último comando usa somente as identidades sintéticas locais. Para material pessoal, encaminhe o payload por API/conector autorizado, acrescente título/idioma e confira `source_preview` antes de importar; não publique esse JSON, que inclui o PDF. Também é possível executar `python scripts/ocr-pdf.py entrada.pdf novo-payload.json --language por+eng` com Poppler/Tesseract instalados, sob os mesmos limites de recursos. Confira os [avisos dos componentes](../THIRD_PARTY_NOTICES.md).
 
 A CI testa o container sem rede e a ingestão real do OCR; o site Stanford é prova pontual explícita, não dependência permanente da suíte. O gerador das três fixtures PDF usa ReportLab/Pillow/MuPDF somente no preparo de material sintético, fora do runtime e do Edge.
+
+## Conversão local de DOC e MOBI
+
+DOCX, PPTX e EPUB são importados diretamente pelo backend. DOC e MOBI exigem preparação local com os conversores abertos LibreOffice e calibre. Não forneça documentos cifrados nem tente remover DRM. O payload resultante passa por `source_preview` antes de `source_import`.
+
+```powershell
+docker build -f Dockerfile.convert -t araread-convert:1 .
+node --import tsx scripts/convert-legacy.ts entrada.doc .local/preparado-doc.json
+node --import tsx scripts/convert-legacy.ts entrada.mobi .local/preparado-mobi.json
+```
+
+O script recusa sobrescrita e entrada acima do limite, monta a entrada somente para leitura, bloqueia rede e executa como usuário sem privilégios, com CPU, memória, processos, tempo e armazenamento temporário limitados. Conserva os bytes da entrada e a proveniência da conversão. A instalação das ferramentas exige espaço de disco adicional; não limpe nem reinicie serviços compartilhados de outros projetos para concluir o build. A CI gera documentos sintéticos reais e executa `scripts/verify-legacy-conversion.ts`; um script escrito não comprova conversão até esse gate passar.
+
+## Evolução editorial 0.5
+
+Aplique as migrations `20261028202053_study_editions_v5.sql` e `20261028211325_edition_restore_archive.sql`, nesta ordem, preservando todas as anteriores. Elas acrescentam treze tabelas editoriais com RLS forçado e proteções de referências; o total passa a 32. O pacote Edge deve incluir `src/editions` além de `src/study` e `src/ingestion`. Confira backup v4, os formatos anteriores, duas contas, leitura pública autorizada e revogação de convite antes de publicar. A interface e o MCP usam os mesmos casos de uso; publicação está condicionada ao gate da revisão exata.
