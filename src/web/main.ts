@@ -63,9 +63,11 @@ async function resolvePending(repeat=false){
 }
 async function load(){
  if(!session){render();return;}
+ const screenAtStart=screen;
  try{account=await call('account_context');await cacheSet(owner(),'account',account);library=await call('library_list',{query,offset,limit:12});await cacheSet(owner(),'library',library);}
  catch(e){if(e instanceof ApiError)throw e;account=await cacheGet(owner(),'account');library=await cacheGet(owner(),'library')||{items:[],pagination:{}};notice('Mostrando somente o material carregado neste dispositivo. Alterações exigem conexão.');}
- pending=await cacheGet(owner(),'pending');queued=await queue(owner());prepared=online()?await revalidatePrepared(owner(),call):await cachedPassages(owner());if(ctx&&screen==='reader')await loadReading(ctx.reading.id,'opened');else render();
+ if(screen!==screenAtStart)return;
+ pending=await cacheGet(owner(),'pending');queued=await queue(owner());prepared=online()?await revalidatePrepared(owner(),call):await cachedPassages(owner());if(screen!==screenAtStart)return;if(ctx&&screen==='reader')await loadReading(ctx.reading.id,'opened');else render();
 }
 async function loadReading(id:string,position='resume',ref?:any){
  try{ctx=await call('reading_context',{reading_id:id,position,...(ref?{ref}:{}),...(languageOverride?{language:languageOverride}:{})});try{ctx.display=await call('reading_display',{reading_id:id,ref:ctx.ref,language:ctx.effective_language});}catch(e){if(!(e instanceof ApiError)||e.code!=='PREPARATION_REQUIRED')throw e;ctx.display=null;}await cacheSet(owner(),'last-context',ctx);if(ctx.display)prepared=await preparePassage(owner(),ctx);}
