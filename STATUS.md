@@ -2,9 +2,11 @@
 
 ## Evolução 0.5 — implementação em validação, ainda não publicada
 
-A árvore de desenvolvimento inclui edições compartilhadas, autoria em quatro etapas, leitor independente, configurações persistidas, grupos por convite, capítulos offline e importadores DOCX/PPTX/EPUB. O backup v4, a integração editorial do painel MCP e as proteções adicionais de relações/revisões estão implementados, mas ainda aguardam o gate integrado final. As leituras e provas históricas abaixo não foram substituídas por essas alterações.
+A árvore de desenvolvimento inclui edições compartilhadas, autoria em quatro etapas, leitor independente, configurações persistidas, grupos por convite, capítulos offline e importadores DOCX/PPTX/EPUB. Backup v4, integração editorial do painel MCP e proteções de relações/revisões passaram na integração com banco e Auth reais. As leituras e provas históricas abaixo não foram substituídas por essas alterações.
 
-Provas parciais: testes de ingestão e domínio editorial, jornada web inicial Chromium/WebKit, dezesseis verificações editoriais adversariais e painel em host sintético com tabela, fórmula e apoio preparado. O pacote Edge gerado tem 3.596.060 bytes. Ainda não há prova hospedada da 0.5; conversão real DOC/MOBI, restauração v4, revisão final e integração/publicação permanecem pendentes. O estado definitivo deve identificar o commit e o gate exatos, e não reutilizar provas invalidadas por mudanças posteriores.
+Provas de `44fc310`: 134/134 testes do núcleo, conversão real DOC/MOBI, OCR, instalação/evolução e pacote Edge aprovados na [CI](https://github.com/fabio-ara/AraRead/actions/runs/40779927646). Chromium passou 14/14 jornadas; WebKit, 13/14, com uma corrida no teste de recibos corrigida em `1fed71c`. Todas as jornadas novas passaram nos dois navegadores. [Revisão crítica e limites](docs/evidencias/revisao-0.5.md), [medição de armazenamento/tráfego](docs/evidencias/armazenamento-0.5.json), [leitor em 320 px](docs/assets/editions-320-webkit.png), [desktop](docs/assets/editions-desktop-chromium.png) e [autoria](docs/assets/editions-authoring-webkit.png).
+
+Ainda faltam o gate final da revisão corrigida, integração no branch principal, implantação e homologação hospedada da 0.5. O backup privado anterior à atualização foi obtido pelo conector autenticado comum, com snapshot consistente das 18 seções. Nenhum dado pessoal integra as fixtures ou as evidências públicas. Não há declaração de entrega integral enquanto essas etapas estiverem pendentes.
 
 ## Entrega 0.4.0 — histórica
 
