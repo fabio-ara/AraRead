@@ -59,7 +59,7 @@ jobs:
           path: |
             .local/evidence/editions*.png
             .local/evidence/edition-widget*.png
-            .local/evidence/editions-storage.json
+            .local/evidence/editions*.json
           include-hidden-files: true
           if-no-files-found: ignore
           retention-days: 1

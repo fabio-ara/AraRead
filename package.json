@@ -11,7 +11,7 @@
     "build": "npm run widget:build && vite build",
     "check": "npm run widget:build && tsc --noEmit",
     "test": "tsx --env-file-if-exists=.env --test --test-concurrency=1 tests/*.test.ts",
-    "test:e2e": "playwright test",
+    "test:e2e": "tsx scripts/e2e-paced.ts",
     "db:migrate": "tsx --env-file-if-exists=.env scripts/migrate.ts",
     "local:accounts": "tsx --env-file-if-exists=.env scripts/accounts.ts",
     "local:setup": "tsx scripts/local-setup.ts",

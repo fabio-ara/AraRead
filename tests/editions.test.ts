@@ -61,6 +61,15 @@ test('edição compartilhada: autoria, duas contas, RLS, anonimato e estudo sem 
   const supports=content[0].supports;assert.equal(supports.some((s:any)=>s.kind==='mnemonic'),true);assert.equal(supports.some((s:any)=>s.kind==='humor'),true);
   assert.equal(activityFeedback(content[0].activities[1],'Texto livre').correct,null);
  });
+ await t.test('leituras e apoios armazenados não efetuam HTTP de geração nem modificam estado',async()=>{
+  const before=await call('edition_reader',{version_id:version.version_id},bob),requests:string[]=[],previous=globalThis.fetch;
+  globalThis.fetch=async input=>{requests.push(String(input));throw Error('HTTP externo inesperado no leitor preparado.');};
+  try{
+   const opened=await call('edition_context',{version_id:version.version_id},bob);
+   for(const row of opened.outline){const c=await call('edition_context',{version_id:version.version_id,passage_id:row.id},bob);assert(c.passage.content.segments.length>0);assert(c.passage.content.supports.length>0);for(const activity of c.passage.content.activities)assert.equal(activityFeedback(activity,activity.answer).generative_call,false);}
+   assert.deepEqual(await call('edition_reader',{version_id:version.version_id},bob),before);assert.deepEqual(requests,[]);
+  }finally{globalThis.fetch=previous;}
+ });
  await t.test('grupos por convite isolam comentários e saída revoga acesso',async()=>{
   group=await call('edition_group',{operation_id:op(),expected_revision:0,action:'create',version_id:version.version_id,title:'Grupo sintético'});
   assert.equal((await call('edition_groups',{group_id:group.group_id},bob)).items.length,0);
