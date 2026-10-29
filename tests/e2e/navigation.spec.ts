@@ -9,7 +9,7 @@ const accounts=JSON.parse(await readFile('.local/test-accounts.json','utf8'));
 // workers enabled in reading.spec.ts and editions.spec.ts.
 test.use({serviceWorkers:'block'});
 test('resposta atrasada da biblioteca preserva o rascunho aberto em outra tela',async({page})=>{
- await page.goto('/');await page.getByLabel('E-mail',{exact:true}).fill(accounts[0].email);await page.getByLabel('Senha',{exact:true}).fill(accounts[0].password);await page.getByRole('button',{name:'Entrar na biblioteca',exact:true}).click();await expect(page.getByRole('heading',{name:'Um texto. Muitos caminhos.',exact:true})).toBeVisible();
+ await page.goto('/');await page.getByLabel('E-mail',{exact:true}).fill(accounts[0].email);await page.getByLabel('Senha',{exact:true}).fill(accounts[0].password);await page.getByRole('button',{name:'Entrar na biblioteca',exact:true}).click();await expect(page.getByRole('heading',{name:'Edições',exact:true})).toBeVisible();
  let release:(()=>void)|undefined;
  await page.route('**/api/library_list',async route=>{await new Promise<void>(resolve=>release=resolve);await route.continue();});
  try{
