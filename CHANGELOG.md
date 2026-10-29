@@ -1,6 +1,15 @@
 # Alterações
 
-## 0.4.0 — 27/10/2026 (validação em andamento)
+## 0.5.0 — 28/10/2026
+
+- Fontes incorporadas, projetos editoriais, versões compartilhadas e estado pessoal separados; autoria em fontes, configuração, amostra e produção/publicação, com 61 ferramentas MCP e orientação 1.4.0.
+- Leitor independente com três abas, apoios preparados, seleção contextual, atividades opcionais, configurações entre dispositivos e capítulo completo offline. O consumo do conteúdo não exige IA.
+- Edições públicas ou privadas por convite e grupos com comentários compartilhados voluntariamente, preservando notas, grifos e progresso individuais.
+- DOCX/PPTX/EPUB com importação real; DOC/MOBI por conversores locais isolados. Backup v4 de 31 seções e restauração compatível com v1/v2/v3.
+- Três migrations aditivas da evolução, 32 tabelas com RLS forçado. Convites consumidos continuam revogados após excluir uma identidade.
+- Correções de navegação tardia, estado dos controles durante buscas e precedência da configuração pessoal. Resultados observados de CI, implantação, demonstração e cliente externo em [STATUS](STATUS.md).
+
+## 0.4.0 — 27/10/2026
 
 - Passagens respeitam parágrafos e fronteiras estruturais; referências legadas continuam válidas, com reparo explícito que conserva progresso e histórico.
 - Seleção nativa e grifos nas três representações, com versão, segmento, pontos de código, confirmação, recuperação offline e backup compatível.

@@ -1,0 +1,210 @@
+{
+  "checked_at": "2026-10-29T00:25:18.665Z",
+  "application": "0.5.0",
+  "implementation_revision": "0f4fdf60d182aa6f9aa1d8b4a1fed7306cfd983c",
+  "integrated_revision": "b12fc34bc242ad5870295370318b01c445cb9898",
+  "repository": "https://github.com/fabio-ara/AraRead",
+  "pull_requests": [
+    5,
+    6
+  ],
+  "frontend": "https://fabio-ara.github.io/AraRead/",
+  "ci": {
+    "push": "https://github.com/fabio-ara/AraRead/actions/runs/40790784552",
+    "pull_request": "https://github.com/fabio-ara/AraRead/actions/runs/40790789894",
+    "main_and_pages": [
+      {
+        "workflow": "GitHub Pages",
+        "url": "https://github.com/fabio-ara/AraRead/actions/runs/40793562725"
+      },
+      {
+        "workflow": "verificação local",
+        "url": "https://github.com/fabio-ara/AraRead/actions/runs/40792229726"
+      }
+    ],
+    "real_backend_tests": 134,
+    "chromium_journeys": 16,
+    "webkit_journeys": 16,
+    "skipped": 0
+  },
+  "deployment": {
+    "service": "Supabase Edge araread, instalação exclusiva sa-east-1",
+    "edge_version": 10,
+    "source_revision": "0f4fdf60d182aa6f9aa1d8b4a1fed7306cfd983c",
+    "status": "ACTIVE",
+    "asymmetric_auth_verification": "Assinatura, emissor, audiência, sessão ativa e concessão na função",
+    "migration_count": 10,
+    "added_migrations": [
+      {
+        "name": "20261028202053_study_editions_v5.sql",
+        "sha256": "666636659f6806802f24c4a25331a5e1711e682d7c88e2a0fe7859a9fc18276c"
+      },
+      {
+        "name": "20261028211325_edition_restore_archive.sql",
+        "sha256": "cadfac9217eda3f2a4a761670f6634a1847b6b12b028882f6c6ea965d1942319"
+      },
+      {
+        "name": "20261028234928_edition_invite_account_deletion.sql",
+        "sha256": "80099bd4098098b517773fb616f630b07ed52462bebe56c5aad61c98ac7c89e0"
+      }
+    ],
+    "previous_migration_hashes_preserved": true,
+    "forced_rls_tables": 32,
+    "application_role_bypass_rls": false
+  },
+  "http": {
+    "level": "HTTP Edge e Auth/PostgreSQL hospedados",
+    "checked_at": "2026-10-29T00:11:06.609Z",
+    "passed": [
+      "saude com banco real; dados sem token recebem 401",
+      "CORS aceita somente a origem da interface",
+      "HTTP preserva bytes e hash; porcao e idioma reais",
+      "escrita, segunda leitura e recibo idempotente pelo gateway",
+      "duas identidades isoladas por RLS atraves do HTTP",
+      "PDF real no Edge, com avisos da extracao parcial",
+      "URL publica funciona no Edge e loopback e recusado",
+      "24 chamadas concorrentes preservam identidades pelo pooler transacional",
+      "0.4: paragrafo inteiro, grifo Unicode, recibo e isolamento no Edge",
+      "0.4: vocabulario com selecao e calculos puros nao mudam progresso",
+      "0.4: backup v3 restaura grifo em outra conta com novos IDs",
+      "sessao revogada perde acesso imediatamente no gateway"
+    ],
+    "synthetic_identities_removed": 2,
+    "does_not_validate": [
+      "interface hospedada",
+      "ChatGPT"
+    ]
+  },
+  "mcp": {
+    "client": "SDK oficial MCP sobre HTTPS hospedado, fora do processo servidor",
+    "checked_at": "2026-10-28T23:44:47.086Z",
+    "passed": [
+      "descoberta, DCR, consentimento sintetico e PKCE reais no provedor",
+      "SDK oficial descobre contratos 0.4 e orientacao atraves do MCP hospedado",
+      "leitura e escrita reais, nova sessao MCP e conferencia independente pela API da interface",
+      "Pages apresenta três abas, salva grifo relido pelo MCP, calcula e retoma offline sem avanço",
+      "mapa, progresso, navegação fora de sequência, preferências e pacote privado de perfil no MCP hospedado",
+      "0.5: autoria editorial em quatro etapas, publicação privada, painel com fallback e estado pessoal pelo SDK hospedado",
+      "perspectiva, livro sem URL, contexto/variante, vocabulário salvo, envio na mesma leitura e recurso MCP Apps no runtime hospedado",
+      "token web nao substitui audiencia e permissao MCP",
+      "revogacao imediata e nova autorizacao real"
+    ],
+    "published_ui": {
+      "published_ui": true,
+      "desktop": true,
+      "mobile": true,
+      "phone_width_everywhere": true,
+      "three_tabs": true,
+      "keyboard": true,
+      "contextual_highlight": true,
+      "historical_calculation": true,
+      "reading_progress_unchanged": true,
+      "logout": true,
+      "service_worker": "shell e porção recuperados após recarga sem rede no Pages real"
+    },
+    "synthetic_identity_removed": true,
+    "synthetic_oauth_client_removed": true,
+    "does_not_validate": [
+      "ChatGPT"
+    ],
+    "catalog_tools": 61,
+    "guidance": "1.4.0",
+    "execution_edge_version": 9
+  },
+  "large_restore": {
+    "checked_at": "2026-10-28T23:30:59.592Z",
+    "bundle_bytes": 17086904,
+    "passed": [
+      "perfil Edge informa cota real de 16 MiB",
+      "backup acima de 16 MiB restaura no gateway de 32 MiB",
+      "recibo confirmado e IDs remapeados",
+      "bytes originais iguais em contas distintas"
+    ],
+    "synthetic_identities_removed": 2,
+    "execution_edge_version": 9
+  },
+  "editions": {
+    "checked_at": "2026-10-29T00:25:05.746Z",
+    "completed": true,
+    "level": "HTTPS Edge/Auth/PostgreSQL e Pages reais, identidades sintéticas comuns",
+    "passed": [
+      "Edição original com dois capítulos publicada; duas contas e visitante leem o mesmo conteúdo",
+      "Grifos, notas, revisões e recibos pessoais isolados; visitante não consulta o leitor privado",
+      "Convite dá acesso à edição privada e revogação o retira no Edge",
+      "Backup v4 restaurado por outra conta no Edge, privado, com âncoras e recibo",
+      "Pages real: autenticação, configuração, leitura, atividades, seleção, duas contas e capítulo offline",
+      "Auth remove conta participante sem apagar edição e o convite consumido não volta a funcionar"
+    ],
+    "ui": {
+      "public_anonymous": true,
+      "two_authenticated_accounts": true,
+      "personal_notes_isolated": true,
+      "three_tabs": true,
+      "configured_text_size": 24,
+      "widths": [
+        320,
+        390,
+        480,
+        1440
+      ],
+      "column_max": 480,
+      "stored_contextual_support": true,
+      "optional_activity": true,
+      "offline_chapter_passages": 2,
+      "offline_historical_calculator": true,
+      "offline_note_confirmed_by_api": true,
+      "offline_reload": true,
+      "generative_http_dependencies": 0,
+      "observed_request_paths": [
+        "/functions/v1/araread/api/config",
+        "/functions/v1/araread/api/public/edition_catalog",
+        "/functions/v1/araread/api/public/edition_context",
+        "/auth/v1/token",
+        "/functions/v1/araread/api/account_context",
+        "/functions/v1/araread/api/library_list",
+        "/functions/v1/araread/api/edition_catalog",
+        "/functions/v1/araread/api/edition_context",
+        "/functions/v1/araread/api/edition_reader",
+        "/functions/v1/araread/api/edition_plan",
+        "/functions/v1/araread/api/edition_annotate",
+        "/functions/v1/araread/api/operation_get"
+      ]
+    },
+    "demo": {
+      "title": "Aprender a examinar uma hipótese — demonstração AraRead",
+      "version_id": "34489b93-168e-4bf9-afc9-c9c25418fd93",
+      "public": true
+    },
+    "synthetic_identities_removed": 1,
+    "cleanup_errors": [],
+    "limits": [
+      "Sem avaliação acadêmica humana ou estudo de eficácia",
+      "O SDK e o navegador automatizado não homologam o cliente ChatGPT"
+    ]
+  },
+  "preservation": {
+    "checked_at": "2026-10-29T00:12:32.374Z",
+    "edge_version": 10,
+    "migrations": 10,
+    "level": "Conector autenticado AraRead, conta comum, RLS; exportação v3 consistente antes/depois da implantação",
+    "sections_checked": 18,
+    "all_sections_structurally_identical": true,
+    "original_bytes_included": true,
+    "identifiers_progress_notes_preferences_receipts_preserved": true,
+    "personal_content_published": false,
+    "write_operations": 0
+  },
+  "security_advisors": {
+    "new_findings": [],
+    "existing_warning": "auth_leaked_password_protection",
+    "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection",
+    "paid_feature_not_enabled": true
+  },
+  "limits": [
+    "Corpus sintético; não é estudo de eficácia ou revisão acadêmica humana.",
+    "Chromium/WebKit automatizados não equivalem a aparelhos físicos nem a certificação WCAG.",
+    "Cotas do conteúdo/restauração continuam Edge 16/32 MiB, Node 80/128 MiB, original até 8 MiB.",
+    "O benchmark identifica sua própria revisão e exclui WAL, bloat e backups do provedor.",
+    "A prova do ChatGPT é registrada separadamente; a configuração CSP de desenvolvimento do host não foi alterada."
+  ]
+}

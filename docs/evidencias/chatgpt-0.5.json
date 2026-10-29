@@ -1,0 +1,71 @@
+{
+  "checked_on": "2026-10-29",
+  "timezone": "UTC",
+  "application": "0.5.0",
+  "implementation_revision": "0f4fdf60d182aa6f9aa1d8b4a1fed7306cfd983c",
+  "integrated_revision": "b12fc34bc242ad5870295370318b01c445cb9898",
+  "edge_version": 10,
+  "client": "ChatGPT web real, Chrome dedicado, conexão AraRead existente",
+  "metadata": {
+    "refreshed_in_connection_settings": true,
+    "new_conversation_after_refresh": true,
+    "permissions_or_consent_changed": false,
+    "official_refresh_instructions": "https://developers.openai.com/plugins/deploy/connect-chatgpt#refresh-metadata"
+  },
+  "public_demo": {
+    "title": "Aprender a examinar uma hipótese — demonstração AraRead",
+    "version_id": "34489b93-168e-4bf9-afc9-c9c25418fd93",
+    "passage": "A luz da sala",
+    "rights": "Material original sintético autorizado para demonstração pública",
+    "preserved": true
+  },
+  "requested_read_only_flow": [
+    "assistant_guidance",
+    "edition_catalog",
+    "edition_context",
+    "reading_display com version_id"
+  ],
+  "directly_observed": {
+    "reading_display_opened_by_host": true,
+    "public_demo_title_and_first_passage_match": true,
+    "tabs_interacted": ["Tradução", "Original", "Leitura facilitada"],
+    "native_viewport_screenshots_visually_inspected": true,
+    "facilitated_portuguese_text_visible": true,
+    "translation_portuguese_text_visible": true,
+    "original_english_text_visible": true,
+    "reader_column_within_480px": true,
+    "no_personal_state_write_requested_or_performed_by_browser_operator": true
+  },
+  "reported_by_client_response": {
+    "guidance_version": "1.4.0",
+    "public_catalog_entry_found": true,
+    "edition_context_retrieved": true,
+    "reading_display_ready": true,
+    "fallback_text_with_three_representations": true,
+    "only_four_authorized_read_calls": true,
+    "no_personal_works_queried": true,
+    "no_import_generation_or_progress_write": true
+  },
+  "independent_evidence": {
+    "sdk_hosted_report": "hospedado-0.5.json",
+    "fallback_and_editorial_authoring_tested_directly_by_sdk": true,
+    "pages_public_demo_opened_and_navigated_in_dedicated_chrome": true,
+    "pages_next_passage_observed": "Duas medidas",
+    "personal_data_preservation": "18 seções comparadas estruturalmente antes/depois da implantação por conta comum, incluindo originais; nenhuma diferença"
+  },
+  "capture_handling": {
+    "native_tool_return_only": true,
+    "local_file_write_unavailable": true,
+    "reason": "O instrumento recusou gravação no caminho local por seu limite de raízes permitidas; não se tentou outro caminho ou mecanismo de UI.",
+    "browser_download_or_save_dialog_used": false,
+    "image_published": false,
+    "private_conversation_url_or_sidebar_published": false
+  },
+  "limits": [
+    "Prova de recuperação e leitura no ChatGPT; autoria e escritas foram validadas separadamente pelo SDK e Pages.",
+    "Versão da orientação, catálogo, contexto e fallback constam da resposta do cliente; o painel e suas três representações foram observados diretamente.",
+    "CSP de desenvolvimento preexistente desativada no host, sem alteração; esta inspeção não comprova aplicação de CSP pelo ChatGPT.",
+    "Sem revisão acadêmica humana, estudo de eficácia, certificação WCAG ou aparelho móvel físico.",
+    "Capturas foram inspecionadas no retorno nativo, mas não há PNG do ChatGPT versionado nesta prova."
+  ]
+}
