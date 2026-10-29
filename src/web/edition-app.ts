@@ -104,7 +104,7 @@ export function createEditionApp(api:Services){
   if(data.passage.content.activities.length)options.append(editionActivities(data.passage.content.activities,false));
   const about=el('details',{},el('summary',{},'Sobre esta amostra'));
   for(const source of data.sources)about.append(el('p',{},`${source.metadata.author} — ${source.metadata.title}. ${source.metadata.edition}`));
-  about.append(el('p',{},'Uma passagem preparada para você experimentar a leitura.'),button('Revisar a amostra e continuar o preparo',()=>loadProject(p.id)));
+  about.append(el('p',{},'Uma passagem preparada para você experimentar a leitura.'),el('p',{},data.passage.content.provenance.limits),el('details',{},el('summary',{},'Revisão editorial'),el('p',{},data.passage.assessment.verification)),button('Revisar a amostra e continuar o preparo',()=>loadProject(p.id)));
   options.append(about);root.append(options);
  }
  function settingsView(){
