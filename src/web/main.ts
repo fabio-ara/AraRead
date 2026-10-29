@@ -81,13 +81,13 @@ function render(){
  disposeReadingPanel();app.replaceChildren();
  if(screen!=='editions')editionApp?.dispose();
  const nav=el('nav',{'aria-label':'Navegação principal'},button('Edições',()=>{screen='editions';render();},{class:screen==='editions'?'active':''}),button('Biblioteca',()=>{screen='library';ctx=null;languageOverride=undefined;return load();},{class:screen==='library'?'active':''}),button('Importar',()=>{screen='import';render();},{class:screen==='import'?'active':''}),button('Configurações',()=>{screen='settings';render();},{class:screen==='settings'?'active':''}));
- app.append(el('header',{class:'top'},el('div',{class:'top-inner'},el('a',{href:import.meta.env.BASE_URL,class:'brand','aria-label':`${config.name} — biblioteca`},el('span',{class:'brand-mark','aria-hidden':'true'},'AR'),config.name),session?nav:el('span',{class:'private-label'},'Sua biblioteca pessoal'),session?button('Sair',()=>logout(),{class:'quiet logout'}):null)));
+ app.append(el('header',{class:'top'},el('div',{class:'top-inner'},el('a',{href:import.meta.env.BASE_URL,class:'brand','aria-label':`${config.name} — biblioteca`},el('img',{class:'brand-mark',src:`${import.meta.env.BASE_URL}assets/brand/ara-mark.svg`,alt:'',width:30,height:30}),config.name),session?nav:null,session?button('Sair',()=>logout(),{class:'quiet logout'}):null)));
  const main=el('main',{id:'main',tabIndex:-1});main.append(el('div',{id:'notice',class:'notice',hidden:true}));
- if(!online())main.append(el('p',{class:'offline',role:'status'},'Sem conexão · consulte as porções preparadas. A cópia disponível não confirma o estado atual do servidor.'));
+ if(!online())main.append(el('p',{class:'offline',role:'status'},'Sem conexão · suas leituras salvas estão disponíveis.'));
  if(queued.length)main.append(el('p',{class:'offline',role:'status'},`${queued.length} alteração(ões) local(is) aguardando sincronização.`,button('Ver pendências',()=>{screen='settings';render();})));
- if(pending)main.append(el('p',{class:'offline'},'Existe uma operação sem confirmação. Consulte o recibo em Configurações.'));
+ if(pending)main.append(el('p',{class:'offline'},'Uma alteração aguarda confirmação. Confira em Configurações.'));
  if(passwordSetup&&session)main.append(passwordView());else if(session&&new URLSearchParams(location.search).has('authorization_id'))main.append(consentView());else if(screen==='editions')main.append(editionsView());else if(!session)main.append(loginView());else if(screen==='library')main.append(libraryView());else if(screen==='import')main.append(importView());else if(screen==='settings')main.append(settingsView());else main.append(readerView());
- app.append(main,el('footer',{class:'footer'},`${config.name} · leitura na ordem da obra`,el('span',{},config.local?'Ambiente local exclusivo · dados sintéticos de teste disponíveis':'Biblioteca privada')));renderNotice();
+ app.append(main,el('footer',{class:'footer'},config.name,config.local?el('span',{},'Ambiente de desenvolvimento'):null));renderNotice();
  if(logoutRequested)main.prepend(logoutPanel());
  if(busy)document.querySelectorAll<HTMLButtonElement>('button').forEach(b=>b.disabled=true);
  for(const detail of app.querySelectorAll('details'))if(openSummaries.includes(detail.querySelector(':scope>summary')?.textContent||''))detail.open=true;

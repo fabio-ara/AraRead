@@ -17,7 +17,11 @@ A tradução conserva sentido e ambiguidades, sem aplicar lentes interpretativas
 
 ## Estudar sem assistente conectado
 
-A entrada principal apresenta edições por obra, conceito ou tradição. Uma edição pública pode ser aberta sem conta; a conta guarda dados pessoais. “Continuar leitura” usa sua retomada disponível. O índice e Anterior/Próxima abrem passagens sem confirmar cobertura. “Li esta passagem e continuar” confirma somente aquela passagem; um desvio conserva a retomada principal. Abrir ou confirmar cobertura não comprova compreensão.
+A entrada **Edições** reúne leituras publicadas e amostras dos seus projetos. Escolha **Abrir amostra** para experimentar uma passagem nas três abas antes de revisar o preparo. Abrir a amostra conserva a decisão editorial pendente. Uma edição pública pode ser aberta sem conta; a conta guarda dados pessoais. **Continuar leitura** usa sua retomada disponível.
+
+No leitor, o texto e as três abas ficam em primeiro plano. **Índice** abre outras passagens ou retorna ao percurso principal. **Anterior** e **Próxima** (esta dentro do índice para quem está conectado) navegam sem confirmar cobertura. **Continuar**, ou **Concluir leitura** na última passagem, marca aquela passagem como lida; um desvio conserva a retomada principal. Cobertura registra passagens lidas, não compreensão.
+
+Abra o menu **Leitura** para aparência, atividades, marcas de revisão, notas, fontes, grupos e preparo offline. As informações editoriais ficam em **Sobre esta edição**. No catálogo, **Mais opções** reúne as cópias offline e a configuração de autoria.
 
 Selecione texto para consultar Dicionário, Contexto, Memorizar, Humor, Exemplo, Perspectivas, Objeções e Correções. O apoio usa o menor trecho preparado que contém a seleção e avisa quando se refere a trecho maior. Ausência de apoio pode gerar um pedido editorial voluntário; não dispara geração de texto. Grifos e notas pertencem à versão, representação e ocorrência exatas. A calculadora opera localmente, com limites e convenção civil explícitos.
 

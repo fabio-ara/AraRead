@@ -1,5 +1,13 @@
 # Estado verificável
 
+## Leitor web — revisão de 29/10/2026
+
+A entrada **Edições** oferece **Abrir amostra** para projetos nessa etapa, com acesso direto autenticado por `?sample=<projeto>`. A leitura da amostra mantém a aprovação editorial pendente. O leitor apresenta texto, três abas e navegação; **Índice** e **Leitura** agrupam os recursos adicionais. **Continuar** confirma a passagem lida, enquanto a navegação pelo índice preserva a cobertura. O [guia de uso](docs/guia-uso.md) acompanha os novos caminhos.
+
+Marca, tipografia, cores, cartões e abas seguem a referência visual do AraLearn, reutilizada sob MIT e somente em leitura. A coluna de 430 px continua dentro do limite de 480 px. O cabeçalho acomoda zoom de 200%; a marca também integra a cópia offline. Mensagens rotineiras foram simplificadas; fontes, limites editoriais e recuperação de alterações continuam disponíveis nas áreas pertinentes. Nenhuma fonte pessoal, amostra real, nota ou identificador privado foi incorporado ao repositório.
+
+Validação local: tipos, build, documentação e auditoria pública; as 16 jornadas Chromium passaram entre a execução inicial e os subconjuntos repetidos após as correções. A amostra foi aberta pelas três abas e pelo endereço direto sem aprová-la, a navegação foi contrastada com a confirmação explícita de leitura, e notas/grifos/offline foram conferidos com PostgreSQL/Auth reais e material sintético. Inspeção visual em 320/390/480/1440 px, tema escuro e zoom de 200%. O workflow existente exige CI da revisão exata antes de publicar o Pages; esta revisão usa a API 0.5.0 existente, sem migration.
+
 ## Entrega 0.5.0 — publicada em 28/10/2026
 
 **AraRead 0.5.0 está no [GitHub Pages](https://fabio-ara.github.io/AraRead/) e na função Supabase Edge `araread`, versão 10, na instalação exclusiva existente em sa-east-1.** Os [PRs #5](https://github.com/fabio-ara/AraRead/pull/5) e [#6](https://github.com/fabio-ara/AraRead/pull/6) integraram a implementação, com revisão final `0f4fdf60d182aa6f9aa1d8b4a1fed7306cfd983c` e merge `b12fc34bc242ad5870295370318b01c445cb9898`. A documentação posterior preserva esse código; a CI e o workflow Pages vinculam cada publicação à sua revisão exata.

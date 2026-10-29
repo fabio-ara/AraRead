@@ -15,7 +15,7 @@ export function editionActivities(activities:Passage['activities'],integrated:bo
    if(!response.value.trim())throw Error('Escreva ou escolha sua resposta.');
    if(a.kind==='open'&&!self.value)throw Error('Compare com os critérios e registre sua autoavaliação.');
    const feedback=activityFeedback(a,response.value,self.value||undefined),saved=save?await save({activity_id:a.id,text:response.value,...(self.value?{self_assessment:self.value}:{})}):null;
-   const shown=saved?.response||feedback;result.textContent=`${shown.correct===null?'Autoavaliação registrada; o significado não foi julgado automaticamente.':shown.correct?'Resposta confere com a referência.':'Confira a resposta de referência.'} ${shown.feedback} Referência: ${shown.answer}. ${shown.criteria}${saved?.status==='local'?' Registro somente neste dispositivo, aguardando confirmação.':''}`;
+   const shown=saved?.response||feedback;result.textContent=`${shown.correct===null?'Autoavaliação registrada.':shown.correct?'Resposta confere com a referência.':'Confira a resposta de referência.'} ${shown.feedback} Referência: ${shown.answer}. ${shown.criteria}${saved?.status==='local'?' Registro neste dispositivo, aguardando sincronização.':''}`;
   }catch(e:any){result.textContent=e.message||'Não foi possível guardar a resposta.';}finally{submit.disabled=false;}};
   card.append(submit,result);root.append(card);
  }
