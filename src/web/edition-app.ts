@@ -19,7 +19,12 @@ export function createEditionApp(api:Services){
  const owns=()=>api.owner()===uid;
  const current=()=>{if(!owns())throw Error('A conta mudou. Reabra esta tela na conta atual.');};
  const notice=(text:string)=>{message=text;const status=root.querySelector('[data-edition-status]');if(status)status.textContent=text;};
- const button=(title:string,run:()=>unknown,attrs:any={})=>el('button',{type:'button',...attrs,onclick:async()=>{if(busy)return;try{current();busy=true;await run();}catch(e:any){notice(e.message||'Não foi possível concluir.');}finally{busy=false;}}},title);
+ const disabledStates=new WeakMap<HTMLButtonElement,boolean>();
+ const setBusy=(value:boolean)=>{busy=value;for(const b of root.querySelectorAll('button'))if(disabledStates.has(b))b.disabled=value||disabledStates.get(b)!;};
+ const button=(title:string,run:()=>unknown,attrs:any={})=>{
+  const b=el('button',{type:'button',...attrs,disabled:busy||!!attrs.disabled,onclick:async()=>{if(busy)return;try{current();setBusy(true);await run();}catch(e:any){notice(e.message||'Não foi possível concluir.');}finally{setBusy(false);}}},title);
+  disabledStates.set(b,!!attrs.disabled);return b;
+ };
  const read=(name:string,args:any)=>uid?api.call(name,args,uid):api.publicCall(name,args);
  async function perform(tool:string,args:any){
   current();if(!uid)throw Error('Entre para guardar dados pessoais.');if(!navigator.onLine&&tool!=='edition_annotate')throw Error('A autoria exige conexão.');

@@ -25,7 +25,23 @@ test('banco vazio, schema real do GoTrue, primeira migration e evolução preser
   await db.query("insert into araread.elements(id,owner_id,source_id,ordinal,kind,text,locator) values($1,$2,$3,0,'paragraph','Não é fato','§ 1')",[element,owner,source]);
   await db.query("insert into araread.readings(id,owner_id,source_id,revision,opened,resume,covered) values($1,$2,$3,7,$4,$4,$5)",[reading,owner,source,JSON.stringify(ref),JSON.stringify([ref])]);
   await db.query("insert into araread.mediations(id,owner_id,reading_id,source_id,element_id,start_offset,end_offset,language,rewrite,additions,provenance) values($1,$2,$3,$4,$5,0,10,'pt-BR','Não é uma certeza.','[]','{}')",[mediation,owner,reading,source,element]);
-  for(const file of files.slice(1))await db.query(await readFile(`supabase/migrations/${file}`,'utf8'));
+  const deletionFix='20261028234928_edition_invite_account_deletion.sql';
+  for(const file of files.slice(1).filter(file=>file<deletionFix))await db.query(await readFile(`supabase/migrations/${file}`,'utf8'));
+  // A referência histórica de um convite consumido não pode impedir apagar a
+  // identidade nem tornar o mesmo código reutilizável após a exclusão.
+  const claimant=randomUUID(),project=randomUUID(),version=randomUUID(),group=randomUUID(),invite=randomUUID();
+  await db.query('insert into auth.users(id) values($1)',[claimant]);
+  await db.query("insert into araread.edition_projects(id,owner_id,title,rights) values($1,$2,'Projeto sintético para evolução','{}')",[project,owner]);
+  await db.query("insert into araread.edition_versions(id,owner_id,project_id,version,title,author,topics,traditions,rights,config,source_ids,manifest,sha256,review,visibility,state) values($1,$2,$3,1,'Fixture SQL','', '[]','[]','{}','{}','{}','{}','fixture','{}','invited','shared')",[version,owner,project]);
+  await db.query("insert into araread.edition_groups(id,owner_id,version_id,title) values($1,$2,$3,'Grupo sintético')",[group,owner,version]);
+  await db.query("insert into araread.edition_invites(id,owner_id,group_id,version_id,token_hash,expires_at,claimed_by) values($1,$2,$3,$4,'fixture-hash',now()+interval '1 day',$5)",[invite,owner,group,version,claimant]);
+  await db.query('insert into araread.edition_members(group_id,owner_id,version_id,member_id,invite_id) values($1,$2,$3,$4,$5)',[group,owner,version,claimant,invite]);
+  await assert.rejects(()=>db!.query('delete from auth.users where id=$1',[claimant]),{code:'23503'});
+  for(const file of files.filter(file=>file>=deletionFix))await db.query(await readFile(`supabase/migrations/${file}`,'utf8'));
+  assert.equal((await db.query('delete from auth.users where id=$1',[claimant])).rowCount,1);
+  assert.deepEqual((await db.query('select claimed_by,revoked from araread.edition_invites where id=$1',[invite])).rows[0],{claimed_by:null,revoked:true});
+  assert.equal((await db.query('select 1 from araread.edition_members where member_id=$1',[claimant])).rowCount,0);
+  assert.equal((await db.query('select 1 from araread.edition_versions where id=$1',[version])).rowCount,1);
   assert.equal((await db.query('select title from araread.works where id=$1',[work])).rows[0].title,'Fixture SQL de atualização, não uma identidade de login');
   const preserved=(await db.query('select * from araread.readings where id=$1',[reading])).rows[0];assert.equal(preserved.revision,7);assert.deepEqual(preserved.covered,[ref]);assert.deepEqual(preserved.resume,ref);
   assert.equal((await db.query('select source_id from araread.reading_segments where reading_id=$1',[reading])).rows[0].source_id,source);
