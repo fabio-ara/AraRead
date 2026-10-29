@@ -1,6 +1,6 @@
 {
-  "checked_at": "2026-10-28T22:29:24.936Z",
-  "revision": "44fc310ee9c6fb8787a78a93062749b0a0555e6c",
+  "checked_at": "2026-10-28T23:18:31.795Z",
+  "revision": "cff35f084228649ffce01771c03790747eab728b",
   "working_tree_dirty": false,
   "environment": "PostgreSQL/Auth locais reais, papel authenticated, duas contas sintéticas",
   "content_rows_before_and_after": {
@@ -14,7 +14,7 @@
   "logical_json_bytes": {
     "edition_projects": 2994,
     "edition_sources": 3866,
-    "edition_passages": 28924,
+    "edition_passages": 29879,
     "edition_versions": 2802,
     "edition_settings": 346,
     "edition_reviews": 1580
@@ -73,16 +73,16 @@
     {
       "reader": 1,
       "passages": 4,
-      "response_body_bytes": 49988,
-      "gzip_if_transport_enabled_bytes": 15598,
-      "elapsed_ms": 45
+      "response_body_bytes": 50944,
+      "gzip_if_transport_enabled_bytes": 15723,
+      "elapsed_ms": 46
     },
     {
       "reader": 2,
       "passages": 4,
-      "response_body_bytes": 49992,
-      "gzip_if_transport_enabled_bytes": 15592,
-      "elapsed_ms": 32
+      "response_body_bytes": 50948,
+      "gzip_if_transport_enabled_bytes": 15722,
+      "elapsed_ms": 31
     }
   ],
   "limits": [
@@ -96,21 +96,21 @@
     "original_structured": 2002,
     "translation": 862,
     "facilitated": 2020,
-    "supports": 15809,
-    "activities": 2516,
+    "supports": 16354,
+    "activities": 2927,
     "evidence": 378
   },
   "offline_chapters": [
     {
       "chapter": "1. Hipóteses e evidências",
       "passages": 2,
-      "contexts_json_bytes": 25184,
+      "contexts_json_bytes": 25563,
       "meaning": "Payload de contextos completo, antes do envelope e overhead do IndexedDB; a jornada web mede a entrada efetivamente gravada."
     },
     {
       "chapter": "2. Datas e sentidos",
       "passages": 2,
-      "contexts_json_bytes": 24734,
+      "contexts_json_bytes": 25311,
       "meaning": "Payload de contextos completo, antes do envelope e overhead do IndexedDB; a jornada web mede a entrada efetivamente gravada."
     }
   ]

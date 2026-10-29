@@ -1,10 +1,10 @@
 # Conectar o assistente
 
-A interface web no GitHub Pages é independente do ChatGPT. O mesmo endpoint MCP pode ser configurado em clientes compatíveis com Streamable HTTP/OAuth; o painel visual MCP Apps é opcional. O núcleo não exige chave ou assinatura de um modelo específico. A orientação atual é 1.1.0 e há 27 ferramentas. Provas 1.0.0/0.1.0 abaixo são históricas; a revisão atual está no [checkpoint](../STATUS.md).
+A interface web no GitHub Pages é independente do ChatGPT. O mesmo endpoint MCP pode ser configurado em clientes compatíveis com Streamable HTTP/OAuth; o painel visual MCP Apps é opcional. O núcleo não exige chave ou assinatura de um modelo específico. A orientação atual é **1.4.0**, há **61 ferramentas** e a aplicação é **0.5.0**. As provas por ambiente e os limites do cliente externo estão no [STATUS](../STATUS.md).
 
 O assistente precisa receber a orientação e usar o MCP para que as explicações sobrevivam à conversa. Um arquivo local no repositório não é carregado automaticamente pelo ChatGPT. A instalação expõe a orientação por três caminhos: instruções do servidor, ferramenta `assistant_guidance` e recurso `araread://assistant/guidance`; o prompt `retomar-leitura` também inclui o texto versionado.
 
-**Estado em 24/10/2026:** aplicação 0.2.0 e orientação 1.1.0 aprovadas no ChatGPT, com ferramentas técnicas atualizadas e consentimento pessoal preservado. O painel recuperou o vocabulário salvo e confirmou continuidade; nova conversa recuperou dados e variantes. Veja a [evidência atual](evidencias/chatgpt-evolucao-2026-10-24.json) e a [interface independente no Pages](https://fabio-ara.github.io/AraRead/). Separadamente, o SDK oficial comprovou OAuth/PKCE, 27 ferramentas, revogação e reconexão no HTTPS hospedado. O [endpoint MCP](https://ltzoontstgpbegtakrgk.supabase.co/functions/v1/araread/mcp) exige OAuth; não cole chave administrativa no cliente.
+O SDK oficial comprovou no HTTPS hospedado o catálogo atual, OAuth/PKCE, autoria em quatro etapas, publicação privada, painel/fallback, estado pessoal, revogação e reconexão. Essa prova é distinta da homologação no ChatGPT. O [endpoint MCP](https://ltzoontstgpbegtakrgk.supabase.co/functions/v1/araread/mcp) exige OAuth; não cole chave administrativa no cliente. A [prova 0.2](evidencias/chatgpt-evolucao-2026-10-24.json) permanece como registro histórico.
 
 ## Preparar uma conexão hospedada
 
@@ -20,9 +20,13 @@ O formulário observado fica em ChatGPT → Plugins → Adicionar → Adicionar 
 
 Antes de conectar uma instalação nova, conclua o convite da biblioteca com o e-mail escolhido e entre na interface com sua identidade de leitor Supabase. O frontend Pages não exige conta ChatGPT. Defina pessoalmente sua senha de leitor; essa identidade é distinta da conta do painel Supabase. Na caixa MCP, leia o aviso e marque “Entendo e quero continuar” somente se desejar conceder essa confiança; então “Criar como plugin” inicia o fluxo. Entre na biblioteca se solicitado, confira a conta/destino e decida o consentimento “Autorizar acesso”. O titular concluiu esses atos nesta instalação, conforme o §2 do mandato, sem compartilhar senha ou link com o agente.
 
-Depois do consentimento, execute a jornada abaixo. A versão da página do plugin é distinta da versão da aplicação e da orientação; consulte assistant_guidance para conferir 1.1.0. Na atualização observada foi usado “Atualizar ferramentas”, preservando a concessão pessoal.
+Depois do consentimento, execute a jornada abaixo. A versão da página do plugin é distinta da versão da aplicação e da orientação; consulte `assistant_guidance` para conferir 1.4.0. Após mudanças no servidor, abra Gerenciar → Atualizar ferramentas na conexão existente e inicie nova conversa, conforme a [documentação oficial de atualização](https://developers.openai.com/plugins/deploy/connect-chatgpt#refresh-metadata). Confira se `edition_catalog` está disponível e se `reading_display` aceita `version_id`. A atualização de metadados preserva a concessão existente; não exige publicar o plugin em diretório público.
 
 ## Primeiro uso e teste verificável
+
+Para uma edição já publicada, peça: “Consulte a orientação e procure a edição pelo título em `edition_catalog`. Abra-a com `edition_context` e apresente por `reading_display`, usando `version_id`. Recupere os apoios preparados; não gere outra versão nem avance meu progresso por abrir o painel”. Para autoria, siga as quatro etapas do [guia](guia-uso.md); configurações e aprovações usam o estado persistido. Sem MCP Apps, `reading_display` entrega a apresentação textual equivalente.
+
+O fluxo abaixo continua disponível para leituras pessoais anteriores.
 
 Peça ao assistente:
 
@@ -30,7 +34,7 @@ Peça ao assistente:
 
 Para homologar uma instância no cliente real, execute com material sintético:
 
-1. Confirme descoberta de ferramentas e carregamento da orientação atual (1.2.0 na 0.3).
+1. Confirme descoberta de ferramentas e carregamento da orientação atual (1.4.0 na 0.5).
 2. Pré-verifique e importe fonte sintética, confirme conteúdo sem menus, notas, tabela/fórmula e lacunas.
 3. Salve duas variantes com perspectivas/contextos identificados e uma pergunta/resposta, confira recibos e recupere as variantes para comparação sem regenerar.
 4. Confira um único painel com três abas alinhadas, sem botões operacionais, e a mesma preparação na interface web autenticada.
@@ -48,4 +52,4 @@ O catálogo declara leituras e escritas corretamente. Confirmações adicionais 
 
 A referência técnica da integração é a documentação de [autenticação da OpenAI](https://developers.openai.com/plugins/build/auth), além das [fontes oficiais verificadas](decisoes.md). A compatibilidade local de dois protocolos é prova do SDK, não garantia de que todo cliente ou conta ChatGPT aceite a instalação.
 
-A homologação 0.3 exige repetir os critérios novos no cliente externo; consulte [STATUS](../STATUS.md). Um harness local não prova atualização do catálogo ou renderização no ChatGPT real.
+A homologação de uma versão exige repetir os critérios afetados no cliente externo; consulte [STATUS](../STATUS.md). Um harness local não prova atualização do catálogo ou renderização no ChatGPT real.

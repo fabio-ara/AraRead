@@ -2,11 +2,13 @@
 
 Um ambiente para preparar edições de estudo e ler obras difíceis, com **Leitura facilitada | Tradução | Original**. O assistente conectado produz e revisa o material; a edição publicada pode ser estudada pelo site, sem ChatGPT, MCP ou chamadas generativas. Fonte, edição e estado pessoal do leitor têm identidades e permissões distintas.
 
-A evolução 0.5 em desenvolvimento acrescenta autoria em quatro etapas, configurações compartilhadas entre web e MCP, fontes canônicas reutilizadas, apoios preparados, atividades opcionais, grupos privados por convite e capítulos completos offline. Leituras pessoais anteriores continuam acessíveis. A tradução não adota perfis interpretativos; verificações automáticas não certificam compreensão nem fidelidade acadêmica. Todas as telas mantêm largura máxima de 480 px.
+A versão 0.5 acrescenta autoria em quatro etapas, configurações compartilhadas entre web e MCP, fontes canônicas reutilizadas, apoios preparados, atividades opcionais, grupos privados por convite e capítulos completos offline. Leituras pessoais anteriores continuam acessíveis. A tradução não adota perfis interpretativos; verificações automáticas não certificam compreensão nem fidelidade acadêmica. Todas as telas mantêm largura máxima de 480 px.
 
 Veja o [guia de autoria e leitura](docs/guia-uso.md), a [arquitetura](docs/arquitetura.md) e os [formatos de entrada](docs/fontes-formatos.md). A [evolução 0.4](docs/leitura-0.4.md) documenta a continuidade das leituras pessoais anteriores.
 
-**Publicada: 0.4.0. A evolução 0.5 ainda não foi publicada.** O [STATUS](STATUS.md) distingue implementação, testes locais, prova hospedada e limitações. O destino existente é o [GitHub Pages](https://fabio-ara.github.io/AraRead/), com API/Auth/[MCP OAuth](https://ltzoontstgpbegtakrgk.supabase.co/functions/v1/araread/mcp) no Supabase exclusivo Free. Não há chave de modelo, cadastro público nem descoberta de bibliotecas pessoais alheias.
+**Publicada: 0.5.0.** O [STATUS](STATUS.md) distingue implementação, testes locais, prova hospedada e limitações. Abra o [GitHub Pages](https://fabio-ara.github.io/AraRead/) e escolha **Explorar edições públicas** para estudar sem login ou assinatura de IA. API/Auth/[MCP OAuth](https://ltzoontstgpbegtakrgk.supabase.co/functions/v1/araread/mcp) usam o Supabase exclusivo Free. Não há chave de modelo, cadastro público nem descoberta de bibliotecas pessoais alheias.
+
+A demonstração pública **Aprender a examinar uma hipótese — demonstração AraRead** contém dois capítulos e quatro passagens originais, com apoios e atividades preparados. Abra-a no catálogo para experimentar a leitura; notas sincronizadas exigem uma conta autorizada.
 
 ## Usar localmente
 

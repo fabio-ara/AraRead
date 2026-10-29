@@ -1,6 +1,6 @@
 # Documentação por objetivo
 
-A evolução 0.5 em validação está descrita no [guia de uso](guia-uso.md): autoria em quatro etapas, edições compartilhadas e leitura autônoma pelo site. A biblioteca anterior e o painel de três abas continuam disponíveis. O [STATUS](../STATUS.md) distingue implementação em desenvolvimento, versão publicada e provas efetivamente observadas.
+A versão 0.5 publicada está descrita no [guia de uso](guia-uso.md): autoria em quatro etapas, edições compartilhadas e leitura autônoma pelo site. A biblioteca anterior e o painel de três abas continuam disponíveis. O [STATUS](../STATUS.md) distingue implementação, ambiente de teste, hospedagem e cliente externo.
 
 O AraRead conserva uma biblioteca e o percurso de leitura para que uma interrupção não obrigue a reconstruir a conversa anterior. A fonte determina a ordem; o assistente acrescenta uma mediação identificada.
 
